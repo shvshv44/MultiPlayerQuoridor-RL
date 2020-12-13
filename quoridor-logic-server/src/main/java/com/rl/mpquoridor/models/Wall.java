@@ -7,4 +7,9 @@ import lombok.Data;
 public class Wall {
     private Position position;
     private Direction direction;
+
+    public Wall(Position position, Direction direction) {
+        this.position = position;
+        this.direction = direction;
+    }
 }

@@ -1,5 +1,6 @@
 package com.rl.mpquoridor.models;
 
+import com.rl.mpquoridor.enums.Cell;
 import com.rl.mpquoridor.enums.Direction;
 import lombok.Data;
 
@@ -7,17 +8,43 @@ import java.util.LinkedList;
 
 @Data
 public class Board {
-    private int[][] board;
+    private Cell[][] board;
 
-    public Board(int size) {
+    public Board(int size, Position[] pawnPositions) {
         int newSize = size * 2 - 1;
-        this.board = new int[newSize][newSize];
+        this.board = new Cell[newSize][newSize];
         this.initBoard();
+
+        for (Position position: pawnPositions) {
+            this.board[position.getY() * 2][position.getX() * 2] = Cell.PAWN;
+        }
     }
 
-    public int[][] addWall(Wall wall) {
-        this.board = this.addWallToBoard(wall, this.board);
-        return this.board;
+    public void printBoard() {
+        for (int height = 0; height < this.board.length; height++) {
+            System.out.println("");
+            for (int width = 0; width < this.board[0].length; width++) {
+                System.out.print(this.board[height][width] + " , ");
+            }
+        }
+
+        System.out.println("");
+    }
+
+    public boolean movePawn(Position fromPosition, Position toPosition) {
+        //TODO: check if this is a valid new position
+        this.board[fromPosition.getY() * 2][fromPosition.getX() * 2] = Cell.EMPTY;
+        this.board[toPosition.getY() * 2][toPosition.getX() * 2] = Cell.PAWN;
+        return true;
+    }
+
+    public boolean addWall(Wall wall, Position[] positions, int[] heightsWin) {
+        if (this.checkAddingWall(wall, positions, heightsWin)) {
+            this.board = this.addWallToBoard(wall, this.board);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean checkAddingWall(Wall wall, Position[] positions, int[] heightsWin) {
@@ -30,9 +57,9 @@ public class Board {
             if (newX + 2 > this.board[0].length) {
                 return false;
             } else {
-                if (this.board[newY][newX] == 1 ||
-                        this.board[newY][newX + 1] == 1 ||
-                        this.board[newY][newX + 2] == 1) {
+                if (this.board[newY][newX] == Cell.WALL ||
+                        this.board[newY][newX + 1] == Cell.WALL ||
+                        this.board[newY][newX + 2] == Cell.WALL) {
                     return false;
                 }
             }
@@ -40,9 +67,9 @@ public class Board {
             if (newY + 2 > this.board.length) {
                 return false;
             } else {
-                if (this.board[newY][newX] == 1 ||
-                        this.board[newY + 1][newX] == 1 ||
-                        this.board[newY + 2][newX] == 1) {
+                if (this.board[newY][newX] == Cell.WALL ||
+                        this.board[newY + 1][newX] == Cell.WALL ||
+                        this.board[newY + 2][newX] == Cell.WALL) {
                     return false;
                 }
             }
@@ -54,13 +81,13 @@ public class Board {
     private void initBoard() {
         for (int height = 0; height < this.board.length; height++) {
             for (int width = 0; width < this.board[0].length; width++) {
-                this.board[height][width] = 0;
+                this.board[height][width] = Cell.EMPTY;
             }
         }
     }
 
     private boolean checkPaths(Wall wall, Position[] positions, int[] heightsWin) {
-        int[][] newBoard = new int[this.board.length][this.board[0].length];
+        Cell[][] newBoard = new Cell[this.board.length][this.board[0].length];
         for (int height = 0; height < this.board.length; height++) {
             System.arraycopy(this.board[height], 0, newBoard[height], 0, this.board[0].length);
         }
@@ -69,18 +96,16 @@ public class Board {
 
         for (int i = 0; i < positions.length; i++) {
             if (this.checkingExistingPath(newBoard, positions[i], heightsWin[i])) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     //BFS
     // 1 - checked
     // 0 - not checked
-    private boolean checkingExistingPath(int[][] board, Position position, int rawExit) {
-        int explored = 1;
-
+    private boolean checkingExistingPath(Cell[][] board, Position position, int rawExit) {
         LinkedList<Position> nextToVisit
                 = new LinkedList<>();
         nextToVisit.add(position);
@@ -89,7 +114,7 @@ public class Board {
             Position cur = nextToVisit.remove();
 
             if (!this.isValidLocation(cur)
-                    || board[cur.getY()][cur.getX()] == explored) {
+                    || board[cur.getY()][cur.getX()] == Cell.CHECKED) {
                 continue;
             }
 
@@ -99,7 +124,7 @@ public class Board {
             }
 
             //RIGHT
-            if (board[cur.getY()][cur.getX() + 1] != 1) {
+            if (cur.getY() != this.board.length + 1 && board[cur.getY()][cur.getX() + 1] != Cell.WALL) {
                 Position Position
                         = new Position(
                         cur.getX() + 2,
@@ -107,7 +132,7 @@ public class Board {
                 nextToVisit.add(Position);
             }
             // LEFT
-            else if (board[cur.getY()][cur.getX() - 1] != 1) {
+            if (cur.getX() != 0 && board[cur.getY()][cur.getX() - 1] != Cell.WALL) {
                 Position Position
                         = new Position(
                         cur.getX() - 2,
@@ -115,7 +140,7 @@ public class Board {
                 nextToVisit.add(Position);
             }
             // UP
-            else if (board[cur.getY() + 1][cur.getX()] != 1) {
+            if (cur.getY() != this.board.length - 1 && board[cur.getY() + 1][cur.getX()] != Cell.WALL) {
                 Position Position
                         = new Position(
                         cur.getX(),
@@ -123,31 +148,31 @@ public class Board {
                 nextToVisit.add(Position);
             }
             // DOWN
-            else if (board[cur.getY() - 1][cur.getX()] != 1) {
+            if (cur.getY() != 0 && board[cur.getY() - 1][cur.getX()] != Cell.WALL) {
                 Position Position
                         = new Position(
                         cur.getX(),
                         cur.getY() - 2);
                 nextToVisit.add(Position);
             }
-            board[cur.getY()][cur.getX()] = 2;
+            board[cur.getY()][cur.getX()] = Cell.CHECKED;
         }
         return true;
     }
 
-    public int[][] addWallToBoard(Wall wall, int[][] board) {
+    public Cell[][] addWallToBoard(Wall wall, Cell[][] board) {
         Direction direction = wall.getDirection();
         Position position = wall.getPosition();
-        int newX = position.getX() * 2 + 1;
-        int newY = position.getY() * 2 + 1;
+        int newX = position.getX() * 2;
+        int newY = position.getY() * 2;
         if (direction == Direction.Right) {
-            board[newY][newX] = 1;
-            board[newY][newX + 1] = 1;
-            board[newY][newX + 2] = 1;
+            board[newY + 1][newX] = Cell.WALL;
+            board[newY + 1][newX + 1] = Cell.WALL;
+            board[newY + 1][newX + 2] = Cell.WALL;
         } else {
-            board[newY][newX] = 1;
-            board[newY + 1][newX] = 1;
-            board[newY + 2][newX] = 1;
+            board[newY][newX + 1] = Cell.WALL;
+            board[newY + 1][newX + 1] = Cell.WALL;
+            board[newY + 2][newX + 1] = Cell.WALL;
         }
 
         return board;

@@ -1,0 +1,12 @@
+
+<div id="board-container">
+
+  <div class="cell-row" *ngFor="let num1 of [].constructor(9); let i = index">
+    <div class="cell" *ngFor="let num2 of [].constructor(9); let j = index">
+      <app-board-cell [row]="i" [col]="j" [playerCode]="0"></app-board-cell>
+    </div>
+  </div>
+
+</div>
+
+

@@ -1,0 +1,18 @@
+$board-height: 50px;
+
+.cell {
+  display: block;
+  float: left;
+  height: $board-height; width: $board-height;
+  background: #ece5a4;
+  margin: 10px;
+
+  border: solid 3px #585040;
+
+  &:hover {
+    cursor: pointer;
+    animation:hover 1s infinite alternate;
+    transition: all 1s;
+    background: #bfaf83 !important;
+  }
+}

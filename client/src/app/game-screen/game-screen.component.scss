@@ -16,6 +16,11 @@
 
 #board {
   grid-area: board;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 #options {

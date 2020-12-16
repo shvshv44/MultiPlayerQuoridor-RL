@@ -1,5 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 
+//===============================================================================================
+//                                  GLOBAL VARS
+//===============================================================================================
+
+$cell-inner-size: 45px;
+$cell-border-size: 2px;
+$cell-actual-size: $cell-inner-size + ($cell-border-size * 2);
+$wall-size: 10px;
+$wall-length: $cell-actual-size;
+$num-of-cells: 9;
+
+$row-column-size: ($cell-actual-size * $num-of-cells) + ($wall-size * ($num-of-cells - 1)) + 30px;
+
+//===============================================================================================
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 

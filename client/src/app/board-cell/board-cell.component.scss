@@ -1,13 +1,13 @@
-$board-height: 50px;
+@import "src/styles";
 
 .cell {
   display: block;
   float: left;
-  height: $board-height; width: $board-height;
+  height: $cell-inner-size;
+  width: $cell-inner-size;
   background: #ece5a4;
-  margin: 10px;
 
-  border: solid 3px #585040;
+  border: solid $cell-border-size #585040;
 
   &:hover {
     cursor: pointer;

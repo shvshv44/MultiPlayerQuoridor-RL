@@ -1,11 +1,46 @@
 
-<div id="board-container">
+<div class="board-container">
 
-  <div class="cell-row" *ngFor="let num1 of [].constructor(9); let i = index">
-    <div class="cell" *ngFor="let num2 of [].constructor(9); let j = index">
-      <app-board-cell [row]="i" [col]="j" [playerCode]="0"></app-board-cell>
+  <!--  First 8 Board Rows -->
+  <div *ngFor="let itemRow of [].constructor(8); let i = index">
+
+    <!--  Cell With Walls Row-->
+    <div class="board-cell-row">
+
+      <div *ngFor="let itemCol of [].constructor(8); let j = index">
+        <app-board-cell [row]="i" [col]="j" [playerCode]="0"></app-board-cell>
+        <app-board-wall [isHorizontal]="true"></app-board-wall>
+      </div>
+
+      <app-board-cell [row]="i" [col]="8" [playerCode]="0"></app-board-cell>
+
     </div>
+
+    <!--  Only Walls Row-->
+    <div class="board-wall-row">
+
+      <div *ngFor="let itemCol of [].constructor(8);">
+        <app-board-wall [isHorizontal]="false"></app-board-wall>
+      </div>
+
+      <app-board-wall [isHorizontal]="false"></app-board-wall>
+
+    </div>
+
   </div>
+
+<!--  Last Board Row -->
+  <div class="board-cell-row">
+
+    <div *ngFor="let itemCol of [].constructor(8); let j = index">
+      <app-board-cell [row]="8" [col]="j" [playerCode]="0"></app-board-cell>
+      <app-board-wall [isHorizontal]="true"></app-board-wall>
+    </div>
+
+    <app-board-cell [row]="8" [col]="8" [playerCode]="0"></app-board-cell>
+
+  </div>
+
 
 </div>
 

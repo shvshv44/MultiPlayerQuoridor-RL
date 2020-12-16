@@ -8,11 +8,24 @@ import com.rl.mpquoridor.models.Wall;
 
 import java.util.*;
 
+
+
+
+
+
+
+/**
+ * ------------------------------------------
+ * Every procedure you create in this class
+ * you have to make sure that you create
+ * the same in ReadOnlyPhysicalBoard class
+ * -------------------------------------------
+ */
 public class PhysicalBoard {
     // todo Change the datasets and all other related methods in this class.
-    HashSet<Wall> walls;
-    BiMap<Pawn, Position> pawns;
-    HashMap<Pawn, Integer> pawnWalls;
+    private HashSet<Wall> walls;
+    private BiMap<Pawn, Position> pawns;
+    private HashMap<Pawn, Integer> pawnWalls;
 
     public PhysicalBoard(Map<Pawn, Position> pawns, int numberOfWallsPerPlayer) {
         this.pawns = HashBiMap.create(pawns.size());
@@ -38,20 +51,26 @@ public class PhysicalBoard {
         return Collections.unmodifiableMap(pawnWalls);
     }
 
-    public boolean movePawn(Pawn pawn,Position source, Position dest) {
+    public void movePawn(Pawn pawn, Position source, Position dest) {
         if(pawns.containsKey(pawn) && pawns.get(pawn).equals(source)) {
             pawns.put(pawn, dest);
-            return true;
         }
-        return false;
     }
 
-    public boolean putWall(Pawn pawn, Wall wall) {
-        if(pawnWalls.get(pawn) > 0) {
-            pawnWalls.put(pawn, pawnWalls.get(pawn) - 1);
-            this.walls.add(wall);
-            return true;
+    public void putWall(Wall wall) {
+        this.walls.add(wall);
+    }
+    public void removeWall(Wall wall) {
+        this.walls.remove(wall);
+    }
+
+    public void reduceWallToPawn(Pawn p) {
+        if(pawns.containsKey(p)) {
+            this.pawnWalls.put(p, this.pawnWalls.get(p) - 1);
         }
-        return false;
+    }
+
+    public int getSize() {
+        return 9;
     }
 }

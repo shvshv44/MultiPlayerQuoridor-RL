@@ -8,7 +8,7 @@ import com.rl.mpquoridor.models.Wall;
 import java.util.Map;
 import java.util.Set;
 
-public class ReadOnlyPhysicalBoard extends PhysicalBoard {
+public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     PhysicalBoard source;
     public ReadOnlyPhysicalBoard(PhysicalBoard source) {
         this.source = source;

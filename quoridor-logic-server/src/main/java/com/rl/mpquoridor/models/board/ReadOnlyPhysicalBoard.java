@@ -15,12 +15,7 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     }
 
     @Override
-    public boolean movePawn(Pawn pawn, Position source, Position dest) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean putWall(Pawn pawn, Wall wall) {
+    public void movePawn(Pawn pawn, Position source, Position dest) {
         throw new UnsupportedOperationException();
     }
 
@@ -35,4 +30,26 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     public Map<Pawn, Integer> getPawnWalls() {
         return source.getPawnWalls();
     }
+
+    @Override
+    public int getSize() {
+        return source.getSize();
+    }
+
+    @Override
+    public void putWall(Wall wall) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeWall(Wall wall) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void reduceWallToPawn(Pawn p) {
+        throw new UnsupportedOperationException();
+    }
+
+
 }

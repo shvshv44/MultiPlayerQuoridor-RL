@@ -2,7 +2,6 @@ package com.rl.mpquoridor.models;
 
 import com.rl.mpquoridor.models.enums.WallDirection;
 
-import java.awt.*;
 import java.util.Objects;
 
 public class Wall {

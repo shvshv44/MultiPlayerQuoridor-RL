@@ -20,24 +20,16 @@ public class GameBoard {
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
-
-        switch (numberOfPlayers) {
-            case 2:
-                pawns = initiateTwoPlayers();
-                break;
-            case 3:
-                pawns = initiateThreePlayers();
-                break;
-            case 4:
-                pawns = initiateFourPlayers();
-                break;
-            default:
-                throw new RuntimeException("Invalid number of players");
-        }
-
-        this.board = new PhysicalBoard(pawns, 10);
         this.pawnEndLine = new HashMap<>();
-        System.out.println("not yet implemented");
+
+        pawns = switch (numberOfPlayers) {
+            case 2 -> initiateTwoPlayers();
+            case 3 -> initiateThreePlayers();
+            case 4 -> initiateFourPlayers();
+            default -> throw new RuntimeException("Invalid number of players");
+        };
+
+        this.board = new PhysicalBoard(pawns, numberOfWallsPerPlayer);
     }
 
     private Map<Pawn, Position> initiateTwoPlayers() {
@@ -78,28 +70,30 @@ public class GameBoard {
         return  ret;
     }
 
+    /**
+     * Moving the pawn to the given direction. It considerate walls and other pawns.
+     * If there is a wall or the movement is out side the board it throws an exception
+     * If there is a pawn ( or more ) it jumps over it ( or them )
+     * @param pawn - the moving pawn
+     * @param direction - the moving direction
+     * @throws IllegalMovementException - if the movement is illegal
+     */
     private void movePawn(Pawn pawn, MovementDirection direction) throws IllegalMovementException {
-        // todo: implement this method in the right way...
-        System.out.println("not yet implemented");
-
-        Position dest = new Position(this.board.getPawns().get(pawn));
-
-        if(direction.equals(MovementDirection.UP)) {
-            dest.setJ(dest.getI() - 1);
-        } else if (direction.equals(MovementDirection.DOWN)) {
-            dest.setJ(dest.getI() + 1);
-        } else if (direction.equals(MovementDirection.LEFT)) {
-            dest.setJ(dest.getJ() - 1);
-        } else if (direction.equals(MovementDirection.RIGHT)) {
-            dest.setJ(dest.getJ() + 1);
+        Position dest = this.simulateMove(this.getPhysicalBoard().getPawnPosition(pawn), direction);
+        if(dest == null) {
+            throw new IllegalMovementException("Illegal moving request.");
         }
-        this.board.movePawn(pawn, this.board.getPawns().get(pawn),dest);
-
+        this.getPhysicalBoard().movePawn(pawn, dest);
         checkWinner(pawn);
     }
 
+    /**
+     * This method checks if the given pawn won the game.
+     * If it does, the method stores the pawn on variable winner.
+     * @param pawn - the pawn this method checks.
+     */
     private void checkWinner(Pawn pawn) {
-        if(winner == null && this.pawnEndLine.get(pawn).contains(this.getPhysicalBoard().getPawns().get(pawn))) {
+        if(winner == null && this.pawnEndLine.get(pawn).contains(this.getPhysicalBoard().getPawnPosition(pawn))) {
             this.winner = pawn;
         }
     }
@@ -116,23 +110,16 @@ public class GameBoard {
         }
 
         // Checking the wall is in the bounds of the board
-        if(wall.getPos().getI() < 0 || wall.getPos().getI() >= this.getPhysicalBoard().getSize() -1 ||
-           wall.getPos().getJ() < 0 || wall.getPos().getJ() >= this.getPhysicalBoard().getSize() -1 )  {
+        if(wall.getPosition().getI() < 0 || wall.getPosition().getI() >= this.getPhysicalBoard().getSize() -1 ||
+           wall.getPosition().getJ() < 0 || wall.getPosition().getJ() >= this.getPhysicalBoard().getSize() -1 )  {
             throw new IllegalMovementException("The wall is out side the board bounds");
         }
 
         // Make sure all the pawns have an available path
-        this.getPhysicalBoard().putWall(wall);
-        boolean isAllPathExists = true;
-        for (Pawn p : this.getPhysicalBoard().getPawns().keySet()) {
-            if(!isPathExists(this.getPhysicalBoard().getPawns().get(p), this.pawnEndLine.get(p))){
-                isAllPathExists = false;
-                break;
-            }
-        }
-        if(!isAllPathExists) {
-            this.getPhysicalBoard().removeWall(wall);
-            throw new IllegalMovementException("Not all pawns have access to their finish line");
+        this.getPhysicalBoard().putWall(wall); // Putting this, if pawn has no path, remove this wall.
+        if(!isAllPawnsHavePath()) {
+            this.getPhysicalBoard().removeWall(wall); // removing the illegal wall.
+            throw new IllegalMovementException("Not all pawns have available path to their end");
         }
 
         this.getPhysicalBoard().reduceWallToPawn(pawn);
@@ -220,8 +207,152 @@ public class GameBoard {
         return ret;
     }
 
-    // todo: implement this methods
     private boolean isWallCollides(Wall wall) {
+        for (Wall w : this.getPhysicalBoard().getWalls()) {
+            if(isWallCollides(wall, w)) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private boolean isWallCollides(Wall wall1, Wall wall2) {
+        // Two walls are the same wall
+        if(wall1.equals(wall2)) {
+            return true;
+        }
+        // two walls have the same pos but different direction
+        if(wall1.getPosition().equals(wall2.getPosition())) {
+            return false;
+        }
+
+        if(wall1.getWallDirection().equals(WallDirection.RIGHT) && wall2.getWallDirection().equals(WallDirection.RIGHT)) {
+            return wall1.getPosition().getI() == wall2.getPosition().getI() && Math.abs(wall1.getPosition().getJ() - wall2.getPosition().getJ()) <= 1;
+        }
+        if(wall1.getWallDirection().equals(WallDirection.DOWN) && wall2.getWallDirection().equals(WallDirection.DOWN)) {
+            return wall1.getPosition().getJ() == wall2.getPosition().getJ() && Math.abs(wall1.getPosition().getI() - wall2.getPosition().getI()) <= 1;
+        }
+        if(wall1.getWallDirection().equals(WallDirection.DOWN) && wall2.getWallDirection().equals(WallDirection.RIGHT)) {
+            return wall1.getPosition().getI() == wall2.getPosition().getI() - 1 && wall1.getPosition().getJ() == wall2.getPosition().getJ() + 1;
+        }
+        // If we are here, the commented statement is true.
+        // if(wall1.getWallDirection().equals(WallDirection.RIGHT) && wall2.getWallDirection().equals(WallDirection.DOWN)) {
+        return wall1.getPosition().getI() == wall2.getPosition().getI() + 1 && wall1.getPosition().getJ() == wall2.getPosition().getJ() - 1;
+        // }
+
+    }
+
+    private boolean isAllPawnsHavePath() {
+        for (Pawn p : this.getPhysicalBoard().getPawns()) {
+            if(!isPathExists(this.getPhysicalBoard().getPawnPosition(p), this.pawnEndLine.get(p))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // This will use to assist for moving the pawn in different directions
+
+
+    /**
+     *
+     * @param s - starting position
+     * @param direction - direction to go
+     * @return the destination or null if the move is illegal
+     */
+    private Position simulateMove(Position s, MovementDirection direction) {
+        return switch (direction) {
+            case UP -> simulateUpMove(s);
+            case DOWN -> simulateDownMove(s);
+            case LEFT -> simulateLeftMove(s);
+            case RIGHT -> simulateRightMove(s);
+        };
+    }
+
+    private Position simulateUpMove(Position s) {
+
+        if(s.getI() <= 0) {
+            return null;
+        }
+
+        Wall block1 = new Wall(s, WallDirection.RIGHT);
+        Wall block2 = new Wall(new Position(s.getI(), s.getJ() - 1), WallDirection.RIGHT);
+
+        if(this.getPhysicalBoard().getWalls().contains(block1) ||
+           this.getPhysicalBoard().getWalls().contains(block2)) {
+            return null;
+        }
+
+        Position next = new Position(s.getI()-1, s.getJ());
+
+        if(this.getPhysicalBoard().pawnAt(next) != null) {
+            return simulateUpMove(next);
+        } else {
+            return next;
+        }
+
+    }
+    private Position simulateDownMove(Position s) {
+        if(s.getI() >= this.getPhysicalBoard().getSize() - 1) {
+            return null;
+        }
+
+        Position next = new Position(s.getI()+1, s.getJ());
+
+        Wall block1 = new Wall(next, WallDirection.RIGHT);
+        Wall block2 = new Wall(new Position(next.getI(), next.getJ() - 1), WallDirection.RIGHT);
+
+        if(this.getPhysicalBoard().getWalls().contains(block1) ||
+                this.getPhysicalBoard().getWalls().contains(block2)) {
+            return null;
+        }
+
+        if(this.getPhysicalBoard().pawnAt(next) != null) {
+            return simulateDownMove(next);
+        } else {
+            return next;
+        }
+    }
+    private Position simulateLeftMove(Position s) {
+        if(s.getJ() <= 0) {
+            return null;
+        }
+
+        Wall block1 = new Wall(s, WallDirection.DOWN);
+        Wall block2 = new Wall(new Position(s.getI() - 1, s.getJ()), WallDirection.DOWN);
+
+        if(this.getPhysicalBoard().getWalls().contains(block1) ||
+           this.getPhysicalBoard().getWalls().contains(block2)) {
+            return null;
+        }
+
+        Position next = new Position(s.getI(), s.getJ() - 1);
+
+        if(this.getPhysicalBoard().pawnAt(next) != null) {
+            return simulateLeftMove(next);
+        } else {
+            return next;
+        }
+    }
+    private Position simulateRightMove(Position s) {
+        if(s.getJ() >= this.getPhysicalBoard().getSize() - 1) {
+            return null;
+        }
+
+        Position next = new Position(s.getI(), s.getJ() + 1);
+
+        Wall block1 = new Wall(next, WallDirection.RIGHT);
+        Wall block2 = new Wall(new Position(next.getI() - 1 , next.getJ()), WallDirection.DOWN);
+
+        if(this.getPhysicalBoard().getWalls().contains(block1) ||
+           this.getPhysicalBoard().getWalls().contains(block2)) {
+            return null;
+        }
+
+        if(this.getPhysicalBoard().pawnAt(next) != null) {
+            return simulateRightMove(next);
+        } else {
+            return next;
+        }
     }
 }

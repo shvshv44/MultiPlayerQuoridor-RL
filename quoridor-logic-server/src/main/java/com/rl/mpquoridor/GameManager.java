@@ -1,6 +1,7 @@
 package com.rl.mpquoridor;
 
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.models.GameResult;
 import com.rl.mpquoridor.models.Pawn;
 import com.rl.mpquoridor.models.actions.PlaceWall;
 import com.rl.mpquoridor.models.actions.TurnAction;
@@ -35,23 +36,27 @@ public class GameManager {
     /**
      * @return the winner and all the turns taken in the game.
      */
-    public Pair<Player, List<Pair<Player, TurnAction>>> run() {
+    public GameResult run() {
         List<Pair<Player, TurnAction>> history = new ArrayList<>();
         while(this.gameBoard.winner() == null) {
             Player currentPlayer = this.players[currentTurn];
             TurnAction action = currentPlayer.play();
             try {
                 this.gameBoard.executeAction(this.playerPawn.get(currentPlayer), action);
-                Arrays.stream(players).forEach(Player::triggerChange);
                 history.add(Pair.of(currentPlayer, action));
                 currentTurn = (currentTurn + 1) % this.players.length;
+                Arrays.stream(players).forEach((p) -> {
+                    p.setCurrentTurn(currentTurn);
+                    p.triggerChange();
+                });
+
 
             } catch (IllegalMovementException e) {
-                currentPlayer.illegalMovePlayed();
+                currentPlayer.illegalMovePlayed(e.getMessage());
             }
         }
 
-        return Pair.of(playerPawn.inverse().get(gameBoard.winner()), history);
+        return new GameResult(this.playerPawn.inverse().get(this.gameBoard.winner()), history);
     }
 }
 

@@ -10,6 +10,7 @@ import { GameConsoleComponent } from './game-console/game-console.component';
 import { GameOptionsComponent } from './game-options/game-options.component';
 import { GameScreenComponent } from './game-screen/game-screen.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { OptionButtonComponent } from './option-button/option-button.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     BoardCellComponent,
     GameConsoleComponent,
     GameOptionsComponent,
-    GameScreenComponent
+    GameScreenComponent,
+    OptionButtonComponent
   ],
   imports: [
     BrowserModule,

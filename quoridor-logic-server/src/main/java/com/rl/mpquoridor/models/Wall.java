@@ -5,11 +5,11 @@ import com.rl.mpquoridor.models.enums.WallDirection;
 import java.util.Objects;
 
 public class Wall {
-    private Position pos;
-    private WallDirection wallDirection;
+    private final Position position;
+    private final WallDirection wallDirection;
 
-    public Wall(Position pos, WallDirection wallDirection) {
-        this.pos = pos;
+    public Wall(Position position, WallDirection wallDirection) {
+        this.position = position;
         this.wallDirection = wallDirection;
     }
 
@@ -18,28 +18,21 @@ public class Wall {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Wall wall = (Wall) o;
-        return Objects.equals(pos, wall.pos) &&
+        return Objects.equals(position, wall.position) &&
                 wallDirection == wall.wallDirection;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pos, wallDirection);
+        return Objects.hash(position, wallDirection);
     }
 
     public WallDirection getWallDirection() {
         return wallDirection;
     }
 
-    public void setWallDirection(WallDirection wallDirection) {
-        this.wallDirection = wallDirection;
+    public Position getPosition() {
+        return position;
     }
 
-    public Position getPos() {
-        return pos;
-    }
-
-    public void setPos(Position pos) {
-        this.pos = pos;
-    }
 }

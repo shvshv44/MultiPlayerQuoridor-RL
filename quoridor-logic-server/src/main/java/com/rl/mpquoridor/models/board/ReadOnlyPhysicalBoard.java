@@ -15,7 +15,7 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     }
 
     @Override
-    public void movePawn(Pawn pawn, Position source, Position dest) {
+    public void movePawn(Pawn pawn, Position dest) {
         throw new UnsupportedOperationException();
     }
 
@@ -23,7 +23,7 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
         return source.getWalls();
     }
 
-    public Map<Pawn, Position> getPawns() {
+    public Set<Pawn> getPawns() {
         return source.getPawns();
     }
 
@@ -51,5 +51,13 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public Pawn pawnAt(Position p) {
+        return source.pawnAt(p);
+    }
 
+    @Override
+    public Position getPawnPosition(Pawn pawn) {
+        return source.getPawnPosition(pawn);
+    }
 }

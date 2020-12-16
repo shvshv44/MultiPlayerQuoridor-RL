@@ -26,7 +26,7 @@ public class GameManager {
         Pawn[] playOrder = (Pawn[]) Arrays.stream(this.players).map(p -> playerPawn.get(p)).toArray();
         this.playerPawn =  HashBiMap.create(this.players.length);
         int i = 0;
-        for(Pawn p : this.gameBoard.getPhysicalBoard().getPawns().keySet()) {
+        for(Pawn p : this.gameBoard.getPhysicalBoard().getPawns()) {
             this.players[i].setMyPawn(p);
             this.players[i].setPlayOrder(playOrder);
             this.playerPawn.put(this.players[i], p);

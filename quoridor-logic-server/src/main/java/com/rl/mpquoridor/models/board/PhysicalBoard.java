@@ -43,16 +43,16 @@ public class PhysicalBoard {
         return Collections.unmodifiableSet(walls);
     }
 
-    public Map<Pawn, Position> getPawns() {
-        return Collections.unmodifiableMap(pawns);
+    public Set<Pawn> getPawns() {
+        return Collections.unmodifiableSet(pawns.keySet());
     }
 
     public Map<Pawn, Integer> getPawnWalls() {
         return Collections.unmodifiableMap(pawnWalls);
     }
 
-    public void movePawn(Pawn pawn, Position source, Position dest) {
-        if(pawns.containsKey(pawn) && pawns.get(pawn).equals(source)) {
+    public void movePawn(Pawn pawn, Position dest) {
+        if(this.pawns.containsKey(pawn)) {
             pawns.put(pawn, dest);
         }
     }
@@ -72,5 +72,13 @@ public class PhysicalBoard {
 
     public int getSize() {
         return 9;
+    }
+
+    public Pawn pawnAt(Position p) {
+        return pawns.inverse().get(p);
+    }
+
+    public Position getPawnPosition(Pawn pawn) {
+        return this.pawns.get(pawn);
     }
 }

@@ -6,6 +6,11 @@ public class Position {
     private int i;
     private int j;
 
+    public Position(Position p) {
+        this.i = p.i;
+        this.j = p.j;
+    }
+
     public int getI() {
         return i;
     }

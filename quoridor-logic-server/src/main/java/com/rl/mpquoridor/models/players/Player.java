@@ -6,8 +6,7 @@ import com.rl.mpquoridor.models.board.PhysicalBoard;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 
 public abstract class Player {
-    ReadOnlyPhysicalBoard board;
-
+    protected ReadOnlyPhysicalBoard board;
     public Player(ReadOnlyPhysicalBoard physicalBoard) {
         this.board = physicalBoard;
     }

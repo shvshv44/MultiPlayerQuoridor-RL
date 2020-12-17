@@ -36,13 +36,13 @@ public class GameBoard {
         Map<Pawn, Position> ret = new HashMap<>();
         Pawn p1 = new Pawn();
         Pawn p2 = new Pawn();
-        ret.put(p1, new Position(0, 4));
-        ret.put(p2, new Position(8, 4));
+        ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
+        ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
         this.pawnEndLine.put(p1, new HashSet<>());
         this.pawnEndLine.put(p2, new HashSet<>());
 
-        for (int i = 0; i < 9; i++) {
-            this.pawnEndLine.get(p1).add(new Position(8, i));
+        for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
+            this.pawnEndLine.get(p1).add(new Position(this.getPhysicalBoard().getSize() - 1, i));
             this.pawnEndLine.get(p2).add(new Position(0, i));
         }
         return ret;
@@ -51,10 +51,10 @@ public class GameBoard {
     private Map<Pawn, Position> initiateThreePlayers() {
         Map<Pawn, Position> ret = initiateTwoPlayers();
         Pawn p3 = new Pawn();
-        ret.put(p3, new Position(4, 0));
+        ret.put(p3, new Position(this.getPhysicalBoard().getSize() / 2, 0));
         this.pawnEndLine.put(p3, new HashSet<>());
-        for (int i = 0; i < 9; i++) {
-            this.pawnEndLine.get(p3).add(new Position(i, 8));
+        for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
+            this.pawnEndLine.get(p3).add(new Position(i, this.getPhysicalBoard().getSize() - 1));
         }
         return ret;
     }
@@ -62,9 +62,9 @@ public class GameBoard {
     private Map<Pawn, Position> initiateFourPlayers() {
         Map<Pawn, Position> ret = initiateThreePlayers();
         Pawn p4 = new Pawn();
-        ret.put(p4, new Position(4, 8));
+        ret.put(p4, new Position(this.getPhysicalBoard().getSize() / 2, this.getPhysicalBoard().getSize() -1));
         this.pawnEndLine.put(p4, new HashSet<>());
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
             this.pawnEndLine.get(p4).add(new Position(0, i));
         }
         return  ret;

@@ -23,17 +23,24 @@ public class GameManager {
         this.players = new Player[players.length];
         System.arraycopy(players, 0, this.players, 0, players.length);
         this.gameBoard = new GameBoard(this.players.length, numberOfWallsPerPlayer);
-        Pawn[] playOrder = (Pawn[]) Arrays.stream(this.players).map(p -> playerPawn.get(p)).toArray();
+        initPlayerPawn();
+        Pawn[] playOrder = (Pawn[]) this.gameBoard.getPhysicalBoard().getPawns().toArray();
+        int i = 0;
+
+        for(Player p: this.players) {
+            p.setMyPawn(playerPawn.get(p));
+            p.setPlayOrder(playOrder);
+        }
+
+    }
+    public void initPlayerPawn() {
         this.playerPawn =  HashBiMap.create(this.players.length);
         int i = 0;
-        for(Pawn p : this.gameBoard.getPhysicalBoard().getPawns()) {
-            this.players[i].setMyPawn(p);
-            this.players[i].setPlayOrder(playOrder);
-            this.playerPawn.put(this.players[i], p);
+        for (Pawn p : this.gameBoard.getPhysicalBoard().getPawns()) {
+            this.playerPawn.put(players[i], p);
             i++;
         }
     }
-
     public GameResult run() {
         List<Pair<Player, TurnAction>> history = new ArrayList<>();
         while(this.gameBoard.getWinner() == null) {

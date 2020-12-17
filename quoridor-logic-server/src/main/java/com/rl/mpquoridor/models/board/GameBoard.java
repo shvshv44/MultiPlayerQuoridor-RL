@@ -251,9 +251,6 @@ public class GameBoard {
         return true;
     }
 
-    // This will use to assist for moving the pawn in different directions
-
-
     /**
      *
      * @param s - starting position

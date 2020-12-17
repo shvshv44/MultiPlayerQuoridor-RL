@@ -18,24 +18,24 @@ public class GameWebSocket {
 
 
     @MessageMapping("/movePawn/{gameId}")
-    public void movePawn(@PathVariable String gameId, TurnAction action) throws Exception {
+    public void movePawn(@PathVariable String gameId, TurnAction action) {
         // todo: play the movePawn and return the game status
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
     @MessageMapping("/putWall/{gameId}")
-    public void putWall(@PathVariable String gameId, TurnAction action) throws Exception {
+    public void putWall(@PathVariable String gameId, TurnAction action) {
         // todo: play the putWall and return the
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
 
-    public void endTurn(String gameId, TurnAction action) throws Exception {
+    public void endTurn(String gameId, TurnAction action) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
 
-    public void avaliableMoves(String gameId, List<Position> positions) throws Exception {
+    public void avaliableMoves(String gameId, List<Position> positions) {
         // send the available moves of the next turn
         this.messageSender.convertAndSend("/topic/availableMoves/" + gameId, positions);
     }

@@ -9,7 +9,7 @@ export class BoardCellComponent implements OnInit {
 
   @Input() row = -1;
   @Input() col = -1;
-  @Input() playerCode = -1; // if a player stands on the cell
+  @Input() playerCode = 0; // if a player stands on the cell
 
   constructor() { }
 

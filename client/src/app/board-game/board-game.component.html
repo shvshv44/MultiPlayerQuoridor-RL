@@ -8,11 +8,11 @@
     <div class="board-cell-row">
 
       <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
-        <app-board-cell [row]="i" [col]="j" [playerCode]="0"></app-board-cell>
+        <app-board-cell [row]="i" [col]="j" ></app-board-cell>
         <app-board-wall [row]="i" [col]="j" [isVertical]="true" (mouseover)="mouseHoverWallEvent($event, i, j)" (mouseout)="mouseOutWallEvent($event, i, j)"></app-board-wall>
       </div>
 
-      <app-board-cell [row]="i" [col]="boardRowSize-1" [playerCode]="0"></app-board-cell>
+      <app-board-cell [row]="i" [col]="boardRowSize-1"></app-board-cell>
 
     </div>
 
@@ -33,11 +33,11 @@
   <div class="board-cell-row">
 
     <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
-      <app-board-cell [row]="boardRowSize-1" [col]="j" [playerCode]="0"></app-board-cell>
+      <app-board-cell [row]="boardRowSize-1" [col]="j" ></app-board-cell>
       <app-board-wall [row]="boardRowSize-1" [col]="j" [isVertical]="true"></app-board-wall>
     </div>
 
-    <app-board-cell [row]="boardRowSize-1" [col]="boardRowSize-1" [playerCode]="0"></app-board-cell>
+    <app-board-cell [row]="boardRowSize-1" [col]="boardRowSize-1" ></app-board-cell>
 
   </div>
 

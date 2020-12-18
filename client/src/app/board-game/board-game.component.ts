@@ -29,6 +29,23 @@ export class BoardGameComponent implements OnInit {
 
   // tslint:disable-next-line:use-lifecycle-interface
   ngAfterViewInit(): void {
+    this.createCellsAndWallsArrays();
+    this.create4PlayersAtStart();
+  }
+
+  private create4PlayersAtStart(): void {
+    const halfOfABoard = Math.round(this.boardRowSize / 2) - 1;
+    const rightMiddleIndex  =   (halfOfABoard * this.boardRowSize) + (this.boardRowSize - 1);
+    const upMiddleIndex     =   halfOfABoard;
+    const leftMiddleIndex   =   halfOfABoard * this.boardRowSize;
+    const downMiddleIndex   =   ((this.boardRowSize - 1) * this.boardRowSize) + halfOfABoard;
+    this.cells[rightMiddleIndex].playerCode = 1;
+    this.cells[upMiddleIndex].playerCode = 2;
+    this.cells[leftMiddleIndex].playerCode = 3;
+    this.cells[downMiddleIndex].playerCode = 4;
+  }
+
+  private createCellsAndWallsArrays(): void {
     const allWallsArray = this.wallsAsList.toArray();
     this.cells = this.cellsAsList.toArray();
     for (const wall of allWallsArray) {
@@ -40,7 +57,7 @@ export class BoardGameComponent implements OnInit {
     }
   }
 
-  initActiveCells(): void {
+  private initActiveCells(): void {
     for (let i = 0; i < 9; i++) {
       this.activeCells.push([]);
       for (let j = 0; j < 9; j++) {
@@ -61,14 +78,12 @@ export class BoardGameComponent implements OnInit {
     let wallIndex = 0;
     if (event.target.classList.contains('vertical')) {
       wallIndex = row * (this.boardRowSize - 1) + col;
-      // TODO: make the hover trigger
       operation(this.verticalWalls[wallIndex]);
       operation(this.verticalWalls[wallIndex + this.boardRowSize - 1]);
     } else {
       wallIndex = row * (this.boardRowSize) + col;
       operation(this.horizontalWalls[wallIndex]);
       operation(this.horizontalWalls[wallIndex + 1]);
-      // TODO: make the hover trigger
     }
   }
 

@@ -18,6 +18,7 @@ export class BoardGameComponent implements OnInit {
   cells: BoardCellComponent[] = [];
   horizontalWalls: BoardWallComponent[] = [];
   verticalWalls: BoardWallComponent[] = [];
+  playerLocations: any[] = [];
 
 
   constructor() {
@@ -35,14 +36,17 @@ export class BoardGameComponent implements OnInit {
 
   private create4PlayersAtStart(): void {
     const halfOfABoard = Math.round(this.boardRowSize / 2) - 1;
-    const rightMiddleIndex  =   (halfOfABoard * this.boardRowSize) + (this.boardRowSize - 1);
-    const upMiddleIndex     =   halfOfABoard;
-    const leftMiddleIndex   =   halfOfABoard * this.boardRowSize;
-    const downMiddleIndex   =   ((this.boardRowSize - 1) * this.boardRowSize) + halfOfABoard;
-    this.cells[rightMiddleIndex].playerCode = 1;
-    this.cells[upMiddleIndex].playerCode = 2;
-    this.cells[leftMiddleIndex].playerCode = 3;
-    this.cells[downMiddleIndex].playerCode = 4;
+    const endOfTheBoard = this.boardRowSize - 1;
+    this.playerLocations.push({row: halfOfABoard,   col: endOfTheBoard}); // right
+    this.playerLocations.push({row: 0,              col: halfOfABoard});  // up
+    this.playerLocations.push({row: halfOfABoard,   col: 0});             // left
+    this.playerLocations.push({row: endOfTheBoard,  col: halfOfABoard});  // down
+
+    let currentPlayerCode = 1;
+    for (const location of this.playerLocations) {
+      this.cells[location.row * this.boardRowSize + location.col].playerCode = currentPlayerCode;
+      currentPlayerCode++;
+    }
   }
 
   private createCellsAndWallsArrays(): void {
@@ -93,6 +97,16 @@ export class BoardGameComponent implements OnInit {
 
   private deleteHoverToWall(wall: BoardWallComponent): void {
     wall.elementRef.nativeElement.getElementsByClassName('wall')[0].classList.remove('wall-hover');
+  }
+
+  playerAskForWall(row: number, col: number, isVertical: boolean): void {
+    // TODO: send a request to the server using web socket service!
+    console.log('Player ask for wall ' + row + ' ' + col + ' in direction: ' + ((isVertical) ? 'vertical' : 'horizontal'));
+  }
+
+  playerAskToMove(row: number, col: number): void {
+    // TODO: send a request to the server using web socket service!
+    console.log('Player ask to move ' + row + ' ' + col + ' ');
   }
 
 }

@@ -5,14 +5,14 @@
   float: left;
   height: $cell-inner-size;
   width: $cell-inner-size;
-  background: #ece5a4;
+  background: $game-screen-component-color;
 
-  border: solid $cell-border-size #585040;
+  border: solid $cell-border-size $game-screen-border-color;
 
   &:hover {
     cursor: pointer;
     animation:hover 1s infinite alternate;
     transition: all 1s;
-    background: #bfaf83 !important;
+    background: $cell-hover-color !important;
   }
 }

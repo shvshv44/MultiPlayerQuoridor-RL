@@ -7,14 +7,9 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class BoardCellComponent implements OnInit {
 
-  @Input()
-  row = -1;
-
-  @Input()
-  col = -1;
-
-  @Input()
-  playerCode = -1; // if a player stands on the cell
+  @Input() row = -1;
+  @Input() col = -1;
+  @Input() playerCode = -1; // if a player stands on the cell
 
   constructor() { }
 

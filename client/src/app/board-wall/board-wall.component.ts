@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-board-wall',
@@ -7,9 +7,12 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class BoardWallComponent implements OnInit {
   @Input() isActive = false;
-  @Input() isHorizontal = true;
+  @Input() isVertical = true;
+  @Input() row = -1;
+  @Input() col = -1;
 
-  constructor() { }
+  constructor(public elementRef: ElementRef) {
+  }
 
   ngOnInit(): void {
   }

@@ -2,28 +2,28 @@
 <div class="board-container">
 
   <!--  First 8 Board Rows -->
-  <div *ngFor="let itemRow of [].constructor(8); let i = index">
+  <div *ngFor="let itemRow of [].constructor(boardRowSize - 1); let i = index">
 
     <!--  Cell With Walls Row-->
     <div class="board-cell-row">
 
-      <div *ngFor="let itemCol of [].constructor(8); let j = index">
+      <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
         <app-board-cell [row]="i" [col]="j" [playerCode]="0"></app-board-cell>
-        <app-board-wall [isHorizontal]="true"></app-board-wall>
+        <app-board-wall [row]="i" [col]="j" [isVertical]="true" (mouseover)="mouseHoverWallEvent($event, i, j)" (mouseout)="mouseOutWallEvent($event, i, j)"></app-board-wall>
       </div>
 
-      <app-board-cell [row]="i" [col]="8" [playerCode]="0"></app-board-cell>
+      <app-board-cell [row]="i" [col]="boardRowSize-1" [playerCode]="0"></app-board-cell>
 
     </div>
 
     <!--  Only Walls Row-->
     <div class="board-wall-row">
 
-      <div *ngFor="let itemCol of [].constructor(8);">
-        <app-board-wall [isHorizontal]="false"></app-board-wall>
+      <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
+        <app-board-wall [row]="i" [col]="j" [isVertical]="false" (mouseover)="mouseHoverWallEvent($event, i, j)" (mouseout)="mouseOutWallEvent($event, i, j)"></app-board-wall>
       </div>
 
-      <app-board-wall [isHorizontal]="false"></app-board-wall>
+      <app-board-wall [row]="i" [col]="boardRowSize-1" [isVertical]="false"></app-board-wall>
 
     </div>
 
@@ -32,12 +32,12 @@
 <!--  Last Board Row -->
   <div class="board-cell-row">
 
-    <div *ngFor="let itemCol of [].constructor(8); let j = index">
-      <app-board-cell [row]="8" [col]="j" [playerCode]="0"></app-board-cell>
-      <app-board-wall [isHorizontal]="true"></app-board-wall>
+    <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
+      <app-board-cell [row]="boardRowSize-1" [col]="j" [playerCode]="0"></app-board-cell>
+      <app-board-wall [row]="boardRowSize-1" [col]="j" [isVertical]="true"></app-board-wall>
     </div>
 
-    <app-board-cell [row]="8" [col]="8" [playerCode]="0"></app-board-cell>
+    <app-board-cell [row]="boardRowSize-1" [col]="boardRowSize-1" [playerCode]="0"></app-board-cell>
 
   </div>
 

@@ -1,5 +1,7 @@
+@import "src/styles";
+
 #game-screen {
   height: 100%;
   width: 100%;
-  background-color: #f1ce7b;
+  background-color: $screen-color;
 }

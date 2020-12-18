@@ -44,7 +44,7 @@ export class BoardGameComponent implements OnInit {
 
     let currentPlayerCode = 1;
     for (const location of this.playerLocations) {
-      this.cells[location.row * this.boardRowSize + location.col].playerCode = currentPlayerCode;
+      this.cells[this.calculateCellIndex(location.row, location.col)].playerCode = currentPlayerCode;
       currentPlayerCode++;
     }
   }
@@ -81,11 +81,11 @@ export class BoardGameComponent implements OnInit {
   mouseWallEvent(event: any, row: number, col: number, operation: (wall: BoardWallComponent) => void): void {
     let wallIndex = 0;
     if (event.target.classList.contains('vertical')) {
-      wallIndex = row * (this.boardRowSize - 1) + col;
+      wallIndex = this.calculateWallIndex(row, col, true);
       operation(this.verticalWalls[wallIndex]);
       operation(this.verticalWalls[wallIndex + this.boardRowSize - 1]);
     } else {
-      wallIndex = row * (this.boardRowSize) + col;
+      wallIndex = this.calculateWallIndex(row, col, false);
       operation(this.horizontalWalls[wallIndex]);
       operation(this.horizontalWalls[wallIndex + 1]);
     }
@@ -107,6 +107,40 @@ export class BoardGameComponent implements OnInit {
   playerAskToMove(row: number, col: number): void {
     // TODO: send a request to the server using web socket service!
     console.log('Player ask to move ' + row + ' ' + col + ' ');
+  }
+
+  public movePawn(row: number, col: number, playerCode: number): void {
+    const prevLocation = this.playerLocations[playerCode - 1];
+    const newLocation = {row, col};
+    this.cells[this.calculateCellIndex(prevLocation.row, prevLocation.col)].playerCode = 0;
+    this.playerLocations[playerCode - 1] = newLocation;
+    this.cells[this.calculateCellIndex(newLocation.row, newLocation.col)].playerCode = playerCode;
+  }
+
+  public placeWall(row: number, col: number, isVertical: boolean): void {
+    const wallIndex = this.calculateWallIndex(row, col, isVertical);
+
+    if (isVertical) {
+      this.verticalWalls[wallIndex].isActive = true;
+      this.verticalWalls[wallIndex + this.boardRowSize - 1].isActive = true;
+    } else {
+      this.horizontalWalls[wallIndex].isActive = true;
+      this.horizontalWalls[wallIndex + 1].isActive = true;
+    }
+  }
+
+  private calculateCellIndex(row: number, col: number): number {
+    return row * this.boardRowSize + col;
+  }
+
+  private calculateWallIndex(row: number, col: number, isVertical: boolean): number {
+    let wallIndex = 0;
+    if (isVertical) {
+      wallIndex = row * (this.boardRowSize - 1) + col;
+    } else {
+      wallIndex = row * (this.boardRowSize) + col;
+    }
+    return wallIndex;
   }
 
 }

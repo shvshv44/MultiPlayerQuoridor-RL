@@ -22,6 +22,10 @@
   background: $wall-hover-color !important;
 }
 
+.wall-active {
+  background: $wall-hover-color !important;
+}
+
 .horizontal {
   height: $wall-size;
   width: $wall-length;

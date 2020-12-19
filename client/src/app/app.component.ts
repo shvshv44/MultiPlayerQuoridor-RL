@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {DataService} from './data.service';
+import {WebSocketApiService} from './web-socket-api.service';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +9,6 @@ import {DataService} from './data.service';
 export class AppComponent {
   title = 'client';
 
-  constructor(private data: DataService) {
+  constructor(private webSocketApiService: WebSocketApiService) {
   }
 }

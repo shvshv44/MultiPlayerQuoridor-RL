@@ -1,0 +1,16 @@
+@import "src/styles";
+
+#console-box {
+  display: block;
+  height: 50%;
+
+  border: solid 3px $game-screen-border-color;
+  border-radius: 12px;
+  background-color: $game-screen-component-color;
+  padding: 15px;
+  margin: 35px;
+}
+
+#console-scroll {
+  height: 100%
+}

@@ -1,0 +1,9 @@
+<div id="console-box">
+
+    <cdk-virtual-scroll-viewport id="console-scroll" itemSize="25" >
+      <ng-container *cdkVirtualFor="let line of consoleLines">
+        <div style="color: black"> {{line}} </div>
+      </ng-container>
+    </cdk-virtual-scroll-viewport>
+
+</div>

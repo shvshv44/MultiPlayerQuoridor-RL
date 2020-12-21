@@ -6,6 +6,7 @@ import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -13,6 +14,7 @@ public class GameBoard {
     private final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     private final Map<Pawn, HashSet<Position>> pawnEndLine;
+    @Getter
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
 
@@ -146,14 +148,6 @@ public class GameBoard {
             this.readOnlyPhysicalBoard = new ReadOnlyPhysicalBoard(this.board);
         }
         return this.readOnlyPhysicalBoard;
-    }
-
-    /**
-     * Should be an O(1) implementation.
-     *  @return the winner pawn or null
-     */
-    public Pawn getWinner() {
-        return this.winner;
     }
 
     private boolean isPathExists(Position s, HashSet<Position> dest) {

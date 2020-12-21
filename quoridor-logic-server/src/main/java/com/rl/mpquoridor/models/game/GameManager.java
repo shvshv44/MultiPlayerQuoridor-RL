@@ -11,7 +11,6 @@ import com.rl.mpquoridor.models.players.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.collect.BiMap;
-
 import java.util.*;
 
 

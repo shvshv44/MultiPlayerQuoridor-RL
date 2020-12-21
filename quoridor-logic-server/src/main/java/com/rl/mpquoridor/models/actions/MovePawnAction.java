@@ -2,10 +2,10 @@ package com.rl.mpquoridor.models.actions;
 
 import com.rl.mpquoridor.models.enums.MovementDirection;
 
-public class MovePawn extends  TurnAction {
+public class MovePawnAction implements   TurnAction {
     MovementDirection direction;
 
-    public MovePawn(MovementDirection direction) {
+    public MovePawnAction(MovementDirection direction) {
         this.direction = direction;
     }
 

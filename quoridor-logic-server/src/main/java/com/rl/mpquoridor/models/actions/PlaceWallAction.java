@@ -1,11 +1,11 @@
 package com.rl.mpquoridor.models.actions;
 
-import com.rl.mpquoridor.models.Wall;
+import com.rl.mpquoridor.models.board.Wall;
 
-public class PlaceWall  extends TurnAction {
+public class PlaceWallAction implements TurnAction {
     private final Wall wall;
 
-    public PlaceWall(Wall wall) {
+    public PlaceWallAction(Wall wall) {
         this.wall = wall;
     }
 

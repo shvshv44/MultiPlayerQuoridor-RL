@@ -10,6 +10,7 @@ export class WebSocketApiService {
   webSocketEndPoint = 'http://localhost:8080/quoridor-websocket';
   topic = '/topic/gameStatus/';
   stompClient: any;
+  gameId = '-1';
 
   constructor() {
     this._connect();
@@ -24,6 +25,7 @@ export class WebSocketApiService {
 
   // tslint:disable-next-line:typedef
   _connectToGame(gameId: string) {
+    this.gameId = gameId;
     // tslint:disable-next-line:variable-name
     const _this = this;
 
@@ -60,9 +62,15 @@ export class WebSocketApiService {
    * @param {*} message
    */
   // tslint:disable-next-line:typedef
-  _send(message: any) {
-    console.log('calling logout api via web socket');
-    this.stompClient.send('/app/hello', {}, JSON.stringify(message));
+  _sendPawnMovment(message: any) {
+    console.log('calling send pawn movment');
+    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(message));
+  }
+
+  // tslint:disable-next-line:typedef
+  _sendPutWall(message: any) {
+    console.log('calling send put wall');
+    this.stompClient.send('/app/' + this.gameId + '/putWall', {}, JSON.stringify(message));
   }
 
   // tslint:disable-next-line:typedef

@@ -1,21 +1,17 @@
 package com.rl.mpquoridor.models.players;
 
-import com.rl.mpquoridor.models.Pawn;
+import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.actions.TurnAction;
-import com.rl.mpquoridor.models.board.PhysicalBoard;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
+import com.rl.mpquoridor.models.events.GameEvent;
 
-public abstract class Player {
-    protected ReadOnlyPhysicalBoard board;
-    public Player(ReadOnlyPhysicalBoard physicalBoard) {
-        this.board = physicalBoard;
-    }
+import java.util.List;
 
-    public abstract void setPlayOrder(Pawn[] playOrder);
-    public abstract void setMyPawn(Pawn myPawn);
-    public abstract void illegalMovePlayed(String msg);
-    public abstract void triggerChange(); // todo: this signature could get Json or something.
-    // public abstract void triggerChange(JsonObject json);
-    public abstract TurnAction play();
-    public abstract void setCurrentTurn(int pawnIdx);
+public interface Player {
+    void setPlayOrder(List<Pawn> playOrder);
+    void setMyPawn(Pawn myPawn);
+    void illegalMovePlayed(String msg);
+    void trigger(GameEvent event);
+    void setBoard(ReadOnlyPhysicalBoard board);
+    TurnAction play();
 }

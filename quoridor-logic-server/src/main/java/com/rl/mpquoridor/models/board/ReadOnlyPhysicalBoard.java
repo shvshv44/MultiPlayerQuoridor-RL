@@ -1,10 +1,6 @@
 package com.rl.mpquoridor.models.board;
 
 
-import com.rl.mpquoridor.models.Pawn;
-import com.rl.mpquoridor.models.Position;
-import com.rl.mpquoridor.models.Wall;
-
 import java.util.Map;
 import java.util.Set;
 

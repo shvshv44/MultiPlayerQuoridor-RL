@@ -2,9 +2,6 @@ package com.rl.mpquoridor.models.board;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.rl.mpquoridor.models.Pawn;
-import com.rl.mpquoridor.models.Position;
-import com.rl.mpquoridor.models.Wall;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package com.rl.mpquoridor.models;
+package com.rl.mpquoridor.models.board;
 
 import java.util.Objects;
 

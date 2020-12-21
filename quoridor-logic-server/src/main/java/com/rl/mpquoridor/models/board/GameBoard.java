@@ -1,11 +1,8 @@
 package com.rl.mpquoridor.models.board;
 
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
-import com.rl.mpquoridor.models.Pawn;
-import com.rl.mpquoridor.models.Position;
-import com.rl.mpquoridor.models.Wall;
-import com.rl.mpquoridor.models.actions.MovePawn;
-import com.rl.mpquoridor.models.actions.PlaceWall;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
+import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
@@ -17,6 +14,7 @@ public class GameBoard {
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     private final Map<Pawn, HashSet<Position>> pawnEndLine;
     private Pawn winner = null;
+    private final List<Pawn> playOrder = new LinkedList<>();
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
@@ -36,6 +34,10 @@ public class GameBoard {
         Map<Pawn, Position> ret = new HashMap<>();
         Pawn p1 = new Pawn();
         Pawn p2 = new Pawn();
+
+        playOrder.add(p1);
+        playOrder.add(p2);
+
         ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
         ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
         this.pawnEndLine.put(p1, new HashSet<>());
@@ -51,6 +53,7 @@ public class GameBoard {
     private Map<Pawn, Position> initiateThreePlayers() {
         Map<Pawn, Position> ret = initiateTwoPlayers();
         Pawn p3 = new Pawn();
+        playOrder.add(p3);
         ret.put(p3, new Position(this.getPhysicalBoard().getSize() / 2, 0));
         this.pawnEndLine.put(p3, new HashSet<>());
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
@@ -62,6 +65,7 @@ public class GameBoard {
     private Map<Pawn, Position> initiateFourPlayers() {
         Map<Pawn, Position> ret = initiateThreePlayers();
         Pawn p4 = new Pawn();
+        playOrder.add(p4);
         ret.put(p4, new Position(this.getPhysicalBoard().getSize() / 2, this.getPhysicalBoard().getSize() -1));
         this.pawnEndLine.put(p4, new HashSet<>());
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
@@ -126,10 +130,10 @@ public class GameBoard {
     }
 
     public void executeAction(Pawn pawn, TurnAction action) throws  IllegalMovementException{
-        if(action instanceof PlaceWall) {
-            placeWall(pawn, ((PlaceWall) action).getWall());
-        } else if(action instanceof MovePawn) {
-            movePawn(pawn, ((MovePawn) action).getDirection());
+        if(action instanceof PlaceWallAction) {
+            placeWall(pawn, ((PlaceWallAction) action).getWall());
+        } else if(action instanceof MovePawnAction) {
+            movePawn(pawn, ((MovePawnAction) action).getDirection());
         }
     }
 
@@ -351,5 +355,9 @@ public class GameBoard {
         } else {
             return next;
         }
+    }
+
+    public List<Pawn> getPlayOrder() {
+        return Collections.unmodifiableList(this.playOrder);
     }
 }

@@ -19,7 +19,6 @@ import java.util.*;
  * -------------------------------------------
  */
 public class PhysicalBoard {
-    // todo Change the datasets and all other related methods in this class.
     private HashSet<Wall> walls;
     private BiMap<Pawn, Position> pawns;
     private HashMap<Pawn, Integer> pawnWalls;

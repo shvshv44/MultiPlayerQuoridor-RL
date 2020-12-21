@@ -174,7 +174,6 @@ public class GameBoard {
         return false;
     }
 
-    // todo: Change this to work with other dataSet
     private List<Position> getAvailableNeighbors(Position p) {
         List<Position> ret = new ArrayList<>();
         // UP

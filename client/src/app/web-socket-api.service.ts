@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 
@@ -8,7 +8,7 @@ import * as SockJS from 'sockjs-client';
 })
 export class WebSocketApiService {
   webSocketEndPoint = 'http://localhost:8080/quoridor-websocket';
-  topic = '/topic/greetings';
+  topic = '/topic/gameStatus/';
   stompClient: any;
 
   constructor() {
@@ -20,16 +20,22 @@ export class WebSocketApiService {
     console.log('Initialize WebSocket Connection');
     const ws = new SockJS(this.webSocketEndPoint);
     this.stompClient = Stomp.over(ws);
+  }
+
+  // tslint:disable-next-line:typedef
+  _connectToGame(gameId: string) {
     // tslint:disable-next-line:variable-name
     const _this = this;
+
     // tslint:disable-next-line:only-arrow-functions typedef
     _this.stompClient.connect({}, function () {
       // tslint:disable-next-line:only-arrow-functions typedef
-      _this.stompClient.subscribe(_this.topic, function (sdkEvent: any) {
+      _this.stompClient.subscribe(_this.topic + gameId, function(sdkEvent: any) {
         _this.onMessageReceived(sdkEvent);
       });
       // _this.stompClient.reconnect_delay = 2000;
     }, this.errorCallBack);
+
   }
 
   // tslint:disable-next-line:typedef

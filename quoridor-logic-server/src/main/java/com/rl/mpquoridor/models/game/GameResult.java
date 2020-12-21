@@ -1,18 +1,16 @@
-package com.rl.mpquoridor.models;
+package com.rl.mpquoridor.models.game;
 
-import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.players.Player;
 import com.sun.istack.NotNull;
-import org.springframework.data.util.Pair;
 
 import java.util.Collections;
 import java.util.List;
 
 public class GameResult {
     private final Player winner;
-    private final List<Pair<Player, TurnAction>> history;
+    private final List<HistoryRecord> history;
 
-    public GameResult(@NotNull Player winner, List<Pair<Player, TurnAction>> history) {
+    public GameResult(@NotNull Player winner, List<HistoryRecord> history) {
         this.winner = winner;
         this.history = history;
     }
@@ -21,7 +19,7 @@ public class GameResult {
         return winner;
     }
 
-    public List<Pair<Player, TurnAction>> getHistory() {
+    public List<HistoryRecord> getHistory() {
         return Collections.unmodifiableList(history);
     }
 }

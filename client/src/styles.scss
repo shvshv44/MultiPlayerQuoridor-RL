@@ -45,7 +45,7 @@ $player-blue-border-color: #010185;
 //===============================================================================================
 
 html, body {
-  background-color: #d2d2d2;
+  background-image: url(./assets/parquet.jpg);
   height: 100%;
 }
 
@@ -62,5 +62,6 @@ app-root {
 
 .header {
   font-size: 120px;
-  color: #a336ff;
+  color: #000000;
+  text-shadow: 2px 2px 5px white;
 }

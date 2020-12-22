@@ -2,10 +2,10 @@ import {setWalls} from './walls.actions';
 import {Action, createReducer, on, State} from '@ngrx/store';
 import {Wall} from '../../interfaces/wall';
 
-export const initialState: Wall[] = [];
+export const walls: Wall[] = [];
 
 const wallsReducerAction = createReducer(
-  initialState,
+  walls,
   on(setWalls, (state: Wall[], {walls}) => ([...walls])),
 );
 

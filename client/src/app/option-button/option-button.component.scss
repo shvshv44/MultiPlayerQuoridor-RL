@@ -1,0 +1,26 @@
+@import "src/styles";
+
+.option-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  height: 30px;
+  float: left;
+  margin-top: 10px;
+  margin-left: 2px;
+
+  border: solid 3px $button-border-color;
+  border-radius: 12px;
+  background-color: $button-color;
+  padding: 15px;
+  text-align: center;
+
+  &:hover {
+    cursor: pointer;
+    animation:hover 0.5s infinite alternate;
+    transition: all 0.5s;
+    background: $button-hover-color !important;
+    color: $button-hover-text-color;
+  }
+}

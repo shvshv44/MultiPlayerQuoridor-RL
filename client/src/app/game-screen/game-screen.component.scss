@@ -1,0 +1,34 @@
+@import "src/styles";
+
+* {
+  box-sizing: border-box;
+}
+
+#game-container {
+  display: grid;
+  grid-template-columns: 90% auto;
+  grid-template-rows: 80% auto;
+  grid-template-areas:  "board options"
+                        "console console";
+  grid-gap: 0.5%;
+
+  height: 100%;
+  width: 100%;
+}
+
+#board {
+  grid-area: board;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#options {
+  grid-area: options;
+}
+
+#console {
+  grid-area: console;
+}

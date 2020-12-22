@@ -1,0 +1,24 @@
+@import "src/styles";
+
+.board-container {
+
+  display: flex;
+  justify-content: center;
+  align-content: flex-start;
+  flex-direction: column;
+
+  width: $row-column-size;
+  height: $row-column-size;
+
+}
+
+.board-cell-row {
+  height: $cell-inner-size;
+  width: $row-column-size;
+}
+
+.board-wall-row {
+  height: $wall-size;
+  width: $row-column-size;
+}
+

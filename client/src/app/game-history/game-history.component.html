@@ -1,0 +1,33 @@
+<div class="game-history">
+  <div class="header history-header">
+    <p>Review Games</p>
+  </div>
+  <div class="body-games">
+    <div class="list-of-games">
+      <mat-selection-list #games [multiple]="false">
+        <mat-list-option class="game-option" *ngFor="let gameId of gamesIds" [value]="gameId">
+          Game {{gameId}}
+        </mat-list-option>
+      </mat-selection-list>
+    </div>
+    <div class="details-game">
+      <p>
+        Game: {{games.selectedOptions.selected[0]?.value}}
+      </p>
+      <div class="details">
+        <mat-card>details details details details details details
+          details details details details details details details details
+          details details details details details
+          details
+          details details details details details details details details
+
+          details details details details details details details
+        </mat-card>
+      </div>
+      <div class="watch-game">
+        <button mat-raised-button color="basic" class="button">Watch Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+<router-outlet></router-outlet>

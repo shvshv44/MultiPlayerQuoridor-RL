@@ -1,5 +1,7 @@
 package com.rl.mpquoridor.controllers;
 
+import com.rl.mpquoridor.models.actions.MovePawnAction;
+import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
@@ -16,14 +18,14 @@ public class GameWebSocket {
     private SimpMessagingTemplate messageSender;
 
 
-    @MessageMapping("/{gameId}/movePawn")
-    public void movePawn(@PathVariable String gameId, TurnActionEvent action) {
+    @MessageMapping("/turnAction/{gameId}/movePawn")
+    public void movePawn(@PathVariable String gameId, MovePawnAction action) {
         // todo: play the movePawn and return the game status
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
-    @MessageMapping("/{gameId}/putWall")
-    public void putWall(@PathVariable String gameId, TurnActionEvent action) {
+    @MessageMapping("/turnAction/{gameId}/putWall")
+    public void putWall(@PathVariable String gameId, PlaceWallAction action) {
         // todo: play the putWall and return the
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }

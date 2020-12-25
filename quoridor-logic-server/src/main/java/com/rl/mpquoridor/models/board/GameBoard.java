@@ -22,11 +22,11 @@ public class GameBoard {
         Map<Pawn, Position> pawns;
         this.pawnEndLine = new HashMap<>();
 
-        pawns = switch (numberOfPlayers) {
-            case 2 -> initiateTwoPlayers();
-            case 3 -> initiateThreePlayers();
-            case 4 -> initiateFourPlayers();
-            default -> throw new RuntimeException("Invalid number of players");
+        switch (numberOfPlayers) {
+            case 2 : pawns = initiateTwoPlayers(); break;
+            case 3 : pawns = initiateThreePlayers(); break;
+            case 4 : pawns = initiateFourPlayers(); break;
+            default : throw new RuntimeException("Invalid number of players");
         };
 
         this.board = new PhysicalBoard(pawns, numberOfWallsPerPlayer);
@@ -255,12 +255,15 @@ public class GameBoard {
      * @return the destination or null if the move is illegal
      */
     private Position simulateMove(Position s, MovementDirection direction) {
-        return switch (direction) {
-            case UP -> simulateUpMove(s);
-            case DOWN -> simulateDownMove(s);
-            case LEFT -> simulateLeftMove(s);
-            case RIGHT -> simulateRightMove(s);
-        };
+        Position position = new Position(0,0);
+        switch (direction) {
+            case UP : position = simulateUpMove(s); break;
+            case DOWN : position = simulateDownMove(s); break;
+            case LEFT : position = simulateLeftMove(s); break;
+            case RIGHT : position = simulateRightMove(s); break;
+        }
+
+        return position;
     }
 
     private Position simulateUpMove(Position s) {

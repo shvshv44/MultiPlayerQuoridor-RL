@@ -7,7 +7,7 @@ import {WebSocketApiService} from './web-socket-api.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'client';
+  title = 'Client';
 
   constructor(private webSocketApiService: WebSocketApiService) {
   }

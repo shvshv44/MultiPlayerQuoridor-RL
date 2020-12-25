@@ -17,7 +17,7 @@ public class GameRoomsManagerService {
     private HashMap <String, GameRoomState> gameRooms;
 
     public GameRoomsManagerService() {
-        this.gameRooms = gameRooms = new HashMap<>();
+        this.gameRooms = new HashMap<>();
     }
 
     public String createGame(String playerName) {

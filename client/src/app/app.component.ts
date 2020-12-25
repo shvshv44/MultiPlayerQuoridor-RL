@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {WebSocketApiService} from './web-socket-api.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Client';
+
+  constructor(private webSocketApiService: WebSocketApiService) {
+  }
 }

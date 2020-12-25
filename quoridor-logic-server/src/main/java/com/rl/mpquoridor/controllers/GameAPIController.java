@@ -1,36 +1,60 @@
 package com.rl.mpquoridor.controllers;
 
+import com.rl.mpquoridor.models.game.GameResult;
+import com.rl.mpquoridor.services.GameRoomsManagerService;
+import com.rl.mpquoridor.services.HistoryResolverService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class GameAPIController {
 
+    private GameRoomsManagerService gameRoomManager;
+    private HistoryResolverService historyResolver;
 
-    @GetMapping("/CreateGame")
-    @ResponseBody
-    public String createGame() {
-        return "Game has been started!";
+    @Autowired
+    public GameAPIController(GameRoomsManagerService gameRoomManager, HistoryResolverService historyResolver) {
+        this.gameRoomManager = gameRoomManager;
+        this.historyResolver = historyResolver;
     }
 
-    @GetMapping("/JoinGame/{gameId}")
+    @GetMapping("/CreateGame/{playerName}")
     @ResponseBody
-    public String joinGame(@PathVariable String gameId) {
-        return "Join to game id " + gameId;
+    public String createGame(@PathVariable String playerName) {
+        return gameRoomManager.createGame(playerName);
+    }
+
+    @GetMapping("/JoinGame/{gameId}/{playerName}")
+    @ResponseBody
+    public String joinGame(@PathVariable String gameId, @PathVariable String playerName) {
+        gameRoomManager.joinGame(gameId, playerName);
+        return "Player " + playerName + " has been joined to game " + gameId;
+    }
+
+    @GetMapping("/StartGame/{gameId}")
+    @ResponseBody
+    public String startGame(@PathVariable String gameId) {
+        try {
+            gameRoomManager.startGame(gameId);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!
+        }
+
+        return "Game " + gameId + " has been started!";
     }
 
     @GetMapping("/History")
     @ResponseBody
     public List<String> history() {
-        return new ArrayList<>();
+        return historyResolver.fetchAllHistoryGameIds();
     }
 
     @GetMapping("/History/{gameId}")
     @ResponseBody
-    public String historyByGameId(@PathVariable String gameId) {
-        return "Get all history of: " + gameId;
+    public GameResult historyByGameId(@PathVariable String gameId) {
+        return historyResolver.getResultByGameId(gameId);
     }
 
 }

@@ -44,10 +44,24 @@ $player-blue-border-color: #010185;
 
 //===============================================================================================
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  background-image: url(./assets/parquet.jpg);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 app-root {
   height: 100%;
   width: 100%;
+}
+
+
+.header {
+  font-size: 120px;
+  color: #000000;
+  text-shadow: 2px 2px 5px white;
 }

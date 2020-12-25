@@ -1,15 +1,14 @@
-import {setWalls} from './pawns.actions';
 import {Action, createReducer, on, State} from '@ngrx/store';
-import {Wall} from '../../interfaces/wall';
-import {Position} from "../../interfaces/position";
+import {Position} from '../../interfaces/position';
+import {setPawns} from './pawns.actions';
 
 export const pawns: Position[] = [];
 
-const wallsReducerAction = createReducer(
+const pawnsReducerAction = createReducer(
   pawns,
-  on(setWalls, (state: Position[], {pawns}) => ([...pawns])),
+  on(setPawns, (state: Position[], {pawns}) => ([...pawns])),
 );
 
-export function wallsReducer(state: Position[], action: Action): any {
-  return wallsReducerAction(state, action);
+export function pawnsReducer(state: Position[], action: Action): any {
+  return pawnsReducerAction(state, action);
 }

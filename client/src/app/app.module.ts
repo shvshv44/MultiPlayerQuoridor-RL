@@ -15,6 +15,7 @@ import {BoardWallComponent} from './board-wall/board-wall.component';
 
 import {StoreModule} from '@ngrx/store';
 import {wallsReducer} from './reducers/walls/walls.reducer';
+import {pawnsReducer} from "./reducers/pawns/pawns.reducer";
 
 @NgModule({
   declarations: [
@@ -32,7 +33,7 @@ import {wallsReducer} from './reducers/walls/walls.reducer';
     AppRoutingModule,
     BrowserAnimationsModule,
     ScrollingModule,
-    StoreModule.forRoot({walls: wallsReducer})
+    StoreModule.forRoot({walls: wallsReducer, pawns: pawnsReducer})
   ],
   providers: [],
   bootstrap: [AppComponent]

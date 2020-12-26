@@ -20,12 +20,14 @@ public class GameAPIController {
         this.historyResolver = historyResolver;
     }
 
+    @CrossOrigin
     @GetMapping("/CreateGame/{playerName}")
     @ResponseBody
     public String createGame(@PathVariable String playerName) {
         return gameRoomManager.createGame(playerName);
     }
 
+    @CrossOrigin
     @GetMapping("/JoinGame/{gameId}/{playerName}")
     @ResponseBody
     public String joinGame(@PathVariable String gameId, @PathVariable String playerName) {
@@ -33,6 +35,7 @@ public class GameAPIController {
         return "Player " + playerName + " has been joined to game " + gameId;
     }
 
+    @CrossOrigin
     @GetMapping("/StartGame/{gameId}")
     @ResponseBody
     public String startGame(@PathVariable String gameId) {
@@ -45,12 +48,14 @@ public class GameAPIController {
         return "Game " + gameId + " has been started!";
     }
 
+    @CrossOrigin
     @GetMapping("/History")
     @ResponseBody
     public List<String> history() {
         return historyResolver.fetchAllHistoryGameIds();
     }
 
+    @CrossOrigin
     @GetMapping("/History/{gameId}")
     @ResponseBody
     public GameResult historyByGameId(@PathVariable String gameId) {

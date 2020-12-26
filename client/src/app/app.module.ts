@@ -1,5 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -20,6 +21,11 @@ import {BoardWallComponent} from './board-wall/board-wall.component';
 import {StoreModule} from '@ngrx/store';
 import {wallsReducer} from './reducers/walls/walls.reducer';
 import {pawnsReducer} from './reducers/pawns/pawns.reducer';
+import { PlayDialogComponent } from './play-dialog/play-dialog.component';
+import {FormsModule} from '@angular/forms';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -32,17 +38,23 @@ import {pawnsReducer} from './reducers/pawns/pawns.reducer';
     GameOptionsComponent,
     GameScreenComponent,
     OptionButtonComponent,
-    BoardWallComponent
+    BoardWallComponent,
+    PlayDialogComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MaterialModule,
-    BrowserAnimationsModule,
-    ScrollingModule,
-    StoreModule.forRoot({walls: wallsReducer, pawns: pawnsReducer})
-  ],
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MaterialModule,
+        BrowserAnimationsModule,
+        ScrollingModule,
+        StoreModule.forRoot({walls: wallsReducer, pawns: pawnsReducer}),
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

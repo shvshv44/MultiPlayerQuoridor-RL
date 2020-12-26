@@ -1,0 +1,16 @@
+<div mat-dialog-content class="play-dialog">
+  <ol>
+    <li>
+      <button mat-raised-button color="basic" class="button" (click)="onCreateGame()">Create Game</button>
+    </li>
+    <li>
+      <button mat-raised-button color="basic" class="button" (click)="onJoinGame()">Join Game</button>
+    </li>
+    <li>
+      <mat-form-field>
+        <mat-label>Enter Game ID</mat-label>
+        <input matInput [(ngModel)]="data.gameId">
+      </mat-form-field>
+    </li>
+  </ol>
+</div>

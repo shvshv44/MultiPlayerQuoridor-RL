@@ -5,6 +5,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {PlayDialogData} from '../interfaces/play-dialog-data';
 import {HttpClient} from '@angular/common/http';
 import {catchError, tap} from 'rxjs/operators';
+import {GameRoomService} from '../game-room.service';
 
 
 @Component({
@@ -18,8 +19,9 @@ export class MenuComponent implements OnInit {
   private readonly serverURL = 'http://localhost:8080';
 
   constructor(private router: Router,
-              public dialog: MatDialog,
-              private http: HttpClient) {
+              private dialog: MatDialog,
+              private http: HttpClient,
+              private gameRoom: GameRoomService) {
     this.dialogData = {gameId: '', action: 'none'};
   }
 
@@ -41,17 +43,20 @@ export class MenuComponent implements OnInit {
 
   onCreateOrJoinGame(result: PlayDialogData): void {
     if (result.action === 'create') {
-      this.createGame();
+      this.createGame('shaq');
     } else if (result.action === 'join') {
       this.joinGame(result.gameId);
     }
   }
 
-  createGame(): void {
-    const createGameURL = this.serverURL + '/CreateGame' + '/shaq';
+  createGame(playerName: string): void {
+    const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
     this.http.get(createGameURL, {responseType: 'text'})
       .subscribe(value => {
-        console.log(value); // TODO: open tcp and go to room
+        this.gameRoom.gameID = value;
+        this.gameRoom.playerName = playerName;
+        this.gameRoom.allPlayers = [playerName];
+        this.router.navigateByUrl('/game-room-screen');
       });
   }
 

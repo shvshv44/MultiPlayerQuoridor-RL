@@ -26,6 +26,7 @@ import {FormsModule} from '@angular/forms';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
+import { GameRoomScreenComponent } from './game-room-screen/game-room-screen.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {MatInputModule} from '@angular/material/input';
     GameScreenComponent,
     OptionButtonComponent,
     BoardWallComponent,
-    PlayDialogComponent
+    PlayDialogComponent,
+    GameRoomScreenComponent
   ],
     imports: [
         BrowserModule,

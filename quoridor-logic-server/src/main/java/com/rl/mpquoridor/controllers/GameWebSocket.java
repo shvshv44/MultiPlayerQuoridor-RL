@@ -1,5 +1,6 @@
 package com.rl.mpquoridor.controllers;
 
+import ch.qos.logback.core.joran.action.Action;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
@@ -17,22 +18,29 @@ public class GameWebSocket {
 
     @Autowired
     private SimpMessagingTemplate messageSender;
-
+    private TurnAction lastTurnAction;
 
     @MessageMapping("/turnAction/{gameId}/movePawn")
     public void movePawn(@PathVariable String gameId, MovePawnAction action) {
-        // todo: play the movePawn and return the game status
+        lastTurnAction = action;
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
     @MessageMapping("/turnAction/{gameId}/putWall")
     public void putWall(@PathVariable String gameId, PlaceWallAction action) {
-        // todo: play the putWall and return the
+        lastTurnAction = action;
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
-
     public void endTurn(String gameId, EndTurnEvent action) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
+    }
+
+    public TurnAction getLastTurnAction() {
+        return lastTurnAction;
+    }
+
+    public void setLastTurnAction(TurnAction lastTurnAction) {
+        this.lastTurnAction = lastTurnAction;
     }
 }

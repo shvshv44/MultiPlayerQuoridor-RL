@@ -66,6 +66,17 @@ public class TCPPlayer implements Player {
 
     @Override
     public TurnAction play() {
-        return null;
+        while (gameWebSocket.getLastTurnAction() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        TurnAction turnAction = gameWebSocket.getLastTurnAction();
+        gameWebSocket.setLastTurnAction(null);
+
+        return turnAction;
     }
 }

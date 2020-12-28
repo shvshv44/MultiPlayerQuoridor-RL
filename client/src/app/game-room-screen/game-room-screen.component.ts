@@ -8,7 +8,7 @@ import {GameRoomService} from '../game-room.service';
 })
 export class GameRoomScreenComponent implements OnInit {
 
-  constructor(private gameRoom: GameRoomService) { }
+  constructor(public gameRoom: GameRoomService) { }
 
   ngOnInit(): void {
   }

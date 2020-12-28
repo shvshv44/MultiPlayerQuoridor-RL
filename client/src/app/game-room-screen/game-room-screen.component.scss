@@ -1,8 +1,25 @@
+@import "src/styles";
+
 .game-room-screen {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+.room-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: solid 3px $game-screen-border-color;
+  border-radius: 12px;
+  background-color: $game-screen-component-color;
+  padding: 15px;
+  margin: 35px;
+  width: 40%;
 }
 
 //====================================================
@@ -33,6 +50,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 30px;
 }
 
 .game-room-button {

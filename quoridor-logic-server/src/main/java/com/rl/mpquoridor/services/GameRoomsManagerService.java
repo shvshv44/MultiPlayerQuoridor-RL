@@ -1,10 +1,9 @@
 package com.rl.mpquoridor.services;
 
 import com.rl.mpquoridor.models.game.GameManager;
-import com.rl.mpquoridor.models.game.GameRoomState;
+import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.TCPPlayer;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,6 +38,10 @@ public class GameRoomsManagerService {
         GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameManager.run();
+    }
+
+    public GameRoomState getRoomState(String gameId) {
+        return gameRooms.get(gameId);
     }
 
     // TODO: Temporary function till TCP handler will be created!

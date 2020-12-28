@@ -24,7 +24,9 @@ public class GameAPIController {
     @GetMapping("/CreateGame/{playerName}")
     @ResponseBody
     public String createGame(@PathVariable String playerName) {
-        return gameRoomManager.createGame(playerName);
+        String gameId = gameRoomManager.createGame(playerName);
+        System.out.println(playerName + " has been created game room with id: " + gameId);
+        return gameId;
     }
 
     @CrossOrigin
@@ -32,7 +34,9 @@ public class GameAPIController {
     @ResponseBody
     public String joinGame(@PathVariable String gameId, @PathVariable String playerName) {
         gameRoomManager.joinGame(gameId, playerName);
-        return "Player " + playerName + " has been joined to game " + gameId;
+        String output = "Player " + playerName + " has been joined to game room with id: " + gameId;
+        System.out.println(output);
+        return output;
     }
 
     @CrossOrigin
@@ -40,6 +44,7 @@ public class GameAPIController {
     @ResponseBody
     public String startGame(@PathVariable String gameId) {
         try {
+            System.out.println("Starting game with id: " + gameId);
             gameRoomManager.startGame(gameId);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!

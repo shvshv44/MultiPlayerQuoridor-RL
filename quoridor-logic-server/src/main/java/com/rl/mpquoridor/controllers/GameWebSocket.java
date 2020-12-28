@@ -3,6 +3,7 @@ package com.rl.mpquoridor.controllers;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
+import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class GameWebSocket {
     }
 
 
-    public void endTurn(String gameId, NewTurnEvent action) {
+    public void endTurn(String gameId, EndTurnEvent action) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 }

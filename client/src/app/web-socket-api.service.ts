@@ -8,7 +8,7 @@ import * as SockJS from 'sockjs-client';
 })
 export class WebSocketApiService {
   webSocketEndPoint = 'http://localhost:8080/quoridor-websocket';
-  topic = '/topic';
+  topic = '/topic/gameStatus';
   stompClient: any;
   gameId = '-1';
 

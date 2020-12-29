@@ -7,6 +7,7 @@ import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,11 @@ public class GameWebSocket {
     @Autowired
     private SimpMessagingTemplate messageSender;
 
+    @MessageMapping("/hello")
+    @SendTo("/topic/hello")
+    public boolean greeting(String message) throws Exception {
+        return true;
+    }
 
     @MessageMapping("/turnAction/{gameId}/movePawn")
     public void movePawn(@PathVariable String gameId, MovePawnAction action) {

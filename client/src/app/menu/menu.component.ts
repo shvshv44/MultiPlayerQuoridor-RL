@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {WebSocketApiService} from '../web-socket-api.service';
 
 
 @Component({
@@ -9,12 +10,18 @@ import { Router } from '@angular/router';
 })
 export class MenuComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  constructor(private router: Router,
+              private webSocketApiService: WebSocketApiService) {
+  }
 
   ngOnInit(): void {
   }
 
-  onGameHistoryClick(): void{
+  callHello(): void {
+    this.webSocketApiService._hello({id: 5});
+  }
+
+  onGameHistoryClick(): void {
     this.router.navigateByUrl('/game-history');
   }
 }

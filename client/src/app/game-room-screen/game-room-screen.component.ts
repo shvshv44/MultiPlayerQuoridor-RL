@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {GameRoomService} from '../game-room.service';
+import {WebSocketApiService} from '../web-socket-api.service';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -8,9 +9,15 @@ import {GameRoomService} from '../game-room.service';
 })
 export class GameRoomScreenComponent implements OnInit {
 
-  constructor(public gameRoom: GameRoomService) { }
+  constructor(public gameRoom: GameRoomService,
+              public webSocket: WebSocketApiService) { }
 
   ngOnInit(): void {
+    this.webSocket._sendRoomStatusRequest(
+      {
+        type: 'RoomStatusRequest',
+        gameId: this.gameRoom.gameID
+      });
   }
 
 }

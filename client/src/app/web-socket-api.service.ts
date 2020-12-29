@@ -73,6 +73,11 @@ export class WebSocketApiService {
     this.stompClient.send('/app/' + this.gameId + '/putWall', {}, JSON.stringify(message));
   }
 
+  public _sendRoomStatusRequest(message: any): void {
+    console.log('asking for room status');
+    this.stompClient.send('/app/' + this.gameId + '/roomStatusRequest', {}, JSON.stringify(message));
+  }
+
   // tslint:disable-next-line:typedef
   onMessageReceived(message: string) {
     console.log('Message Recieved from Server :: ' + message);

@@ -6,6 +6,7 @@ import {PlayDialogData} from '../interfaces/play-dialog-data';
 import {HttpClient} from '@angular/common/http';
 import {catchError, tap} from 'rxjs/operators';
 import {GameRoomService} from '../game-room.service';
+import {WebSocketApiService} from '../web-socket-api.service';
 
 
 @Component({
@@ -21,7 +22,8 @@ export class MenuComponent implements OnInit {
   constructor(private router: Router,
               private dialog: MatDialog,
               private http: HttpClient,
-              private gameRoom: GameRoomService) {
+              private gameRoom: GameRoomService,
+              private webSocket: WebSocketApiService) {
     this.dialogData = {gameId: '', action: 'none'};
   }
 
@@ -53,6 +55,7 @@ export class MenuComponent implements OnInit {
     const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
     this.http.get(createGameURL, {responseType: 'text'})
       .subscribe(value => {
+        this.webSocket._connectToGame(value);
         this.gameRoom.gameID = value;
         this.gameRoom.playerName = playerName;
         this.gameRoom.allPlayers = [playerName];

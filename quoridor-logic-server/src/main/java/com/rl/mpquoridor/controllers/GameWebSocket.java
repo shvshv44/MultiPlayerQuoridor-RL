@@ -19,7 +19,7 @@ public class GameWebSocket {
     private SimpMessagingTemplate messageSender;
 
     @MessageMapping("/hello")
-    @SendTo("/topic/hello")
+    @SendTo("/topic")
     public boolean greeting(String message) throws Exception {
         return true;
     }

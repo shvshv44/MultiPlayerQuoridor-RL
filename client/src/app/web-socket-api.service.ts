@@ -26,7 +26,7 @@ export class WebSocketApiService {
     // tslint:disable-next-line:only-arrow-functions typedef
     _this.stompClient.connect({}, function() {
       // tslint:disable-next-line:only-arrow-functions typedef
-      _this.stompClient.subscribe(_this.topic + '/hello', function(sdkEvent: any) {
+      _this.stompClient.subscribe(_this.topic , function(sdkEvent: any) {
         _this.onMessageReceived(sdkEvent);
       });
       // _this.stompClient.reconnect_delay = 2000;

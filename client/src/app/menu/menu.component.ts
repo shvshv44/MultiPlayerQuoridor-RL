@@ -39,33 +39,32 @@ export class MenuComponent implements OnInit {
     this.router.navigateByUrl('/game-history');
   }
 
-  onPlayButtonClick(): void {
+  async onPlayButtonClick(): Promise<void> {
     const dialogRef = this.dialog.open(PlayDialogComponent, {
       width: '250px',
       data: this.dialog
     });
 
-    dialogRef.afterClosed().subscribe(result => this.onCreateOrJoinGame(result));
+    await dialogRef.afterClosed().subscribe(async result => await this.onCreateOrJoinGame(result));
   }
 
-  onCreateOrJoinGame(result: PlayDialogData): void {
+  async onCreateOrJoinGame(result: PlayDialogData): Promise<void> {
     if (result.action === 'create') {
-      this.createGame('shaq');
+      await this.createGame('shaq');
     } else if (result.action === 'join') {
       this.joinGame(result.gameId);
     }
   }
 
-  createGame(playerName: string): void {
+  async createGame(playerName: string): Promise<void> {
     const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
-    this.http.get(createGameURL, {responseType: 'text'})
-      .subscribe(value => {
-        this.webSocket._connectToGame(value);
-        this.gameRoom.gameID = value;
-        this.gameRoom.playerName = playerName;
-        this.gameRoom.allPlayers = [playerName];
-        this.router.navigateByUrl('/game-room-screen');
-      });
+    const value = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+
+    await this.webSocket._connectToGame(value);
+    this.gameRoom.gameID = value;
+    this.gameRoom.playerName = playerName;
+    this.gameRoom.allPlayers = [playerName];
+    this.router.navigateByUrl('/game-room-screen');
   }
 
   joinGame(gameId: string): void {

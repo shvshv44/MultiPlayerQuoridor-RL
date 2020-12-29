@@ -9,7 +9,9 @@ import com.rl.mpquoridor.models.gameroom.RoomStateRequest;
 import com.rl.mpquoridor.models.gameroom.RoomStateResponse;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -29,10 +31,11 @@ public class GameWebSocket {
         this.roomsManager = roomsManager;
         this.gson = gson;
     }
-    
+
     @MessageMapping("/hello")
     @SendTo("/topic/gameStatus")
     public boolean greeting(String message) throws Exception {
+        System.out.println("sharon");
         return true;
     }
 
@@ -48,10 +51,10 @@ public class GameWebSocket {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
-    @MessageMapping("/app/{gameId}/roomStateRequest")
-    public void roomStateRequest(String requestAsString) {
+    @MessageMapping("/shaq/{gameId}/roomStateRequest")
+    public void roomStateRequest(@DestinationVariable String gameId, String requestAsString) {
         RoomStateRequest request = gson.fromJson(requestAsString, RoomStateRequest.class);
-        System.out.println("Input: " + request);
+        System.out.println("game id " + gameId + " , Input : " + request);
         roomStateResponse(request);
     }
 

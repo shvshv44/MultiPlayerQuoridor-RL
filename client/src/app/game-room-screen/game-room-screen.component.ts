@@ -16,7 +16,7 @@ export class GameRoomScreenComponent implements OnInit {
     this.webSocket._sendRoomStatusRequest(
       {
         type: 'RoomStatusRequest',
-        gameId: this.gameRoom.gameID
+        gameID: this.gameRoom.gameID
       });
   }
 

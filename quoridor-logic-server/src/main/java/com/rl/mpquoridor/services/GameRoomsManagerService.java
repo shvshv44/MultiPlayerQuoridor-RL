@@ -24,6 +24,7 @@ public class GameRoomsManagerService {
         GameRoomState state = new GameRoomState();
         state.setId(gameId);
         state.setPlayers(new ArrayList<>());
+        state.getPlayers().add(playerName);
 
         gameRooms.put(gameId, state);
         return gameId;

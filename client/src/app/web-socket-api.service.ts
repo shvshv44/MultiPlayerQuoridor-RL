@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
+import {delay} from 'rxjs/operators';
 
 
 @Injectable({
@@ -11,9 +12,10 @@ export class WebSocketApiService {
   topic = '/topic/gameStatus';
   stompClient: any;
   gameId = '-1';
+  isOpen = false;
 
   constructor() {
-    this._connect();
+    // this._connect();
   }
 
   // tslint:disable-next-line:typedef
@@ -36,7 +38,11 @@ export class WebSocketApiService {
 
   //TODO: Shaked u need to call this when u create the game - it had subscribe to specifig topic/{gameId}
 // tslint:disable-next-line:typedef
-  _connectToGame(gameId: string) {
+  async _connectToGame(gameId: string) {
+    console.log('Initialize WebSocket Connection');
+    const ws = new SockJS(this.webSocketEndPoint);
+    this.stompClient = Stomp.over(ws);
+
     this.gameId = gameId;
     // tslint:disable-next-line:variable-name
     const _this = this;
@@ -49,6 +55,12 @@ export class WebSocketApiService {
       });
       // _this.stompClient.reconnect_delay = 2000;
     }, this.errorCallBack);
+
+    await this.sleep(3000); // MUST EXIST!!!!!!
+  }
+
+  sleep(ms: number): Promise<any> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   // tslint:disable-next-line:typedef
@@ -98,7 +110,7 @@ export class WebSocketApiService {
 
   public _sendRoomStatusRequest(message: any): void {
     console.log('asking for room status');
-    this.stompClient.send('/app/' + this.gameId + '/roomStatusRequest', {}, JSON.stringify(message));
+    this.stompClient.send('/app/shaq/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(message));
   }
 
   // tslint:disable-next-line:typedef

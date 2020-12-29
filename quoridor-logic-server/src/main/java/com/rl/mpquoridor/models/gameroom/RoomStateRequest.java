@@ -5,5 +5,4 @@ import lombok.Data;
 
 @Data
 public class RoomStateRequest extends WebSocketMessage {
-    private String gameID;
 }

@@ -10,6 +10,7 @@ import com.rl.mpquoridor.models.gameroom.RoomStateResponse;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +22,18 @@ public class GameWebSocket {
     private GameRoomsManagerService roomsManager;
     private Gson gson;
 
+
     @Autowired
     public GameWebSocket(SimpMessagingTemplate messageSender, GameRoomsManagerService roomsManager, Gson gson) {
         this.messageSender = messageSender;
         this.roomsManager = roomsManager;
         this.gson = gson;
+    }
+    
+    @MessageMapping("/hello")
+    @SendTo("/topic/gameStatus")
+    public boolean greeting(String message) throws Exception {
+        return true;
     }
 
     @MessageMapping("/turnAction/{gameId}/movePawn")

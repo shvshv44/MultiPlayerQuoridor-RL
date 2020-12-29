@@ -1,10 +1,10 @@
+
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {PlayDialogComponent} from '../play-dialog/play-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {PlayDialogData} from '../interfaces/play-dialog-data';
 import {HttpClient} from '@angular/common/http';
-import {catchError, tap} from 'rxjs/operators';
 import {GameRoomService} from '../game-room.service';
 import {WebSocketApiService} from '../web-socket-api.service';
 
@@ -15,6 +15,7 @@ import {WebSocketApiService} from '../web-socket-api.service';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
+
 
   private dialogData: PlayDialogData;
   private readonly serverURL = 'http://localhost:8080';
@@ -30,7 +31,11 @@ export class MenuComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onGameHistoryClick(): void{
+  callHello(): void {
+    this.webSocket._hello({id: 5});
+  }
+
+  onGameHistoryClick(): void {
     this.router.navigateByUrl('/game-history');
   }
 

@@ -19,7 +19,7 @@
   </div>
 
   <div class="game-room-buttons">
-    <button mat-raised-button color="basic" class="game-room-button" *ngIf="this.gameRoom.playerName === this.gameRoom.allPlayers[0]">Start</button>
+    <button mat-raised-button color="basic" class="game-room-button" (click)="startGame()" *ngIf="this.gameRoom.playerName === this.gameRoom.allPlayers[0]">Start</button>
     <button mat-raised-button color="basic" class="game-room-button">Exit</button>
   </div>
 

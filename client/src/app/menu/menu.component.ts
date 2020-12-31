@@ -16,7 +16,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 })
 export class MenuComponent implements OnInit {
 
-
   private dialogData: PlayDialogData;
   private readonly serverURL = 'http://localhost:8080';
 
@@ -69,8 +68,8 @@ export class MenuComponent implements OnInit {
   }
 
   async joinGame(gameId: string, playerName: string): Promise<void> {
-    const createGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
-    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+    const joinGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
+    const returnedGameId = await this.http.get(joinGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
       this.snackBar.open(err.error, 'close', { duration: 10000, });
     });
 

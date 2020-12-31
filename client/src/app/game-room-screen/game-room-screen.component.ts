@@ -3,6 +3,7 @@ import {GameRoomService} from '../game-room.service';
 import {WebSocketApiService} from '../web-socket-api.service';
 import {MessageHandlerService} from '../message-handler.service';
 import {Router} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -11,12 +12,21 @@ import {Router} from '@angular/router';
 })
 export class GameRoomScreenComponent implements OnInit {
 
+  private readonly serverURL = 'http://localhost:8080';
+
   constructor(public gameRoom: GameRoomService,
               public webSocket: WebSocketApiService,
               public messageHandler: MessageHandlerService,
-              public router: Router) {
+              private router: Router,
+              private http: HttpClient) {
     messageHandler.assignHandler('RoomStateResponse', (message) => {
       this.gameRoom.allPlayers = message.players;
+    });
+
+    messageHandler.assignHandler('StartGameEvent', (message) => {
+      // TODO: Sharon/Guy Raviv need to laod the game data to the Store!!!
+      console.log(message);
+      router.navigateByUrl('/game-screen');
     });
   }
 
@@ -30,5 +40,10 @@ export class GameRoomScreenComponent implements OnInit {
         type: 'RoomStateRequest',
         gameID: this.gameRoom.gameID
       });
+  }
+
+  async startGame(): Promise<void> {
+    const startGameURL = this.serverURL + '/StartGame' + '/' + this.gameRoom.gameID;
+    await this.http.get(startGameURL, {responseType: 'text'}).toPromise();
   }
 }

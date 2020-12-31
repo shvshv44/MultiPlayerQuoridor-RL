@@ -21,15 +21,17 @@ public class GameBoard {
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
         this.pawnEndLine = new HashMap<>();
+        this.board = new PhysicalBoard(numberOfWallsPerPlayer);
 
         switch (numberOfPlayers) {
             case 2 : pawns = initiateTwoPlayers(); break;
             case 3 : pawns = initiateThreePlayers(); break;
             case 4 : pawns = initiateFourPlayers(); break;
             default : throw new RuntimeException("Invalid number of players");
-        };
+        }
 
-        this.board = new PhysicalBoard(pawns, numberOfWallsPerPlayer);
+        this.board.setPawnPosition(pawns);
+
     }
 
     private Map<Pawn, Position> initiateTwoPlayers() {
@@ -112,7 +114,7 @@ public class GameBoard {
 
         // Make sure the wall doesn't collides with any other wall
         if(this.isWallCollides(wall)) {
-            throw new IllegalMovementException("The wall collides with other wall");
+            throw new IllegalMovementException("The wall collides with another wall");
         }
 
         // Checking the wall is in the bounds of the board
@@ -139,11 +141,12 @@ public class GameBoard {
         }
     }
 
-    /**
-     *
-     * @return a readonly copy of the physical board
-     */
-    public PhysicalBoard getPhysicalBoard() {
+
+    private PhysicalBoard getPhysicalBoard() {
+        return this.board;
+    }
+
+    public ReadOnlyPhysicalBoard getReadOnlyPhysicalBoard() {
         if(this.readOnlyPhysicalBoard == null) {
             this.readOnlyPhysicalBoard = new ReadOnlyPhysicalBoard(this.board);
         }

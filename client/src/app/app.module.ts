@@ -27,6 +27,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { GameRoomScreenComponent } from './game-room-screen/game-room-screen.component';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { GameRoomScreenComponent } from './game-room-screen/game-room-screen.com
         FormsModule,
         MatDialogModule,
         MatFormFieldModule,
-        MatInputModule
+        MatInputModule,
+        MatSnackBarModule
     ],
   providers: [],
   bootstrap: [AppComponent]

@@ -4,10 +4,10 @@ import { Router } from '@angular/router';
 import {PlayDialogComponent} from '../play-dialog/play-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {PlayDialogData} from '../interfaces/play-dialog-data';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpEvent} from '@angular/common/http';
 import {GameRoomService} from '../game-room.service';
 import {WebSocketApiService} from '../web-socket-api.service';
-
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-menu',
@@ -24,7 +24,8 @@ export class MenuComponent implements OnInit {
               private dialog: MatDialog,
               private http: HttpClient,
               private gameRoom: GameRoomService,
-              private webSocket: WebSocketApiService) {
+              private webSocket: WebSocketApiService,
+              private snackBar: MatSnackBar) {
     this.dialogData = {gameId: '', action: 'none', playerName: ''};
   }
 
@@ -64,15 +65,18 @@ export class MenuComponent implements OnInit {
   async createGame(playerName: string): Promise<void> {
     const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
     const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
-
     await this.connectAndGoToRoomScreen(returnedGameId, playerName);
   }
 
   async joinGame(gameId: string, playerName: string): Promise<void> {
     const createGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
-    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+      this.snackBar.open(err.error, 'close', { duration: 10000, });
+    });
 
-    await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+    if (typeof returnedGameId === 'string') {
+      await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+    }
   }
 
   async connectAndGoToRoomScreen(gameId: string, playerName: string): Promise<void> {
@@ -86,4 +90,5 @@ export class MenuComponent implements OnInit {
     this.gameRoom.playerName = playerName;
     this.gameRoom.allPlayers = [playerName];
   }
+
 }

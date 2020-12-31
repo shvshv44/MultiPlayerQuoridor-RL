@@ -1,9 +1,13 @@
 package com.rl.mpquoridor.controllers;
 
+import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,10 +36,14 @@ public class GameAPIController {
     @CrossOrigin
     @GetMapping("/JoinGame/{gameId}/{playerName}")
     @ResponseBody
-    public String joinGame(@PathVariable String gameId, @PathVariable String playerName) {
-        gameRoomManager.joinGame(gameId, playerName);
-        System.out.println("Player " + playerName + " has been joined to game room with id: " + gameId);
-        return gameId;
+    public ResponseEntity<String> joinGame(@PathVariable String gameId, @PathVariable String playerName) {
+        try {
+            gameRoomManager.joinGame(gameId, playerName);
+            System.out.println("Player " + playerName + " has been joined to game room with id: " + gameId);
+            return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
+        } catch (InvalidOperationException ex) {
+            return new ResponseEntity<>(ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @CrossOrigin

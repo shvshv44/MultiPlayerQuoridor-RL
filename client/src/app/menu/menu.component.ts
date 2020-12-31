@@ -25,7 +25,7 @@ export class MenuComponent implements OnInit {
               private http: HttpClient,
               private gameRoom: GameRoomService,
               private webSocket: WebSocketApiService) {
-    this.dialogData = {gameId: '', action: 'none'};
+    this.dialogData = {gameId: '', action: 'none', playerName: ''};
   }
 
   ngOnInit(): void {
@@ -41,18 +41,23 @@ export class MenuComponent implements OnInit {
 
   async onPlayButtonClick(): Promise<void> {
     const dialogRef = this.dialog.open(PlayDialogComponent, {
-      width: '250px',
+      height: '400px',
+      width: '600px',
       data: this.dialog
     });
 
-    await dialogRef.afterClosed().subscribe(async result => await this.onCreateOrJoinGame(result));
+    await dialogRef.afterClosed().subscribe(async result => {
+      if (result !== undefined) {
+        await this.onCreateOrJoinGame(result);
+      }
+    });
   }
 
   async onCreateOrJoinGame(result: PlayDialogData): Promise<void> {
     if (result.action === 'create') {
-      await this.createGame('shaq');
+      await this.createGame(result.playerName);
     } else if (result.action === 'join') {
-      await this.joinGame(result.gameId, 'shaq');
+      await this.joinGame(result.gameId, result.playerName);
     }
   }
 

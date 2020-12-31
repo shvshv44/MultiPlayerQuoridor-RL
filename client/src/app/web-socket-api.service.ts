@@ -57,7 +57,7 @@ export class WebSocketApiService {
       // _this.stompClient.reconnect_delay = 2000;
     }, this.errorCallBack);
 
-    await this.sleep(2000); // MUST EXIST!!!!!!
+    await this.sleep(1000); // MUST EXIST!!!!!!
   }
 
   sleep(ms: number): Promise<any> {

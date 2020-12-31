@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 import {delay} from 'rxjs/operators';
+import {MessageHandlerService} from './message-handler.service';
 
 
 @Injectable({
@@ -14,7 +15,7 @@ export class WebSocketApiService {
   gameId = '-1';
   isOpen = false;
 
-  constructor() {
+  constructor(public msgHandler: MessageHandlerService) {
     // this._connect();
   }
 
@@ -56,7 +57,7 @@ export class WebSocketApiService {
       // _this.stompClient.reconnect_delay = 2000;
     }, this.errorCallBack);
 
-    await this.sleep(3000); // MUST EXIST!!!!!!
+    await this.sleep(2000); // MUST EXIST!!!!!!
   }
 
   sleep(ms: number): Promise<any> {
@@ -110,12 +111,12 @@ export class WebSocketApiService {
 
   public _sendRoomStatusRequest(message: any): void {
     console.log('asking for room status');
-    this.stompClient.send('/app/shaq/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(message));
+    this.stompClient.send('/app/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(message));
   }
 
   // tslint:disable-next-line:typedef
-  onMessageReceived(message: string) {
-    console.log('Message Recieved from Server :: ' + message);
-    // this.appComponent.handleMessage(JSON.stringify(message.body));
+  onMessageReceived(messageEvent: any) {
+    const message = JSON.parse(messageEvent.body);
+    this.msgHandler.handleMessage(message);
   }
 }

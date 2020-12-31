@@ -51,7 +51,7 @@ public class GameWebSocket {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
-    @MessageMapping("/shaq/{gameId}/roomStateRequest")
+    @MessageMapping("/{gameId}/roomStateRequest")
     public void roomStateRequest(@DestinationVariable String gameId, String requestAsString) {
         RoomStateRequest request = gson.fromJson(requestAsString, RoomStateRequest.class);
         System.out.println("game id " + gameId + " , Input : " + request);
@@ -62,7 +62,7 @@ public class GameWebSocket {
         GameRoomState roomState = roomsManager.getRoomState(request.getGameID());
         RoomStateResponse response = new RoomStateResponse();
         response.setGameID(request.getGameID());
-        response.setType("RoomStatusResponse");
+        response.setType("RoomStateResponse");
         response.setPlayers(roomState.getPlayers());
         this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID(), response);
     }

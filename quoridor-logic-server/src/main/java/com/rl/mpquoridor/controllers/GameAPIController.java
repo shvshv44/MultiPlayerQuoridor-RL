@@ -34,9 +34,8 @@ public class GameAPIController {
     @ResponseBody
     public String joinGame(@PathVariable String gameId, @PathVariable String playerName) {
         gameRoomManager.joinGame(gameId, playerName);
-        String output = "Player " + playerName + " has been joined to game room with id: " + gameId;
-        System.out.println(output);
-        return output;
+        System.out.println("Player " + playerName + " has been joined to game room with id: " + gameId);
+        return gameId;
     }
 
     @CrossOrigin

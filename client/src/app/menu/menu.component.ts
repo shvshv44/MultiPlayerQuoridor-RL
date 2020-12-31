@@ -52,26 +52,33 @@ export class MenuComponent implements OnInit {
     if (result.action === 'create') {
       await this.createGame('shaq');
     } else if (result.action === 'join') {
-      this.joinGame(result.gameId);
+      await this.joinGame(result.gameId, 'shaq');
     }
   }
 
   async createGame(playerName: string): Promise<void> {
     const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
-    const value = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
 
-    await this.webSocket._connectToGame(value);
-    this.gameRoom.gameID = value;
-    this.gameRoom.playerName = playerName;
-    this.gameRoom.allPlayers = [playerName];
+    await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+  }
+
+  async joinGame(gameId: string, playerName: string): Promise<void> {
+    const createGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
+    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+
+    await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+  }
+
+  async connectAndGoToRoomScreen(gameId: string, playerName: string): Promise<void> {
+    await this.webSocket._connectToGame(gameId);
+    this.defaultGameState(gameId, playerName);
     this.router.navigateByUrl('/game-room-screen');
   }
 
-  joinGame(gameId: string): void {
-    const createGameURL = this.serverURL + '/JoinGame/' + gameId + '/shaq';
-    this.http.get(createGameURL, {responseType: 'text'})
-      .subscribe(value => {
-        console.log(value); // TODO: open tcp and go to room
-      });
+  private defaultGameState(gameId: string, playerName: string): void {
+    this.gameRoom.gameID = gameId;
+    this.gameRoom.playerName = playerName;
+    this.gameRoom.allPlayers = [playerName];
   }
 }

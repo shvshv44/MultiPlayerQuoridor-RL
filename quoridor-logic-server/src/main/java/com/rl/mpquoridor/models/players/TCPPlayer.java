@@ -7,6 +7,8 @@ import com.rl.mpquoridor.models.events.GameEvent;
 
 import java.util.List;
 
+import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason;
+
 public class TCPPlayer implements Player {
 
     private String name;
@@ -26,7 +28,7 @@ public class TCPPlayer implements Player {
     }
 
     @Override
-    public void illegalMovePlayed(String msg) {
+    public void illegalMovePlayed(Reason reason) {
 
     }
 

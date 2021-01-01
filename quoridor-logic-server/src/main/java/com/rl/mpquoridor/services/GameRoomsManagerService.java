@@ -36,16 +36,16 @@ public class GameRoomsManagerService {
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers(), gameId), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameManager.run();
     }
 
     // TODO: Temporary function till TCP handler will be created!
-    private List<Player> createPlayersFromNames(List<String> names) {
+    private List<Player> createPlayersFromNames(List<String> names, String gameId) {
         List<Player> players = new ArrayList<>();
         for (String name : names) {
-            players.add(new TCPPlayer(name));
+            players.add(new TCPPlayer(name, gameId));
         }
 
         return players;

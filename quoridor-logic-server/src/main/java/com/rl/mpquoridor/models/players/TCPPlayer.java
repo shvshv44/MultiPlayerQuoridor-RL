@@ -1,6 +1,8 @@
 package com.rl.mpquoridor.models.players;
 
 import com.rl.mpquoridor.controllers.GameWebSocket;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
+import com.rl.mpquoridor.models.actions.ResponseMovePawnAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
@@ -44,6 +46,11 @@ public class TCPPlayer implements Player {
     public void trigger(GameEvent event) {
         if (event instanceof TurnActionEvent) {
             TurnAction turnAction = ((TurnActionEvent) event).getAction();
+
+            if (turnAction instanceof MovePawnAction) {
+                turnAction = new ResponseMovePawnAction(board.getPawnPosition(((TurnActionEvent) event).getPawn()));
+            }
+
             String nextPlayer = ((TurnActionEvent) event).getNextPlayer();
             boolean isGameEnded = ((TurnActionEvent) event).isGameEnded();
             List<Position> currentPlayerMoves = ((TurnActionEvent) event).getCurrentPlayerMoves();

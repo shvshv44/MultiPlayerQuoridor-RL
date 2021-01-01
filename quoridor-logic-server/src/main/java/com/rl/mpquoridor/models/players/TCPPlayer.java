@@ -75,7 +75,7 @@ public class TCPPlayer implements Player {
         }
 
         TurnAction turnAction = gameWebSocket.getLastTurnAction();
-        gameWebSocket.setLastTurnAction(null);
+        gameWebSocket.resetLastTurnAction();
 
         return turnAction;
     }

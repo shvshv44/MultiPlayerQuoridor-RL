@@ -38,7 +38,7 @@ public class GameWebSocket {
             return lastTurnAction;
     }
 
-    public void setLastTurnAction(TurnAction lastTurnAction) {
-        this.lastTurnAction = lastTurnAction;
+    public void resetLastTurnAction() {
+        this.lastTurnAction = null;
     }
 }

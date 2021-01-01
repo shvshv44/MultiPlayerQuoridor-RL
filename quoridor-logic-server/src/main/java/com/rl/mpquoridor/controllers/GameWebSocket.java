@@ -1,9 +1,12 @@
 package com.rl.mpquoridor.controllers;
 
 import com.google.gson.Gson;
+import ch.qos.logback.core.joran.action.Action;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.enums.WebSocketMessageType;
+import com.rl.mpquoridor.models.actions.TurnAction;
+import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.RoomStateRequest;
@@ -27,7 +30,7 @@ public class GameWebSocket {
     private SimpMessagingTemplate messageSender;
     private GameRoomsManagerService roomsManager;
     private Gson gson;
-
+    private TurnAction lastTurnAction;
 
     @Autowired
     public GameWebSocket(SimpMessagingTemplate messageSender, GameRoomsManagerService roomsManager, Gson gson) {
@@ -44,14 +47,20 @@ public class GameWebSocket {
 
     @MessageMapping("/turnAction/{gameId}/movePawn")
     public void movePawn(@PathVariable String gameId, MovePawnAction action) {
-        // todo: play the movePawn and return the game status
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
+        lastTurnAction = action;
     }
 
     @MessageMapping("/turnAction/{gameId}/putWall")
     public void putWall(@PathVariable String gameId, PlaceWallAction action) {
-        // todo: play the putWall and return the
+        lastTurnAction = action;
+    }
+
+    public void endTurn(String gameId, EndTurnEvent action) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
+    }
+
+    public TurnAction getLastTurnAction() {
+            return lastTurnAction;
     }
 
     @MessageMapping("/{gameId}/roomStateRequest")
@@ -70,7 +79,7 @@ public class GameWebSocket {
         this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID(), response);
     }
 
-    public void endTurn(String gameId, NewTurnEvent action) {
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
+    public void resetLastTurnAction() {
+        this.lastTurnAction = null;
     }
 }

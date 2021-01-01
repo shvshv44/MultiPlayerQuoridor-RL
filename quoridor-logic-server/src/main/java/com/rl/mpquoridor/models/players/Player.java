@@ -13,5 +13,6 @@ public interface Player {
     void illegalMovePlayed(String msg);
     void trigger(GameEvent event);
     void setBoard(ReadOnlyPhysicalBoard board);
+    String getPlayerName();
     TurnAction play();
 }

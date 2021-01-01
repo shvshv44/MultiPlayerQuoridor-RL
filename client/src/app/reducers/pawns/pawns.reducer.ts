@@ -33,7 +33,7 @@ export function pawnsReducer(state: Position[], action: Action): any {
 }
 */
 
-export interface State extends EntityState<Pawn> {
+export interface PawnsState extends EntityState<Pawn> {
   // additional entities state properties
   selectedPawnName: string;
 }
@@ -47,7 +47,7 @@ export const adapter: EntityAdapter<Pawn> = createEntityAdapter<Pawn>({
   sortComparer: false,
 });
 
-export const initialState: State = adapter.getInitialState({
+export const initialState: PawnsState = adapter.getInitialState({
   // additional entity state properties
   selectedPawnName: '',
 });
@@ -100,6 +100,6 @@ const pawnsReducerAction = createReducer(initialState,
     return adapter.removeAll({...state, selectedPawnId: null});
   }));
 
-export function pawnsReducer(state: State | undefined, action: Action): any {
+export function pawnsReducer(state: PawnsState | undefined, action: Action): any {
   return pawnsReducerAction(state, action);
 }

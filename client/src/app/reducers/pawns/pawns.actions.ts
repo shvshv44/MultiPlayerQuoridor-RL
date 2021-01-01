@@ -3,11 +3,9 @@ import {Position} from '../../interfaces/position';
 import {Pawn} from '../../interfaces/pawn';
 import {EntityMap, EntityMapOne, Predicate, Update} from '@ngrx/entity';
 
-export const setPawns = createAction('[Pawns Component] Set pawns', props<{ pawns: Map<string, Position> }>());
-export const changePawnPosition = createAction('[Pawns Component] Change Pawn Position ', props<{ name: string, position: Position }>());
-
 export const loadPawns = createAction('[Pawns Component] Load Pawns', props<{ Pawns: Pawn[] }>());
 export const addPawn = createAction('[Pawns Component] Add Pawn', props<{ Pawn: Pawn }>());
+export const changePawnPosition = createAction('[Pawns Component] Change Pawn Position', props<{ pawn: Pawn }>());
 export const setPawn = createAction('[Pawns Component] Set Pawn', props<{ Pawn: Pawn }>());
 export const upsertPawn = createAction('[Pawns Component] Upsert Pawn', props<{ Pawn: Pawn }>());
 export const addPawns = createAction('[Pawns Component] Add Pawns', props<{ Pawns: Pawn[] }>());

@@ -1,7 +1,7 @@
-import {adapter, State} from './pawns.reducer';
+import {adapter, PawnsState} from './pawns.reducer';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 
-export const getSelectedUserId = (state: State) => state.selectedPawnName;
+export const getSelectedUserId = (state: PawnsState) => state.selectedPawnName;
 
 // get the selectors
 const {
@@ -23,7 +23,7 @@ export const selectAllUsers = selectAll;
 // select the total user count
 export const selectUserTotal = selectTotal;
 
-export const selectPawnState = createFeatureSelector<State>('pawns');
+export const selectPawnState = createFeatureSelector<PawnsState>('pawns');
 
 export const selectPawnArray = createSelector(selectPawnState, selectAll);
 

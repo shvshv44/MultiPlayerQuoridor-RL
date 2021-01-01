@@ -3,6 +3,8 @@ import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 import {MessageHandlerService} from '../../message-handler.service';
 import {ConfigService} from '../config/config.service';
+import {Wall} from '../../interfaces/wall';
+import {Position} from '../../interfaces/position';
 
 
 @Injectable({
@@ -64,15 +66,15 @@ export class WebSocketApiService {
   }
 
   // tslint:disable-next-line:typedef
-  _sendPawnMovment(message: any) {
-    console.log('calling send pawn movment');
-    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(message));
+  _sendPawnMovement(position: Position) {
+    console.log('calling send pawn movement');
+    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(position));
   }
 
   // tslint:disable-next-line:typedef
-  _sendPutWall(message: any) {
+  _sendPutWall(wall: Wall) {
     console.log('calling send put wall');
-    this.stompClient.send('/app/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(message));
+    this.stompClient.send('/app/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(wall));
   }
 
   // tslint:disable-next-line:typedef

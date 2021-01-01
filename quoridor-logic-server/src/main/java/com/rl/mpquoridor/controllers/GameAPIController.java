@@ -1,8 +1,8 @@
 package com.rl.mpquoridor.controllers;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
-import com.rl.mpquoridor.models.actions.TurnAction;
-import com.rl.mpquoridor.models.events.TurnActionEvent;
+import com.rl.mpquoridor.models.common.Constants;
+import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.StartGameEvent;
@@ -58,16 +58,23 @@ public class GameAPIController {
     @CrossOrigin
     @GetMapping("/StartGame/{gameId}")
     @ResponseBody
-    public String startGame(@PathVariable String gameId) {
+    public ResponseEntity<String> startGame(@PathVariable String gameId) {
+        GameRoomState roomState = gameRoomManager.getRoomState(gameId);
+        if (roomState.getPlayers().size() < Constants.MIN_NUMBER_PLAYERS)
+            return new ResponseEntity<>("Game room must contain at least two players!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+
+        startRoomGame(gameId);
+        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, createStartGameEvent(gameId));
+        return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    private void startRoomGame(@PathVariable String gameId) {
         try {
             System.out.println("Starting game with id: " + gameId);
             gameRoomManager.startGame(gameId);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!
         }
-
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, createStartGameEvent(gameId));
-        return gameId;
     }
 
     @CrossOrigin
@@ -87,7 +94,7 @@ public class GameAPIController {
     private StartGameEvent createStartGameEvent(String gameId) {
         GameRoomState roomState = gameRoomManager.getRoomState(gameId);
         StartGameEvent startGame = new StartGameEvent();
-        startGame.setType("StartGameEvent");
+        startGame.setType(WebSocketMessageType.START_GAME_EVENT);
         startGame.setGameID(gameId);
         startGame.setPlayers(roomState.getPlayers());
         startGame.setCurrentPlayerTurn(roomState.getPlayers().get(0));

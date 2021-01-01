@@ -3,7 +3,8 @@ import {GameRoomService} from '../game-room.service';
 import {WebSocketApiService} from '../web-socket-api.service';
 import {MessageHandlerService} from '../message-handler.service';
 import {Router} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -18,7 +19,8 @@ export class GameRoomScreenComponent implements OnInit {
               public webSocket: WebSocketApiService,
               public messageHandler: MessageHandlerService,
               private router: Router,
-              private http: HttpClient) {
+              private http: HttpClient,
+              private snackBar: MatSnackBar) {
     messageHandler.assignHandler('RoomStateResponse', (message) => {
       this.gameRoom.allPlayers = message.players;
     });
@@ -43,7 +45,9 @@ export class GameRoomScreenComponent implements OnInit {
   }
 
   async startGame(): Promise<void> {
-    const startGameURL = this.serverURL + '/StartGame' + '/' + this.gameRoom.gameID;
-    await this.http.get(startGameURL, {responseType: 'text'}).toPromise();
+    const startGameURL = this.serverURL + '/StartGame/' + this.gameRoom.gameID;
+    await this.http.get(startGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+      this.snackBar.open(err.error, 'close', { duration: 10000, });
+    });
   }
 }

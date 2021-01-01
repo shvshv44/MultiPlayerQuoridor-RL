@@ -16,28 +16,8 @@ export class WebSocketApiService {
   isOpen = false;
 
   constructor(public msgHandler: MessageHandlerService) {
-    // this._connect();
   }
 
-  // tslint:disable-next-line:typedef
-  _connect() {
-    console.log('Initialize WebSocket Connection');
-    const ws = new SockJS(this.webSocketEndPoint);
-    this.stompClient = Stomp.over(ws);
-    // tslint:disable-next-line:variable-name
-    const _this = this;
-    // tslint:disable-next-line:only-arrow-functions typedef
-    _this.stompClient.connect({}, function() {
-      // tslint:disable-next-line:only-arrow-functions typedef
-      _this.stompClient.subscribe(_this.topic , function(sdkEvent: any) {
-        _this.onMessageReceived(sdkEvent);
-      });
-      // _this.stompClient.reconnect_delay = 2000;
-    }, this.errorCallBack);
-  }
-
-
-  //TODO: Shaked u need to call this when u create the game - it had subscribe to specifig topic/{gameId}
 // tslint:disable-next-line:typedef
   async _connectToGame(gameId: string) {
     console.log('Initialize WebSocket Connection');
@@ -77,7 +57,7 @@ export class WebSocketApiService {
   errorCallBack(error: string) {
     console.log('errorCallBack -> ' + error);
     setTimeout(() => {
-      this._connect();
+      this._connectToGame(this.gameId);
     }, 5000);
   }
 

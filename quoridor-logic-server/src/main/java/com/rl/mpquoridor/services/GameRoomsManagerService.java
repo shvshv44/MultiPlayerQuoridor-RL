@@ -1,6 +1,7 @@
 package com.rl.mpquoridor.services;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
@@ -11,9 +12,6 @@ import java.util.*;
 
 @Service
 public class GameRoomsManagerService {
-
-    private final int NUMBER_OF_WALLS_PER_PLAYER = 8;
-    private final int MAX_NUMBER_PLAYERS = 4;
 
     private HashMap <String, GameRoomState> gameRooms;
 
@@ -38,7 +36,7 @@ public class GameRoomsManagerService {
             throw new InvalidOperationException("Game with id " + gameId + " does not exist!");
 
         GameRoomState roomState =  gameRooms.get(gameId);
-        if (roomState.getPlayers().size() < MAX_NUMBER_PLAYERS) {
+        if (roomState.getPlayers().size() < Constants.MAX_NUMBER_PLAYERS) {
             roomState.getPlayers().add(playerName);
         } else  {
             throw new InvalidOperationException("Game room is full!");
@@ -47,7 +45,7 @@ public class GameRoomsManagerService {
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), Constants.NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameManager.run();
     }

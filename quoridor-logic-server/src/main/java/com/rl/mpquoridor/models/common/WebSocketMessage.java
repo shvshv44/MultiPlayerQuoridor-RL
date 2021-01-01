@@ -1,9 +1,10 @@
 package com.rl.mpquoridor.models.common;
 
+import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import lombok.Data;
 
 @Data
 public class WebSocketMessage {
-    private String type;
+    private WebSocketMessageType type;
     private String gameID;
 }

@@ -3,6 +3,7 @@ package com.rl.mpquoridor.controllers;
 import com.google.gson.Gson;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
+import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.RoomStateRequest;
@@ -11,7 +12,6 @@ import com.rl.mpquoridor.services.GameRoomsManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -62,7 +62,7 @@ public class GameWebSocket {
         GameRoomState roomState = roomsManager.getRoomState(request.getGameID());
         RoomStateResponse response = new RoomStateResponse();
         response.setGameID(request.getGameID());
-        response.setType("RoomStateResponse");
+        response.setType(WebSocketMessageType.ROOM_STATE_RESPONSE);
         response.setPlayers(roomState.getPlayers());
         this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID(), response);
     }

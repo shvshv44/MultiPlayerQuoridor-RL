@@ -43,6 +43,11 @@ public class CMDPlayer implements Player {
     }
 
     @Override
+    public void getPlayerName() {
+	    return "CMD Player"
+    }
+
+    @Override
     public void setMyPawn(Pawn myPawn) {
         this.myPawn = myPawn;
         logger.info("My pawn is: " + pawnsName.get(myPawn));

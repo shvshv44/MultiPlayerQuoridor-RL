@@ -23,6 +23,11 @@ public class RandomPlayer implements Player {
     }
 
     @Override
+    public String getPlayerName() {
+		  return "Random player";
+    }
+
+    @Override
     public void setMyPawn(Pawn myPawn) {
 
     }

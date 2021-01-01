@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
+import {WebSocketMessageType} from './web-socket-message-type.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageHandlerService {
 
-  handlers = new Map<string, (message: any) => void>();
+  handlers = new Map<WebSocketMessageType, (message: any) => void>();
 
   constructor() { }
 
-  assignHandler(type: string, handler: (message: any) => void): void {
+  assignHandler(type: WebSocketMessageType, handler: (message: any) => void): void {
     this.handlers.set(type, handler);
   }
 

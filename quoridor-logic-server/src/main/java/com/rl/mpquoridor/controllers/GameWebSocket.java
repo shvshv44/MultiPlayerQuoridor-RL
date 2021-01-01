@@ -9,6 +9,8 @@ import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.RoomStateRequest;
 import com.rl.mpquoridor.models.gameroom.RoomStateResponse;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class GameWebSocket {
+
+    private final static Logger logger = LoggerFactory.getLogger(GameWebSocket.class);
 
     private SimpMessagingTemplate messageSender;
     private GameRoomsManagerService roomsManager;
@@ -35,7 +39,6 @@ public class GameWebSocket {
     @MessageMapping("/hello")
     @SendTo("/topic/gameStatus")
     public boolean greeting(String message) throws Exception {
-        System.out.println("sharon");
         return true;
     }
 
@@ -54,7 +57,7 @@ public class GameWebSocket {
     @MessageMapping("/{gameId}/roomStateRequest")
     public void roomStateRequest(@DestinationVariable String gameId, String requestAsString) {
         RoomStateRequest request = gson.fromJson(requestAsString, RoomStateRequest.class);
-        System.out.println("game id " + gameId + " , Input : " + request);
+        logger.info("Game id " + gameId + " , Input : " + request);
         roomStateResponse(request);
     }
 

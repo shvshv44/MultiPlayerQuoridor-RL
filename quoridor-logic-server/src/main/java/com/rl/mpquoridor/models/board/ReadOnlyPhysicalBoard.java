@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
-    PhysicalBoard source;
+    private final PhysicalBoard source;
+
     public ReadOnlyPhysicalBoard(PhysicalBoard source) {
         this.source = source;
     }

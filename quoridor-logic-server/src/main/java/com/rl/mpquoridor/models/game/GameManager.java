@@ -1,4 +1,6 @@
 package com.rl.mpquoridor.models.game;
+
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
 import com.rl.mpquoridor.models.actions.TurnAction;
@@ -11,7 +13,7 @@ import com.rl.mpquoridor.models.events.TurnActionEvent;
 import com.rl.mpquoridor.models.players.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.collect.BiMap;
+
 import java.util.*;
 
 
@@ -27,15 +29,15 @@ public class GameManager {
         initPlayerPawn();
 
         for(Player p: this.players) {
-            p.setMyPawn(playerPawn.get(p));
+            p.setBoard(this.gameBoard.getReadOnlyPhysicalBoard());
             p.setPlayOrder(this.gameBoard.getPlayOrder());
+            p.setMyPawn(playerPawn.get(p));
         }
-
     }
 
     public void initPlayerPawn() {
         this.playerPawn =  HashBiMap.create(this.players.size());
-        List<Pawn> playOrder = this .gameBoard.getPlayOrder();
+        List<Pawn> playOrder = this.gameBoard.getPlayOrder();
 
         Iterator<Player> itPlayer = this.players.iterator();
         Iterator<Pawn> itPawn = playOrder.iterator();
@@ -57,8 +59,8 @@ public class GameManager {
             try {
                 this.gameBoard.executeAction(currentPawn, action);
             } catch (IllegalMovementException e) {
-                currentPlayer.illegalMovePlayed(e.getMessage());
-                logger.info("Illegal action " + e.getMessage());
+                currentPlayer.illegalMovePlayed(e.getReason());
+                logger.info("Illegal action " + e.getReason().getMessage());
                 continue;
             }
             isGameEnded = (this.gameBoard.getWinner() != null);

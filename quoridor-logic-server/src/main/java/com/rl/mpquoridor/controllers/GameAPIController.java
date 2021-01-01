@@ -8,6 +8,8 @@ import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.StartGameEvent;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @RestController
 public class GameAPIController {
+
+    private final static Logger logger = LoggerFactory.getLogger(GameAPIController.class);
 
     private GameRoomsManagerService gameRoomManager;
     private HistoryResolverService historyResolver;
@@ -38,7 +42,7 @@ public class GameAPIController {
     @ResponseBody
     public String createGame(@PathVariable String playerName) {
         String gameId = gameRoomManager.createGame(playerName);
-        System.out.println(playerName + " has been created game room with id: " + gameId);
+        logger.info(playerName + " has been created game room with id: " + gameId);
         return gameId;
     }
 
@@ -48,7 +52,7 @@ public class GameAPIController {
     public ResponseEntity<String> joinGame(@PathVariable String gameId, @PathVariable String playerName) {
         try {
             gameRoomManager.joinGame(gameId, playerName);
-            System.out.println("Player " + playerName + " has been joined to game room with id: " + gameId);
+            logger.info("Player " + playerName + " has been joined to game room with id: " + gameId);
             return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
         } catch (InvalidOperationException ex) {
             return new ResponseEntity<>(ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -70,7 +74,7 @@ public class GameAPIController {
 
     private void startRoomGame(@PathVariable String gameId) {
         try {
-            System.out.println("Starting game with id: " + gameId);
+            logger.info("Starting game with id: " + gameId);
             gameRoomManager.startGame(gameId);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!

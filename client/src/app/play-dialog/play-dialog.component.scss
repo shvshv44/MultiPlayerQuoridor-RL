@@ -1,0 +1,19 @@
+.play-dialog {
+  background-color: #737373;
+  height: 90%;
+  width: 90%;
+  margin: 2px;
+  display: flex;
+  justify-content: left;
+  align-content: center;
+}
+
+.play-dialog li {
+  padding: 5px;
+  list-style-type: none;
+}
+
+.dialog-button {
+  margin-left: 5px;
+  margin-right: 5px;
+}

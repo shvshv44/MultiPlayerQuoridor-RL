@@ -361,4 +361,16 @@ public class GameBoard {
     public List<Pawn> getPlayOrder() {
         return Collections.unmodifiableList(this.playOrder);
     }
+
+    public List<Position> getCurrentPlayerMoves(Pawn pawn) {
+        List<Position> currentPlayerMoves = new ArrayList<>();
+        Arrays.stream(MovementDirection.values()).forEach(movementDirection -> {
+            Position dest = this.simulateMove(this.getPhysicalBoard().getPawnPosition(pawn), movementDirection);
+            if (dest != null) {
+                currentPlayerMoves.add(dest);
+            }
+        });
+
+        return currentPlayerMoves;
+    }
 }

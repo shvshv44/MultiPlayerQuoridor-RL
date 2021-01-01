@@ -6,6 +6,7 @@ import com.rl.mpquoridor.exceptions.IllegalMovementException;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.GameBoard;
 import com.rl.mpquoridor.models.board.Pawn;
+import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
@@ -48,7 +49,9 @@ public class GameManager {
     }
     public GameResult run() {
         List<HistoryRecord> history = new ArrayList<>();
-        while(this.gameBoard.getWinner() == null) {
+        boolean isGameEnded = (this.gameBoard.getWinner() != null);
+
+        while(!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
             trigger(new NewTurnEvent(currentPawn));
@@ -60,9 +63,13 @@ public class GameManager {
                 logger.info("Illegal action " + e.getReason().getMessage());
                 continue;
             }
+            isGameEnded = (this.gameBoard.getWinner() != null);
+            List<Position> nextPlayerMoves = this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer));
+
             history.add(new HistoryRecord(currentPawn, action));
-            trigger(new TurnActionEvent(this.playerPawn.get(currentPlayer), action));
             this.players.add(this.players.poll()); // Move the current player to the end of the queue
+            trigger(new TurnActionEvent(this.playerPawn.get(currentPlayer), action,
+                    this.players.peek().getPlayerName(), isGameEnded, nextPlayerMoves));
         }
 
         return new GameResult(this.playerPawn.inverse().get(this.gameBoard.getWinner()), history);

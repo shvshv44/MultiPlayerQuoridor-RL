@@ -1,21 +1,5 @@
 import {Action, createReducer, on} from '@ngrx/store';
-import {Position} from '../../interfaces/position';
-import {
-  addPawn,
-  addPawns,
-  clearPawns,
-  deletePawn,
-  deletePawns,
-  deletePawnsByPredicate,
-  loadPawns,
-  mapPawn,
-  mapPawns,
-  setPawn,
-  updatePawn,
-  updatePawns,
-  upsertPawn,
-  upsertPawns
-} from './pawns.actions';
+import {addPawn, addPawns, clearPawns, loadPawns, updatePawn,} from './pawns.actions';
 import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
 import {Pawn} from '../../interfaces/pawn';
 
@@ -54,47 +38,17 @@ export const initialState: PawnsState = adapter.getInitialState({
 
 const pawnsReducerAction = createReducer(initialState,
   // tslint:disable-next-line:no-shadowed-variable
-  on(addPawn, (state, {Pawn}) => {
-    return adapter.addOne(Pawn, state);
+  on(addPawn, (state, {pawn}) => {
+    return adapter.addOne(pawn, state);
   }),
-  // tslint:disable-next-line:no-shadowed-variable
-  on(setPawn, (state, {Pawn}) => {
-    return adapter.setOne(Pawn, state);
-  }),
-  // tslint:disable-next-line:no-shadowed-variable
-  on(upsertPawn, (state, {Pawn}) => {
-    return adapter.upsertOne(Pawn, state);
-  }),
-  on(addPawns, (state, {Pawns}) => {
-    return adapter.addMany(Pawns, state);
-  }),
-  on(upsertPawns, (state, {Pawns}) => {
-    return adapter.upsertMany(Pawns, state);
+  on(addPawns, (state, {pawns}) => {
+    return adapter.addMany(pawns, state);
   }),
   on(updatePawn, (state, {update}) => {
     return adapter.updateOne(update, state);
   }),
-  on(updatePawns, (state, {updates}) => {
-    return adapter.updateMany(updates, state);
-  }),
-  on(mapPawn, (state, {entityMap}) => {
-    // @ts-ignore
-    return adapter.map(entityMap, state);
-  }),
-  on(mapPawns, (state, {entityMap}) => {
-    return adapter.map(entityMap, state);
-  }),
-  on(deletePawn, (state, {id}) => {
-    return adapter.removeOne(id, state);
-  }),
-  on(deletePawns, (state, {ids}) => {
-    return adapter.removeMany(ids, state);
-  }),
-  on(deletePawnsByPredicate, (state, {predicate}) => {
-    return adapter.removeMany(predicate, state);
-  }),
-  on(loadPawns, (state, {Pawns}) => {
-    return adapter.setAll(Pawns, state);
+  on(loadPawns, (state, {pawns}) => {
+    return adapter.setAll(pawns, state);
   }),
   on(clearPawns, state => {
     return adapter.removeAll({...state, selectedPawnId: null});

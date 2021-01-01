@@ -44,7 +44,7 @@ public class CMDPlayer implements Player {
 
     @Override
     public void getPlayerName() {
-	    return "CMD Player"
+	    return "CMD Player";
     }
 
     @Override

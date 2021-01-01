@@ -10,6 +10,7 @@ import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -20,7 +21,8 @@ public class TCPPlayer implements Player {
     private List<Pawn> playOrder;
     private Pawn myPawn;
     private ReadOnlyPhysicalBoard board;
-    private GameWebSocket gameWebSocket = new GameWebSocket();
+    @Autowired
+    private GameWebSocket gameWebSocket;
 
     public TCPPlayer(String name, String gameId) {
         this.name = name;

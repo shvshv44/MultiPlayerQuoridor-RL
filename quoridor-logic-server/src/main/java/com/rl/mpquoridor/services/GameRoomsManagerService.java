@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.rl.mpquoridor.models.common.Constants.NUMBER_OF_WALLS_PER_PLAYER;
+
 @Service
 public class GameRoomsManagerService {
 
@@ -45,7 +47,7 @@ public class GameRoomsManagerService {
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers(), gameId), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameManager.run();
     }

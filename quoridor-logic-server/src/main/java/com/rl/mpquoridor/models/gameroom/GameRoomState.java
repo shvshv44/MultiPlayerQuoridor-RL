@@ -1,5 +1,6 @@
-package com.rl.mpquoridor.models.game;
+package com.rl.mpquoridor.models.gameroom;
 
+import com.rl.mpquoridor.models.game.GameManager;
 import lombok.Data;
 
 import java.util.List;

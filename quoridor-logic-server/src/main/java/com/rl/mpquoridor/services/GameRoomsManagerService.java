@@ -1,18 +1,17 @@
 package com.rl.mpquoridor.services;
 
+import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.game.GameManager;
-import com.rl.mpquoridor.models.game.GameRoomState;
+import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.TCPPlayer;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class GameRoomsManagerService {
-
-    private final int NUMBER_OF_WALLS_PER_PLAYER = 8;
 
     private HashMap <String, GameRoomState> gameRooms;
 
@@ -25,20 +24,34 @@ public class GameRoomsManagerService {
         GameRoomState state = new GameRoomState();
         state.setId(gameId);
         state.setPlayers(new ArrayList<>());
+        state.getPlayers().add(playerName);
 
         gameRooms.put(gameId, state);
         return gameId;
     }
 
     public void joinGame(String gameId, String playerName) {
-        gameRooms.get(gameId).getPlayers().add(playerName);
+
+        if (!gameRooms.containsKey(gameId))
+            throw new InvalidOperationException("Game with id " + gameId + " does not exist!");
+
+        GameRoomState roomState =  gameRooms.get(gameId);
+        if (roomState.getPlayers().size() < Constants.MAX_NUMBER_PLAYERS) {
+            roomState.getPlayers().add(playerName);
+        } else  {
+            throw new InvalidOperationException("Game room is full!");
+        }
     }
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(createPlayersFromNames(gameRoomState.getPlayers()), Constants.NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameManager.run();
+    }
+
+    public GameRoomState getRoomState(String gameId) {
+        return gameRooms.get(gameId);
     }
 
     // TODO: Temporary function till TCP handler will be created!

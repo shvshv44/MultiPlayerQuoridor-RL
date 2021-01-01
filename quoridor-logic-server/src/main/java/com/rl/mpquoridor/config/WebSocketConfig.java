@@ -1,4 +1,4 @@
-package com.rl.mpquoridor.webSocket;
+package com.rl.mpquoridor.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/quoridor-websocket").setAllowedOrigins("http://localhost:4200").withSockJS();
+        registry.addEndpoint("/quoridor-websocket").setAllowedOriginPatterns("*").withSockJS();
     }
 
 }

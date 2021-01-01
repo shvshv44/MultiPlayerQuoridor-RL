@@ -56,8 +56,8 @@ public class GameManager {
             try {
                 this.gameBoard.executeAction(currentPawn, action);
             } catch (IllegalMovementException e) {
-                currentPlayer.illegalMovePlayed(e.getMessage());
-                logger.info("Illegal action " + e.getMessage());
+                currentPlayer.illegalMovePlayed(e.getReason());
+                logger.info("Illegal action " + e.getReason().getMessage());
                 continue;
             }
             history.add(new HistoryRecord(currentPawn, action));

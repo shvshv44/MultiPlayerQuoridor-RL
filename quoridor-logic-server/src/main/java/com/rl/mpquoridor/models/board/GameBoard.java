@@ -10,6 +10,8 @@ import lombok.Getter;
 
 import java.util.*;
 
+import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
+
 public class GameBoard {
     private final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
@@ -89,7 +91,7 @@ public class GameBoard {
     private void movePawn(Pawn pawn, MovementDirection direction) throws IllegalMovementException {
         Position dest = this.simulateMove(this.getPhysicalBoard().getPawnPosition(pawn), direction);
         if(dest == null) {
-            throw new IllegalMovementException("Illegal moving request.");
+            throw new IllegalMovementException(MOVING_IN_DIRECTION_IS_NOT_ALLOWED);
         }
         this.getPhysicalBoard().movePawn(pawn, dest);
         checkWinner(pawn);
@@ -109,25 +111,25 @@ public class GameBoard {
     private void placeWall (Pawn pawn, Wall wall)  throws IllegalMovementException {
         // Make sure the pawn has enough walls
         if(getPhysicalBoard().getPawnWalls().get(pawn) == 0) {
-            throw new IllegalMovementException("No more walls left");
+            throw new IllegalMovementException(NO_WALLS_LEFT);
         }
 
         // Make sure the wall doesn't collides with any other wall
         if(this.isWallCollides(wall)) {
-            throw new IllegalMovementException("The wall collides with another wall");
+            throw new IllegalMovementException(WALL_COLLIDES_WITH_OTHER_WALL);
         }
 
         // Checking the wall is in the bounds of the board
-        if(wall.getPosition().getI() < 0 || wall.getPosition().getI() >= this.getPhysicalBoard().getSize() -1 ||
-           wall.getPosition().getJ() < 0 || wall.getPosition().getJ() >= this.getPhysicalBoard().getSize() -1 )  {
-            throw new IllegalMovementException("The wall is out side the board bounds");
+        if(wall.getPosition().getI() < 0 || wall.getPosition().getI() >= this.getPhysicalBoard().getSize() ||
+           wall.getPosition().getJ() < 0 || wall.getPosition().getJ() >= this.getPhysicalBoard().getSize() )  {
+            throw new IllegalMovementException(WALL_IS_OUTSIDE_THE_BOARD_BOUNDS);
         }
 
         // Make sure all the pawns have an available path
         this.getPhysicalBoard().putWall(wall); // Putting this, if pawn has no path, remove this wall.
         if(!isAllPawnsHavePath()) {
             this.getPhysicalBoard().removeWall(wall); // removing the illegal wall.
-            throw new IllegalMovementException("Not all pawns have available path to their end");
+            throw new IllegalMovementException(NO_PATH_AVAILABLE);
         }
 
         this.getPhysicalBoard().reduceWallToPawn(pawn);
@@ -341,7 +343,7 @@ public class GameBoard {
 
         Position next = new Position(s.getI(), s.getJ() + 1);
 
-        Wall block1 = new Wall(next, WallDirection.RIGHT);
+        Wall block1 = new Wall(next, WallDirection.DOWN);
         Wall block2 = new Wall(new Position(next.getI() - 1 , next.getJ()), WallDirection.DOWN);
 
         if(this.getPhysicalBoard().getWalls().contains(block1) ||
@@ -358,5 +360,17 @@ public class GameBoard {
 
     public List<Pawn> getPlayOrder() {
         return Collections.unmodifiableList(this.playOrder);
+    }
+
+    public List<Position> getCurrentPlayerMoves(Pawn pawn) {
+        List<Position> currentPlayerMoves = new ArrayList<>();
+        Arrays.stream(MovementDirection.values()).forEach(movementDirection -> {
+            Position dest = this.simulateMove(this.getPhysicalBoard().getPawnPosition(pawn), movementDirection);
+            if (dest != null) {
+                currentPlayerMoves.add(dest);
+            }
+        });
+
+        return currentPlayerMoves;
     }
 }

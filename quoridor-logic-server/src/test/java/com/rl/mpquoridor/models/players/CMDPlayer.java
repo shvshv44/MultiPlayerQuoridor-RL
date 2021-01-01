@@ -1,4 +1,4 @@
-package com.rl.mpquoridor.players;
+package com.rl.mpquoridor.models.players;
 
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
@@ -10,7 +10,6 @@ import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
 import com.rl.mpquoridor.models.events.GameEvent;
-import com.rl.mpquoridor.models.players.Player;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason;
 
 public class CMDPlayer implements Player {
     private static final String ASK_FOR_INPUT = "---> ";
@@ -42,14 +43,19 @@ public class CMDPlayer implements Player {
     }
 
     @Override
+    public String getPlayerName() {
+	    return "CMD Player";
+    }
+
+    @Override
     public void setMyPawn(Pawn myPawn) {
         this.myPawn = myPawn;
         logger.info("My pawn is: " + pawnsName.get(myPawn));
     }
 
     @Override
-    public void illegalMovePlayed(String msg) {
-        logger.info("Illegal move played: " + msg);
+    public void illegalMovePlayed(Reason reason) {
+        logger.info("Illegal move played: " + reason.getMessage());
     }
 
     @Override

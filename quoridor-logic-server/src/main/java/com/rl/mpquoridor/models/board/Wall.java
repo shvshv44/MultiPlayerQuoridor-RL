@@ -11,5 +11,4 @@ import lombok.Getter;
 public class Wall {
     private final Position position;
     private final WallDirection wallDirection;
-
 }

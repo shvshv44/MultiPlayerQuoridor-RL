@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {GameRoomService} from '../game-room.service';
 import {WebSocketApiService} from '../web-socket-api.service';
 import {MessageHandlerService} from '../message-handler.service';
 import {Router} from '@angular/router';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {WebSocketMessageType} from '../web-socket-message-type.enum';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -21,11 +22,11 @@ export class GameRoomScreenComponent implements OnInit {
               private router: Router,
               private http: HttpClient,
               private snackBar: MatSnackBar) {
-    messageHandler.assignHandler('RoomStateResponse', (message) => {
+    messageHandler.assignHandler(WebSocketMessageType.RoomStateResponse, (message) => {
       this.gameRoom.allPlayers = message.players;
     });
 
-    messageHandler.assignHandler('StartGameEvent', (message) => {
+    messageHandler.assignHandler(WebSocketMessageType.StartGameEvent, (message) => {
       // TODO: Sharon/Guy Raviv need to laod the game data to the Store!!!
       console.log(message);
       router.navigateByUrl('/game-screen');
@@ -39,7 +40,7 @@ export class GameRoomScreenComponent implements OnInit {
 
     this.webSocket._sendRoomStatusRequest(
       {
-        type: 'RoomStateRequest',
+        type: WebSocketMessageType.RoomStateRequest,
         gameID: this.gameRoom.gameID
       });
   }

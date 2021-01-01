@@ -1,12 +1,12 @@
-package com.rl.mpquoridor.players;
+package com.rl.mpquoridor.models.players;
 
+import com.rl.mpquoridor.exceptions.IllegalMovementException;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.events.GameEvent;
-import com.rl.mpquoridor.models.players.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +23,17 @@ public class RandomPlayer implements Player {
     }
 
     @Override
+    public String getPlayerName() {
+		  return "Random player";
+    }
+
+    @Override
     public void setMyPawn(Pawn myPawn) {
 
     }
 
     @Override
-    public void illegalMovePlayed(String msg) {
+    public void illegalMovePlayed(IllegalMovementException.Reason reason) {
     }
 
     @Override

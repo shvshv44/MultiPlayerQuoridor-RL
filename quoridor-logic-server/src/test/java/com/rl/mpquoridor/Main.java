@@ -1,9 +1,9 @@
 package com.rl.mpquoridor;
 
 import com.rl.mpquoridor.models.game.GameManager;
+import com.rl.mpquoridor.models.players.CMDPlayer;
 import com.rl.mpquoridor.models.players.Player;
-import com.rl.mpquoridor.players.CMDPlayer;
-import com.rl.mpquoridor.players.RandomPlayer;
+import com.rl.mpquoridor.models.players.RandomPlayer;
 
 import java.util.ArrayList;
 import java.util.List;

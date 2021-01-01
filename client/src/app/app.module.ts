@@ -28,6 +28,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { GameRoomScreenComponent } from './game-room-screen/game-room-screen.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { GameRulesComponent } from './game-rules/game-rules.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     OptionButtonComponent,
     BoardWallComponent,
     PlayDialogComponent,
-    GameRoomScreenComponent
+    GameRoomScreenComponent,
+    GameRulesComponent
   ],
     imports: [
         BrowserModule,

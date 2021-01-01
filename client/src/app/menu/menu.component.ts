@@ -35,6 +35,10 @@ export class MenuComponent implements OnInit {
     this.webSocket._hello({id: 5});
   }
 
+  onGameRulesClick(): void {
+    this.router.navigateByUrl('/game-rules');
+  }
+
   onGameHistoryClick(): void {
     this.router.navigateByUrl('/game-history');
   }

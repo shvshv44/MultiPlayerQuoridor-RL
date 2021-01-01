@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {setWalls} from '../reducers/walls/walls.actions';
-import {Direction} from '../enums/direction';
-import {Wall} from "../interfaces/wall";
+import {setWalls} from '../../reducers/walls/walls.actions';
+import {Direction} from '../../enums/direction';
+import {Wall} from "../../interfaces/wall";
+import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
 
 // @ts-ignore
 @Component({
@@ -13,6 +14,7 @@ import {Wall} from "../interfaces/wall";
 export class GameScreenComponent implements OnInit {
 
   constructor(private readonly store: Store) {
+    this.store.select(selectPawnArray)
 
     // For Guy use this syntax to init the new walls - examples:
     this.store.dispatch(setWalls({walls: []}));

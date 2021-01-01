@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {PlayDialogData} from '../interfaces/play-dialog-data';
+import {PlayDialogData} from '../../interfaces/play-dialog-data';
 
 @Component({
   selector: 'app-play-dialog',

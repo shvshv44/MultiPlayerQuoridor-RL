@@ -1,21 +1,23 @@
 import {Injectable} from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
-import {delay} from 'rxjs/operators';
-import {MessageHandlerService} from './message-handler.service';
+import {MessageHandlerService} from '../../message-handler.service';
+import {ConfigService} from '../config/config.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebSocketApiService {
-  webSocketEndPoint = 'http://localhost:8080/quoridor-websocket';
+  webSocketEndPoint;
   topic = '/topic/gameStatus';
   stompClient: any;
   gameId = '-1';
   isOpen = false;
 
-  constructor(public msgHandler: MessageHandlerService) {
+  constructor(public msgHandler: MessageHandlerService,
+              private configService: ConfigService) {
+    this.webSocketEndPoint = this.configService.getConfig().serverUrl;
   }
 
 // tslint:disable-next-line:typedef
@@ -86,7 +88,7 @@ export class WebSocketApiService {
   // tslint:disable-next-line:typedef
   _send(message: any) {
     console.log('calling logout api via web socket');
-      this.stompClient.send('/app/hello', {}, JSON.stringify(message));
+    this.stompClient.send('/app/hello', {}, JSON.stringify(message));
   }
 
   public _sendRoomStatusRequest(message: any): void {

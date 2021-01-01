@@ -1,13 +1,13 @@
-
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 import {PlayDialogComponent} from '../play-dialog/play-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
-import {PlayDialogData} from '../interfaces/play-dialog-data';
-import {HttpClient, HttpErrorResponse, HttpEvent} from '@angular/common/http';
-import {GameRoomService} from '../game-room.service';
-import {WebSocketApiService} from '../web-socket-api.service';
+import {PlayDialogData} from '../../interfaces/play-dialog-data';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {GameRoomService} from '../../game-room.service';
+import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfigService} from '../../services/config/config.service';
 
 @Component({
   selector: 'app-menu',
@@ -17,15 +17,17 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class MenuComponent implements OnInit {
 
   private dialogData: PlayDialogData;
-  private readonly serverURL = 'http://localhost:8080';
+  private readonly serverURL;
 
   constructor(private router: Router,
               private dialog: MatDialog,
               private http: HttpClient,
               private gameRoom: GameRoomService,
               private webSocket: WebSocketApiService,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private configService: ConfigService) {
     this.dialogData = {gameId: '', action: 'none', playerName: ''};
+    this.serverURL = this.configService.getConfig().serverUrl;
   }
 
   ngOnInit(): void {
@@ -70,7 +72,7 @@ export class MenuComponent implements OnInit {
   async joinGame(gameId: string, playerName: string): Promise<void> {
     const joinGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
     const returnedGameId = await this.http.get(joinGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
-      this.snackBar.open(err.error, 'close', { duration: 10000, });
+      this.snackBar.open(err.error, 'close', {duration: 10000,});
     });
 
     if (typeof returnedGameId === 'string') {

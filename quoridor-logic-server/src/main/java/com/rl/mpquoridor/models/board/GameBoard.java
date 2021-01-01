@@ -255,7 +255,7 @@ public class GameBoard {
      * @return the destination or null if the move is illegal
      */
     private Position simulateMove(Position s, MovementDirection direction) {
-        Position position = new Position(0,0);
+        Position position = null;
         switch (direction) {
             case UP : position = simulateUpMove(s); break;
             case DOWN : position = simulateDownMove(s); break;

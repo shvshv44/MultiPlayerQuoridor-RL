@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {GameRoomService} from '../game-room.service';
-import {WebSocketApiService} from '../web-socket-api.service';
-import {MessageHandlerService} from '../message-handler.service';
+import {GameRoomService} from '../../game-room.service';
+import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
+import {MessageHandlerService} from '../../message-handler.service';
 import {Router} from '@angular/router';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {WebSocketMessageType} from '../web-socket-message-type.enum';
+import {WebSocketMessageType} from '../../web-socket-message-type.enum';
 
 @Component({
   selector: 'app-game-room-screen',

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChildren, QueryList, ElementRef} from '@angular/core';
+import {Component, OnInit, ViewChildren, QueryList, ElementRef, Input, AfterViewInit} from '@angular/core';
 import {BoardCellComponent} from '../board-cell/board-cell.component';
 import {BoardWallComponent} from '../board-wall/board-wall.component';
 
@@ -7,9 +7,10 @@ import {BoardWallComponent} from '../board-wall/board-wall.component';
   templateUrl: './board-game.component.html',
   styleUrls: ['./board-game.component.scss']
 })
-export class BoardGameComponent implements OnInit {
+export class BoardGameComponent implements OnInit, AfterViewInit {
 
   readonly boardRowSize = 9;
+  @Input() playerLocations: any[] = [];
 
   @ViewChildren(BoardCellComponent) cellsAsList: QueryList<BoardCellComponent> = new QueryList<BoardCellComponent>();
   @ViewChildren(BoardWallComponent) wallsAsList: QueryList<BoardWallComponent> = new QueryList<BoardWallComponent>();
@@ -18,7 +19,6 @@ export class BoardGameComponent implements OnInit {
   cells: BoardCellComponent[] = [];
   horizontalWalls: BoardWallComponent[] = [];
   verticalWalls: BoardWallComponent[] = [];
-  playerLocations: any[] = [];
 
 
   constructor() {
@@ -28,7 +28,6 @@ export class BoardGameComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  // tslint:disable-next-line:use-lifecycle-interface
   ngAfterViewInit(): void {
     this.createCellsAndWallsArrays();
     this.create4PlayersAtStart();

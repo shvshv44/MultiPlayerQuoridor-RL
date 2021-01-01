@@ -23,13 +23,11 @@ public class GameWebSocket {
     @MessageMapping("/turnAction/{gameId}/movePawn")
     public void movePawn(@PathVariable String gameId, MovePawnAction action) {
         lastTurnAction = action;
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
     @MessageMapping("/turnAction/{gameId}/putWall")
     public void putWall(@PathVariable String gameId, PlaceWallAction action) {
         lastTurnAction = action;
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
     public void endTurn(String gameId, EndTurnEvent action) {
@@ -37,7 +35,7 @@ public class GameWebSocket {
     }
 
     public TurnAction getLastTurnAction() {
-        return lastTurnAction;
+            return lastTurnAction;
     }
 
     public void setLastTurnAction(TurnAction lastTurnAction) {

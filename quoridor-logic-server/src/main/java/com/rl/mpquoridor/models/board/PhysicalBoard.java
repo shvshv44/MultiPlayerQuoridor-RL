@@ -6,11 +6,6 @@ import com.google.common.collect.HashBiMap;
 import java.util.*;
 
 
-
-
-
-
-
 /**
  * ------------------------------------------
  * Every procedure you create in this class
@@ -22,13 +17,20 @@ public class PhysicalBoard {
     private HashSet<Wall> walls;
     private BiMap<Pawn, Position> pawns;
     private HashMap<Pawn, Integer> pawnWalls;
+    private int startNumberOfWallsPerPlayer;
 
-    public PhysicalBoard(Map<Pawn, Position> pawns, int numberOfWallsPerPlayer) {
-        this.pawns = HashBiMap.create(pawns.size());
+    public PhysicalBoard(int numberOfWallsPerPlayer) {
         this.pawnWalls = new HashMap<>();
+        this.startNumberOfWallsPerPlayer = numberOfWallsPerPlayer;
+        this.walls = new HashSet<>();
+
+    }
+
+    public void setPawnPosition (Map<Pawn, Position> pawns) {
+        this.pawns = HashBiMap.create(pawns.size());
         this.pawns.putAll(pawns);
         for (Pawn p : this.pawns.keySet()) {
-            this.pawnWalls.put(p, numberOfWallsPerPlayer);
+            this.pawnWalls.put(p, this.startNumberOfWallsPerPlayer);
         }
     }
 
@@ -48,7 +50,7 @@ public class PhysicalBoard {
     }
 
     public void movePawn(Pawn pawn, Position dest) {
-        if(this.pawns.containsKey(pawn)) {
+        if (this.pawns.containsKey(pawn)) {
             pawns.put(pawn, dest);
         }
     }
@@ -61,7 +63,7 @@ public class PhysicalBoard {
     }
 
     public void reduceWallToPawn(Pawn p) {
-        if(pawns.containsKey(p)) {
+        if (pawns.containsKey(p)) {
             this.pawnWalls.put(p, this.pawnWalls.get(p) - 1);
         }
     }

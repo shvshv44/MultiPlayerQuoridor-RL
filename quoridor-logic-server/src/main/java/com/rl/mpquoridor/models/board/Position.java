@@ -3,12 +3,12 @@ package com.rl.mpquoridor.models.board;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.util.Objects;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class Position {
     private final int i;
     private final int j;

@@ -9,3 +9,4 @@ const {
 export const selectWallsState = createFeatureSelector<WallsState>('walls');
 export const selectWallsArray = createSelector(selectWallsState, selectAll);
 export const selectWallsDictionary = createSelector(selectWallsState, selectEntities);
+

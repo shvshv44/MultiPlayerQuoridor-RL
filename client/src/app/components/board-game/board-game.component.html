@@ -1,53 +1,8 @@
-
 <div class="board-container">
-
-  <!--  First 8 Board Rows -->
-  <div *ngFor="let itemRow of [].constructor(boardRowSize - 1); let i = index">
-
-    <!--  Cell With Walls Row-->
-    <div class="board-cell-row">
-
-      <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
-        <app-board-cell [row]="i" [col]="j" (click)="playerAskToMove(i,j)" ></app-board-cell>
-        <app-board-wall [row]="i" [col]="j" [isVertical]="true"
-                        (mouseover)="mouseHoverWallEvent($event, i, j)"
-                        (mouseout)="mouseOutWallEvent($event, i, j)"
-                        (click)="playerAskForWall(i,j,true)"></app-board-wall>
-      </div>
-
-      <app-board-cell [row]="i" [col]="boardRowSize-1" (click)="playerAskToMove(i,boardRowSize-1)"></app-board-cell>
-
-    </div>
-
-    <!--  Only Walls Row-->
-    <div class="board-wall-row">
-
-      <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
-        <app-board-wall [row]="i" [col]="j" [isVertical]="false"
-                        (mouseover)="mouseHoverWallEvent($event, i, j)"
-                        (mouseout)="mouseOutWallEvent($event, i, j)"
-                        (click)="playerAskForWall(i,j,false)"></app-board-wall>
-      </div>
-
-      <app-board-wall [row]="i" [col]="boardRowSize-1" [isVertical]="false"></app-board-wall>
-
-    </div>
-
+  <div *ngFor="let item of counter(boardRowSize); let i = index">
+    <app-board-row [rowIndex]="i" [pawns]="pawns" [walls]="walls" [rowSize]="boardRowSize"
+                   [hoveredWallId]="currentHoveredWallId" (emitHoveredWallId)="handleHover($event)"></app-board-row>
   </div>
-
-<!--  Last Board Row -->
-  <div class="board-cell-row">
-
-    <div *ngFor="let itemCol of [].constructor(boardRowSize - 1); let j = index">
-      <app-board-cell [row]="boardRowSize-1" [col]="j" (click)="playerAskToMove(boardRowSize-1,j)" ></app-board-cell>
-      <app-board-wall [row]="boardRowSize-1" [col]="j" [isVertical]="true"></app-board-wall>
-    </div>
-
-    <app-board-cell [row]="boardRowSize-1" [col]="boardRowSize-1" (click)="playerAskToMove(boardRowSize-1,boardRowSize-1)" ></app-board-cell>
-
-  </div>
-
-
 </div>
 
 

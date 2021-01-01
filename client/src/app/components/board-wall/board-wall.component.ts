@@ -6,12 +6,11 @@ import {Component, ElementRef, Input, OnInit} from '@angular/core';
   styleUrls: ['./board-wall.component.scss']
 })
 export class BoardWallComponent implements OnInit {
-  @Input() isActive = false;
-  @Input() isVertical = true;
-  @Input() row = -1;
-  @Input() col = -1;
+  @Input() isActive;
+  @Input() isVertical;
+  @Input() isHovered;
 
-  constructor(public elementRef: ElementRef) {
+  constructor() {
   }
 
   ngOnInit(): void {

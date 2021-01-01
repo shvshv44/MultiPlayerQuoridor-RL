@@ -31,6 +31,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {EffectsModule} from '@ngrx/effects';
 import {WallsEffects} from './reducers/walls/walls.effects';
 import {PawnsEffects} from './reducers/pawns/pawns.effects';
+import { BoardRowComponent } from './components/board-row/board-row.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import {PawnsEffects} from './reducers/pawns/pawns.effects';
     OptionButtonComponent,
     BoardWallComponent,
     PlayDialogComponent,
-    GameRoomScreenComponent
+    GameRoomScreenComponent,
+    BoardRowComponent,
   ],
   imports: [
     BrowserModule,

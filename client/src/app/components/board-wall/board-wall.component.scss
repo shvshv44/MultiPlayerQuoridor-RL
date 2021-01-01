@@ -3,16 +3,7 @@
 .wall {
   display: block;
   float: left;
-
   border-radius: 1px;
-
-  //&:hover {
-  //  cursor: pointer;
-  //  animation:hover 1s infinite alternate;
-  //  transition: all 1s;
-  //  background: #432d0a !important;
-  //}
-
 }
 
 .wall-hover {
@@ -23,7 +14,7 @@
 }
 
 .wall-active {
-  background: $wall-hover-color !important;
+  background: $wall-active-color !important;
 }
 
 .horizontal {

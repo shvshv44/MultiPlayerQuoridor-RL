@@ -3,7 +3,9 @@ import {switchMap} from 'rxjs/operators';
 import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
 import {from} from 'rxjs';
 import {changePawnPosition} from './pawns.actions';
+import {Injectable} from '@angular/core';
 
+@Injectable()
 export class PawnsEffects {
 
   loadWalls$ = createEffect(() => this.actions$.pipe(

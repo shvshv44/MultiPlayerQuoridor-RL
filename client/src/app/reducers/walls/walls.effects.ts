@@ -3,7 +3,9 @@ import {AddWallServer} from './walls.actions';
 import {switchMap} from 'rxjs/operators';
 import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
 import {from} from 'rxjs';
+import {Injectable} from '@angular/core';
 
+@Injectable()
 export class WallsEffects {
 
   loadWalls$ = createEffect(() => this.actions$.pipe(

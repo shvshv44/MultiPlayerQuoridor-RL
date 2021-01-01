@@ -1,7 +1,7 @@
 <div id="game-container">
 
   <div id="board">
-    <app-board-game></app-board-game>
+    <app-board-game [walls]="walls$ | async" [pawns]="pawns$ | async"></app-board-game>
   </div>
 
   <div id="options">

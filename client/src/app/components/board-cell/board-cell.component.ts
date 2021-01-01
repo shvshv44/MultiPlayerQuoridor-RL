@@ -6,12 +6,10 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./board-cell.component.scss']
 })
 export class BoardCellComponent implements OnInit {
+  @Input() playerCode: number | undefined; // if a player stands on the cell
 
-  @Input() row = -1;
-  @Input() col = -1;
-  @Input() playerCode = 0; // if a player stands on the cell
-
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

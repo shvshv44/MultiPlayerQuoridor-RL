@@ -43,7 +43,7 @@ public class CMDPlayer implements Player {
     }
 
     @Override
-    public void getPlayerName() {
+    public String getPlayerName() {
 	    return "CMD Player";
     }
 

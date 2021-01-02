@@ -17,7 +17,6 @@ import java.util.List;
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason;
 
 public class TCPPlayer implements Player {
-
     private String name;
     private String gameId;
     private List<Pawn> playOrder;

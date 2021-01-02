@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {MenuComponent} from './menu/menu.component';
-import {GameHistoryComponent} from './game-history/game-history.component';
-import {GameScreenComponent} from './game-screen/game-screen.component';
-import {GameRoomScreenComponent} from './game-room-screen/game-room-screen.component';
+import {MenuComponent} from './components/menu/menu.component';
+import {GameHistoryComponent} from './components/game-history/game-history.component';
+import {GameScreenComponent} from './components/game-screen/game-screen.component';
+import {GameRoomScreenComponent} from './components/game-room-screen/game-room-screen.component';
 import {GameRulesComponent} from './game-rules/game-rules.component';
 
 const routes: Routes = [

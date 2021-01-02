@@ -1,0 +1,6 @@
+@import "../../../styles";
+
+.board-cell-row {
+  height: $cell-inner-size;
+  width: $row-column-size;
+}

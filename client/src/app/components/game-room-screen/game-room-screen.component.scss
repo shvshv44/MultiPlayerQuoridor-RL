@@ -1,0 +1,66 @@
+@import "../../../styles";
+
+.game-room-screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+.room-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: solid 3px $game-screen-border-color;
+  border-radius: 12px;
+  background-color: $game-screen-component-color;
+  padding: 15px;
+  margin: 35px;
+  width: 40%;
+}
+
+//====================================================
+
+.header-upper-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.game-room-players {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-room-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+//====================================================
+
+.header-game-room {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px;
+}
+
+.game-room-button {
+  margin: 20px;
+  display: flex;
+  justify-content: center;
+  width: 300px;
+}
+
+.game-room-button:hover {
+  text-shadow: 2px 2px 5px black;
+  background-color: #191919;
+}

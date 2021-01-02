@@ -112,6 +112,7 @@ public class TCPPlayer implements Player {
         if(event instanceof GameOverEvent) {
             GameOverEvent gameOverEvent = (GameOverEvent) event;
             GameOverMessage message = new GameOverMessage();
+            message.setGameID(gameId);
             message.setWinnerName(this.pawnPerPlayerName.get(gameOverEvent.getWinner()));
 
             gameWebSocket.sendToPlayer(gameId, name, message);

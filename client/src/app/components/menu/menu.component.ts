@@ -95,7 +95,6 @@ export class MenuComponent implements OnInit {
   private defaultGameState(gameId: string, playerName: string): void {
     this.store.dispatch(setPawnName({pawnName: playerName}));
     this.store.dispatch(setGameId({gameId}));
-    this.store.dispatch(addPawns({pawns: [{name: playerName, position: {x: 0, y: 0}}]}));
   }
 
 }

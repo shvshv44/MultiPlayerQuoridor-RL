@@ -28,7 +28,7 @@ const pawnsReducerAction = createReducer(initialState,
     return adapter.addOne(pawn, state);
   }),
   on(addPawns, (state, {pawns}) => {
-    return adapter.addMany(pawns, state);
+    return adapter.upsertMany(pawns, state);
   }), on(setSelectedPawn, (state, {pawnName}) => {
     return {...state, selectedPawnName: pawnName};
   }),

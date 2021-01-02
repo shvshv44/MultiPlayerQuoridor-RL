@@ -4,7 +4,6 @@ import * as SockJS from 'sockjs-client';
 import {MessageHandlerService} from '../message-handler/message-handler.service';
 import {ConfigService} from '../config/config.service';
 import {Wall} from '../../interfaces/wall';
-import {Position} from '../../interfaces/position';
 import {Direction} from '../../enums/direction';
 
 
@@ -16,6 +15,7 @@ export class WebSocketApiService {
   topic = '/topic/gameStatus';
   stompClient: any;
   gameId = '-1';
+  playerName = '-1';
   isOpen = false;
 
   constructor(public msgHandler: MessageHandlerService,
@@ -24,7 +24,7 @@ export class WebSocketApiService {
   }
 
 // tslint:disable-next-line:typedef
-  async _connectToGame(gameId: string) {
+  async _connectToGame(gameId: string, playerName: string) {
     console.log('Initialize WebSocket Connection');
     const ws = new SockJS(this.webSocketEndPoint);
     this.stompClient = Stomp.over(ws);
@@ -36,7 +36,7 @@ export class WebSocketApiService {
     // tslint:disable-next-line:only-arrow-functions typedef
     _this.stompClient.connect({}, function() {
       // tslint:disable-next-line:only-arrow-functions typedef
-      _this.stompClient.subscribe(_this.topic + '/' + gameId, function(sdkEvent: any) {
+      _this.stompClient.subscribe(_this.topic + '/' + gameId + '/' + playerName, function(sdkEvent: any) {
         _this.onMessageReceived(sdkEvent);
       });
       // _this.stompClient.reconnect_delay = 2000;
@@ -62,20 +62,20 @@ export class WebSocketApiService {
   errorCallBack(error: string) {
     console.log('errorCallBack -> ' + error);
     setTimeout(() => {
-      this._connectToGame(this.gameId);
+      this._connectToGame(this.gameId, this.playerName);
     }, 5000);
   }
 
   // tslint:disable-next-line:typedef
   _sendPawnMovement(direction: Direction) {
     console.log('calling send pawn movement');
-    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(direction));
+    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/movePawn', {}, JSON.stringify(direction));
   }
 
   // tslint:disable-next-line:typedef
   _sendPutWall(wall: Wall) {
     console.log('calling send put wall');
-    this.stompClient.send('/app/' + this.gameId + '/putWall', {}, JSON.stringify(wall));
+    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/putWall', {}, JSON.stringify(wall));
   }
 
   // tslint:disable-next-line:typedef
@@ -96,7 +96,7 @@ export class WebSocketApiService {
 
   public _sendRoomStatusRequest(message: any): void {
     console.log('asking for room status');
-    this.stompClient.send('/app/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(message));
+    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/roomStateRequest', {}, JSON.stringify(message));
   }
 
   // tslint:disable-next-line:typedef

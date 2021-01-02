@@ -1,0 +1,23 @@
+@import "../../../styles";
+
+#options-box {
+  display: flex;
+  width: 80%;
+  height: 90%;
+  text-align: center;
+  justify-content: flex-start;
+  align-content: center;
+  flex-direction: column;
+
+  border: solid 3px $game-screen-border-color;
+  border-radius: 12px;
+  background-color: $game-screen-component-color;
+  padding: 5px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.options-headline {
+  font-weight: bold;
+  margin-bottom: 50px;
+}

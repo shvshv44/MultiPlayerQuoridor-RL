@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {WebSocketApiService} from './web-socket-api.service';
+import {WebSocketApiService} from './services/web-socket-api/web-socket-api.service';
 
 @Component({
   selector: 'app-root',

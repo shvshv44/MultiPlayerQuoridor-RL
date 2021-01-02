@@ -10,11 +10,11 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Position {
-    private final int i;
-    private final int j;
+    private final int x;
+    private final int y;
 
     public Position(Position p) {
-        this.i = p.i;
-        this.j = p.j;
+        this.x = p.x;
+        this.y = p.y;
     }
 }

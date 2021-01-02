@@ -1,0 +1,18 @@
+<span *ngFor="let item of counter(rowSize); let i = index">
+    <app-board-cell [playerCode]="getExistingPawn(i, rowIndex)"
+                    [legalPosition]="isLegalPosition(i, rowIndex)" (click)="onCellClicked(i, rowIndex)"></app-board-cell>
+    <app-board-wall *ngIf="i != rowSize - 1" [isVertical]="true"
+                    [isHovered]="(i + '_' + rowIndex + '_' + Direction.Right) === hoveredWallId || (i + '_' + (rowIndex -1) + '_' + Direction.Right) === hoveredWallId"
+                    [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Right] || walls[i + '_' + (rowIndex -1) + '_' + Direction.Right]"
+                    (mouseenter)="onMouseEnter(i,rowIndex , Direction.Right)"
+                    (mouseleave)="onMouseLeave()"
+                    (click)="onWallClicked(i,rowIndex , Direction.Right)"></app-board-wall>
+</span>
+<span *ngFor="let item of counter(rowSize); let i = index">
+<app-board-wall *ngIf="rowIndex != rowSize - 1" [isVertical]="false"
+                [isHovered]="(i + '_' + rowIndex + '_' + Direction.Down) === hoveredWallId || ((i - 1) + '_' + rowIndex + '_' + Direction.Down) === hoveredWallId"
+                [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Down] || walls[(i - 1) + '_' + rowIndex + '_' + Direction.Down]"
+                (mouseenter)="onMouseEnter(i ,rowIndex ,Direction.Down)"
+                (mouseleave)="onMouseLeave()"
+                (click)="onWallClicked(i,rowIndex , Direction.Down)"></app-board-wall>
+</span>

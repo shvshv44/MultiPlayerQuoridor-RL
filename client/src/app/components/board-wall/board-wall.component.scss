@@ -1,0 +1,29 @@
+@import "../../../styles";
+
+.wall {
+  display: block;
+  float: left;
+  border-radius: 1px;
+}
+
+.wall-hover {
+  cursor: pointer;
+  animation:hover 1s infinite alternate;
+  transition: all 1s;
+  background: $wall-hover-color !important;
+}
+
+.wall-active {
+  background: $wall-active-color !important;
+}
+
+.horizontal {
+  height: $wall-size;
+  width: $wall-length;
+  margin-right: $wall-size;
+}
+
+.vertical {
+  height: $wall-length;
+  width: $wall-size;
+}

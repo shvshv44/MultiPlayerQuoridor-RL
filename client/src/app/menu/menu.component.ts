@@ -83,7 +83,7 @@ export class MenuComponent implements OnInit {
   }
 
   async connectAndGoToRoomScreen(gameId: string, playerName: string): Promise<void> {
-    await this.webSocket._connectToGame(gameId);
+    await this.webSocket._connectToGame(gameId, playerName);
     this.defaultGameState(gameId, playerName);
     this.router.navigateByUrl('/game-room-screen');
   }

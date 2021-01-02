@@ -75,9 +75,11 @@ public class GameWebSocket {
         response.setGameID(request.getGameID());
         response.setType(WebSocketMessageType.ROOM_STATE_RESPONSE);
         response.setPlayers(roomState.getPlayers().keySet());
-        this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID() + "/" + playerName, response);
-    }
 
+        for (TCPPlayer player: roomState.getPlayers().values()) {
+            this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID() + "/" + player.getPlayerName(), response);
+        }
+    }
 
     private void notifyPlayer(String gameId, String playerName, TurnAction action) {
         this.roomsManager.getRoomState(gameId).getPlayers().get(playerName).assignLastMove(action);

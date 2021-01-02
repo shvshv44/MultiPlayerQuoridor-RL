@@ -19,7 +19,7 @@ export class WebSocketApiService {
 
   constructor(public msgHandler: MessageHandlerService,
               private configService: ConfigService) {
-    this.webSocketEndPoint = this.configService.getConfig().serverUrl;
+    this.webSocketEndPoint = this.configService.getConfig().serverUrl + '/quoridor-websocket';
   }
 
 // tslint:disable-next-line:typedef
@@ -74,7 +74,7 @@ export class WebSocketApiService {
   // tslint:disable-next-line:typedef
   _sendPutWall(wall: Wall) {
     console.log('calling send put wall');
-    this.stompClient.send('/app/' + this.gameId + '/roomStateRequest', {}, JSON.stringify(wall));
+    this.stompClient.send('/app/' + this.gameId + '/putWall', {}, JSON.stringify(wall));
   }
 
   // tslint:disable-next-line:typedef

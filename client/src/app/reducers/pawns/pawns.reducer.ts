@@ -12,7 +12,7 @@ const pawnsReducerAction = createReducer(
   on(setPawns, (state: Position[], {pawns}) => ([...pawns])),
 );
 
-export function pawnsReducer(state: Position[], action: Action): any {
+export function isGameEndedReducer(state: Position[], action: Action): any {
   return pawnsReducerAction(state, action);
 }
 */

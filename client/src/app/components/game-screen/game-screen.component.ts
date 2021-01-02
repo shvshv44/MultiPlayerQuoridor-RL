@@ -4,9 +4,9 @@ import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
 import {Observable} from 'rxjs';
 import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
-import {selectWallsArray, selectWallsDictionary} from '../../reducers/walls/walls.selectors';
+import {selectWallsDictionary} from '../../reducers/walls/walls.selectors';
 import {addPawn} from '../../reducers/pawns/pawns.actions';
-import {AddWall} from '../../reducers/walls/walls.actions';
+import {AddWall, AddWallServer} from '../../reducers/walls/walls.actions';
 import {Direction} from '../../enums/direction';
 import {Dictionary} from '@ngrx/entity';
 
@@ -54,4 +54,7 @@ export class GameScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  public handleWallClicked(wall: Wall): void {
+    this.store.dispatch(AddWallServer({wall}));
+  }
 }

@@ -120,8 +120,8 @@ public class GameBoard {
         }
 
         // Checking the wall is in the bounds of the board
-        if(wall.getPosition().getI() < 0 || wall.getPosition().getI() >= this.getPhysicalBoard().getSize() ||
-           wall.getPosition().getJ() < 0 || wall.getPosition().getJ() >= this.getPhysicalBoard().getSize() )  {
+        if(wall.getPosition().getX() < 0 || wall.getPosition().getX() >= this.getPhysicalBoard().getSize() ||
+           wall.getPosition().getY() < 0 || wall.getPosition().getY() >= this.getPhysicalBoard().getSize() )  {
             throw new IllegalMovementException(WALL_IS_OUTSIDE_THE_BOARD_BOUNDS);
         }
 
@@ -176,33 +176,33 @@ public class GameBoard {
     private List<Position> getAvailableNeighbors(Position p) {
         List<Position> ret = new ArrayList<>();
         // UP
-        if(p.getI() > 0) {
-            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI(), p.getJ()), WallDirection.RIGHT)) &&
-                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI(), p.getJ() - 1), WallDirection.RIGHT))){
-                ret.add(new Position(p.getI() - 1, p.getJ()));
+        if(p.getX() > 0) {
+            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX(), p.getY()), WallDirection.RIGHT)) &&
+                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX(), p.getY() - 1), WallDirection.RIGHT))){
+                ret.add(new Position(p.getX() - 1, p.getY()));
             }
         }
         // DOWN
-        if(p.getI() < this.getPhysicalBoard().getSize() - 1) {
-            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI()+1, p.getJ()), WallDirection.RIGHT)) &&
-                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI()+1, p.getJ() - 1), WallDirection.RIGHT))){
-                ret.add(new Position(p.getI() + 1, p.getJ()));
+        if(p.getX() < this.getPhysicalBoard().getSize() - 1) {
+            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX()+1, p.getY()), WallDirection.RIGHT)) &&
+                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX()+1, p.getY() - 1), WallDirection.RIGHT))){
+                ret.add(new Position(p.getX() + 1, p.getY()));
             }
         }
 
         // LEFT
-        if(p.getJ() > 0) {
-            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI(), p.getJ()), WallDirection.DOWN)) &&
-                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI()-1, p.getJ()), WallDirection.DOWN))){
-                ret.add(new Position(p.getI(), p.getJ() - 1));
+        if(p.getY() > 0) {
+            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX(), p.getY()), WallDirection.DOWN)) &&
+                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX()-1, p.getY()), WallDirection.DOWN))){
+                ret.add(new Position(p.getX(), p.getY() - 1));
             }
         }
 
         // RIGHT
-        if(p.getJ() < this.getPhysicalBoard().getSize() - 1) {
-            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI(), p.getJ()+1), WallDirection.DOWN)) &&
-                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getI()-1, p.getJ()+1), WallDirection.DOWN))){
-                ret.add(new Position(p.getI(), p.getJ() + 1));
+        if(p.getY() < this.getPhysicalBoard().getSize() - 1) {
+            if (!this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX(), p.getY()+1), WallDirection.DOWN)) &&
+                    !this.getPhysicalBoard().getWalls().contains(new Wall(new Position(p.getX()-1, p.getY()+1), WallDirection.DOWN))){
+                ret.add(new Position(p.getX(), p.getY() + 1));
             }
         }
 
@@ -229,17 +229,17 @@ public class GameBoard {
         }
 
         if(wall1.getWallDirection().equals(WallDirection.RIGHT) && wall2.getWallDirection().equals(WallDirection.RIGHT)) {
-            return wall1.getPosition().getI() == wall2.getPosition().getI() && Math.abs(wall1.getPosition().getJ() - wall2.getPosition().getJ()) <= 1;
+            return wall1.getPosition().getX() == wall2.getPosition().getX() && Math.abs(wall1.getPosition().getY() - wall2.getPosition().getY()) <= 1;
         }
         if(wall1.getWallDirection().equals(WallDirection.DOWN) && wall2.getWallDirection().equals(WallDirection.DOWN)) {
-            return wall1.getPosition().getJ() == wall2.getPosition().getJ() && Math.abs(wall1.getPosition().getI() - wall2.getPosition().getI()) <= 1;
+            return wall1.getPosition().getY() == wall2.getPosition().getY() && Math.abs(wall1.getPosition().getX() - wall2.getPosition().getX()) <= 1;
         }
         if(wall1.getWallDirection().equals(WallDirection.DOWN) && wall2.getWallDirection().equals(WallDirection.RIGHT)) {
-            return wall1.getPosition().getI() == wall2.getPosition().getI() - 1 && wall1.getPosition().getJ() == wall2.getPosition().getJ() + 1;
+            return wall1.getPosition().getX() == wall2.getPosition().getX() - 1 && wall1.getPosition().getY() == wall2.getPosition().getY() + 1;
         }
         // If we are here, the commented statement is true.
         // if(wall1.getWallDirection().equals(WallDirection.RIGHT) && wall2.getWallDirection().equals(WallDirection.DOWN)) {
-        return wall1.getPosition().getI() == wall2.getPosition().getI() + 1 && wall1.getPosition().getJ() == wall2.getPosition().getJ() - 1;
+        return wall1.getPosition().getX() == wall2.getPosition().getX() + 1 && wall1.getPosition().getY() == wall2.getPosition().getY() - 1;
         // }
 
     }
@@ -273,19 +273,19 @@ public class GameBoard {
 
     private Position simulateUpMove(Position s) {
 
-        if(s.getI() <= 0) {
+        if(s.getX() <= 0) {
             return null;
         }
 
         Wall block1 = new Wall(s, WallDirection.RIGHT);
-        Wall block2 = new Wall(new Position(s.getI(), s.getJ() - 1), WallDirection.RIGHT);
+        Wall block2 = new Wall(new Position(s.getX(), s.getY() - 1), WallDirection.RIGHT);
 
         if(this.getPhysicalBoard().getWalls().contains(block1) ||
            this.getPhysicalBoard().getWalls().contains(block2)) {
             return null;
         }
 
-        Position next = new Position(s.getI()-1, s.getJ());
+        Position next = new Position(s.getX()-1, s.getY());
 
         if(this.getPhysicalBoard().pawnAt(next) != null) {
             return simulateUpMove(next);
@@ -295,14 +295,14 @@ public class GameBoard {
 
     }
     private Position simulateDownMove(Position s) {
-        if(s.getI() >= this.getPhysicalBoard().getSize() - 1) {
+        if(s.getX() >= this.getPhysicalBoard().getSize() - 1) {
             return null;
         }
 
-        Position next = new Position(s.getI()+1, s.getJ());
+        Position next = new Position(s.getX()+1, s.getY());
 
         Wall block1 = new Wall(next, WallDirection.RIGHT);
-        Wall block2 = new Wall(new Position(next.getI(), next.getJ() - 1), WallDirection.RIGHT);
+        Wall block2 = new Wall(new Position(next.getX(), next.getY() - 1), WallDirection.RIGHT);
 
         if(this.getPhysicalBoard().getWalls().contains(block1) ||
                 this.getPhysicalBoard().getWalls().contains(block2)) {
@@ -316,19 +316,19 @@ public class GameBoard {
         }
     }
     private Position simulateLeftMove(Position s) {
-        if(s.getJ() <= 0) {
+        if(s.getY() <= 0) {
             return null;
         }
 
         Wall block1 = new Wall(s, WallDirection.DOWN);
-        Wall block2 = new Wall(new Position(s.getI() - 1, s.getJ()), WallDirection.DOWN);
+        Wall block2 = new Wall(new Position(s.getX() - 1, s.getY()), WallDirection.DOWN);
 
         if(this.getPhysicalBoard().getWalls().contains(block1) ||
            this.getPhysicalBoard().getWalls().contains(block2)) {
             return null;
         }
 
-        Position next = new Position(s.getI(), s.getJ() - 1);
+        Position next = new Position(s.getX(), s.getY() - 1);
 
         if(this.getPhysicalBoard().pawnAt(next) != null) {
             return simulateLeftMove(next);
@@ -337,14 +337,14 @@ public class GameBoard {
         }
     }
     private Position simulateRightMove(Position s) {
-        if(s.getJ() >= this.getPhysicalBoard().getSize() - 1) {
+        if(s.getY() >= this.getPhysicalBoard().getSize() - 1) {
             return null;
         }
 
-        Position next = new Position(s.getI(), s.getJ() + 1);
+        Position next = new Position(s.getX(), s.getY() + 1);
 
         Wall block1 = new Wall(next, WallDirection.DOWN);
-        Wall block2 = new Wall(new Position(next.getI() - 1 , next.getJ()), WallDirection.DOWN);
+        Wall block2 = new Wall(new Position(next.getX() - 1 , next.getY()), WallDirection.DOWN);
 
         if(this.getPhysicalBoard().getWalls().contains(block1) ||
            this.getPhysicalBoard().getWalls().contains(block2)) {

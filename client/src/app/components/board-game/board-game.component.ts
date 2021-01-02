@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
 import {Dictionary} from '@ngrx/entity';
@@ -8,9 +8,10 @@ import {Dictionary} from '@ngrx/entity';
   templateUrl: './board-game.component.html',
   styleUrls: ['./board-game.component.scss']
 })
-export class BoardGameComponent implements OnInit, AfterViewInit {
+export class BoardGameComponent implements OnInit {
   @Input() pawns: Pawn[];
   @Input() walls: Dictionary<Wall>;
+  @Output() emitWallClicked: EventEmitter<Wall> = new EventEmitter<Wall>();
 
   currentHoveredWallId = '';
 
@@ -28,5 +29,9 @@ export class BoardGameComponent implements OnInit, AfterViewInit {
 
   public handleHover(hoveredWallId: string): void {
     this.currentHoveredWallId = hoveredWallId;
+  }
+
+  public handleWallClicked(wall: Wall): void {
+    this.emitWallClicked.emit(wall);
   }
 }

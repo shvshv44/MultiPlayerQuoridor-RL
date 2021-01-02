@@ -32,6 +32,7 @@ import {EffectsModule} from '@ngrx/effects';
 import {WallsEffects} from './reducers/walls/walls.effects';
 import {PawnsEffects} from './reducers/pawns/pawns.effects';
 import { BoardRowComponent } from './components/board-row/board-row.component';
+import {globalReducer} from './reducers/global/global.reducer';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,7 @@ import { BoardRowComponent } from './components/board-row/board-row.component';
     MaterialModule,
     BrowserAnimationsModule,
     ScrollingModule,
-    StoreModule.forRoot({walls: wallsReducer, pawns: pawnsReducer}),
+    StoreModule.forRoot({walls: wallsReducer, pawns: pawnsReducer, global: globalReducer}),
     EffectsModule.forRoot([WallsEffects, PawnsEffects]),
     FormsModule,
     MatDialogModule,

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Injectable, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
 import {Dictionary} from '@ngrx/entity';
@@ -18,6 +18,7 @@ export class BoardRowComponent implements OnInit {
   @Input() walls: Dictionary<Wall>;
   @Input() hoveredWallId: string;
   @Output() emitHoveredWallId: EventEmitter<string> = new EventEmitter<string>();
+  @Output() emitWallClicked: EventEmitter<Wall> = new EventEmitter<Wall>();
 
   Direction = Direction;
 
@@ -41,11 +42,18 @@ export class BoardRowComponent implements OnInit {
     return 0;
   }
 
-  public onMouseEnter(wallId: string): void{
-    this.emitHoveredWallId.emit(wallId);
+  public onMouseEnter(x: number, y: number, direction: Direction): void {
+    const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
+    if (!this.walls[x + '_' + y + '_' + directionNeedToCheck] && x < this.rowSize - 1 && y < this.rowSize - 1) {
+      this.emitHoveredWallId.emit(x + '_' + y + '_' + direction);
+    }
   }
 
-  public onMouseLeave(): void{
+  public onMouseLeave(): void {
     this.emitHoveredWallId.emit('');
+  }
+
+  public onWallClicked(x: number, y: number, direction: Direction): void {
+    this.emitWallClicked.emit({position: {x, y}, direction});
   }
 }

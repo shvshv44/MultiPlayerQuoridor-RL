@@ -1,26 +1,20 @@
 <div class="game-room-screen">
-
   <div class="header-upper-container">
     <p class="header header-game-room">Game Room</p>
   </div>
-
   <div class="room-details">
     <h2 class="header-game-room">Game ID: {{this.gameRoom.gameID}}</h2>
     <div class="game-room-players">
-
       <table>
         <tr><td>Player 1:</td><td>{{(this.gameRoom.allPlayers.length > 0)? this.gameRoom.allPlayers[0] : ''}}</td></tr>
         <tr><td>Player 2:</td><td>{{(this.gameRoom.allPlayers.length > 1)? this.gameRoom.allPlayers[1] : ''}}</td></tr>
         <tr><td>Player 3:</td><td>{{(this.gameRoom.allPlayers.length > 2)? this.gameRoom.allPlayers[2] : ''}}</td></tr>
         <tr><td>Player 4:</td><td>{{(this.gameRoom.allPlayers.length > 3)? this.gameRoom.allPlayers[3] : ''}}</td></tr>
       </table>
-
     </div>
   </div>
-
   <div class="game-room-buttons">
     <button mat-raised-button color="basic" class="game-room-button" (click)="startGame()" *ngIf="this.gameRoom.playerName === this.gameRoom.allPlayers[0]">Start</button>
     <button mat-raised-button color="basic" class="game-room-button">Exit</button>
   </div>
-
 </div>

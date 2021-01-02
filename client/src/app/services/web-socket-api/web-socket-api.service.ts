@@ -30,6 +30,7 @@ export class WebSocketApiService {
     this.stompClient = Stomp.over(ws);
 
     this.gameId = gameId;
+    this.playerName = playerName;
     // tslint:disable-next-line:variable-name
     const _this = this;
 
@@ -69,13 +70,13 @@ export class WebSocketApiService {
   // tslint:disable-next-line:typedef
   _sendPawnMovement(direction: Direction) {
     console.log('calling send pawn movement');
-    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/movePawn', {}, JSON.stringify(direction));
+    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/movePawn', {}, JSON.stringify({direction}));
   }
 
   // tslint:disable-next-line:typedef
   _sendPutWall(wall: Wall) {
     console.log('calling send put wall');
-    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/putWall', {}, JSON.stringify(wall));
+    this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/putWall', {}, JSON.stringify({wall}));
   }
 
   // tslint:disable-next-line:typedef

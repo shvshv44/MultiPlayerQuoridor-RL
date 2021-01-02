@@ -61,7 +61,8 @@ public class TCPPlayer implements Player {
     @Override
     public void trigger(GameEvent event) {
         if (event instanceof EndTurnEvent) {
-            TurnAction turnAction = ((EndTurnEvent) event).getAction();
+            EndTurnEvent endTurnEvent = ((EndTurnEvent) event);
+            TurnAction turnAction = endTurnEvent.getAction();
             WebSocketAction action = new WebSocketAction();
 
             if (turnAction instanceof MovePawnAction) {
@@ -72,8 +73,11 @@ public class TCPPlayer implements Player {
                 action.setWall(((PlaceWallAction) turnAction).getWall());
             }
 
-            EndTurnEventMessage endTurnEvent = new EndTurnEventMessage(action);
-            gameWebSocket.sendToPlayer(gameId, name, endTurnEvent);
+            EndTurnEventMessage endTurnEventMessage = new EndTurnEventMessage();
+            endTurnEventMessage.setCurrentTurnMove(action);
+            endTurnEventMessage.setPlayerPlayed(this.pawnPerPlayerName.get(endTurnEvent.getPlayedPawn()));
+            endTurnEventMessage.setGameID(gameId);
+            gameWebSocket.sendToPlayer(gameId, name, endTurnEventMessage);
         }
 
         if (event instanceof StartGameEvent) {

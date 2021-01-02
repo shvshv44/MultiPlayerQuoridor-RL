@@ -2,10 +2,13 @@ package com.rl.mpquoridor.models.actions;
 
 import com.rl.mpquoridor.models.board.Wall;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PlaceWallAction implements TurnAction {
-    private final Wall wall;
+    private Wall wall;
 }

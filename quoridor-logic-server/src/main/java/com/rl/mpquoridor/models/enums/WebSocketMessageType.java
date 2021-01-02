@@ -17,6 +17,9 @@ public enum WebSocketMessageType {
     NEW_TURN_EVENT,
 
     @JsonProperty("GameOverEvent")
-    GAME_OVER_EVENT
+    GAME_OVER_EVENT,
+
+    @JsonProperty("EndTurnEvent")
+    END_TURN_EVENT
 
 }

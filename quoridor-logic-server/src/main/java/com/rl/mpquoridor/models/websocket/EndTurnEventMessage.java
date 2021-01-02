@@ -1,13 +1,18 @@
 package com.rl.mpquoridor.models.websocket;
 
 import com.rl.mpquoridor.models.common.WebSocketMessage;
+import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.websocket.actions.WebSocketAction;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 
-@AllArgsConstructor
-@Getter
+@Data
 public class EndTurnEventMessage extends WebSocketMessage {
+
+    public EndTurnEventMessage() {
+        this.setType(WebSocketMessageType.END_TURN_EVENT);
+    }
+
     private WebSocketAction currentTurnMove;
+    private String playerPlayed;
 }

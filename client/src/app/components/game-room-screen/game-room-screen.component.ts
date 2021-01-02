@@ -40,20 +40,19 @@ export class GameRoomScreenComponent implements OnInit {
       console.log(message.players);
     });
 
-    messageHandler.assignHandler(WebSocketMessageType.StartGameEvent, (message) => {
-      // TODO: Sharon/Guy Raviv need to laod the game data to the Store!!!
-      // sharon: i am not sure that u need this - i expect Guy Raviv to send this
+    messageHandler.assignHandler(WebSocketMessageType.StartGameMessage, (message) => {
       this.store.dispatch(addPawns({pawns: message.players}));
-      this.store.dispatch(setSelectedPawn({pawnName: message.currentPlayerTurn}));
-      this.store.dispatch(setCurrentPlayerMoves({positions: message.currentPlayerMoves}));
       console.log(message);
+
 
       router.navigateByUrl('/game-screen');
     });
+
+
   }
 
   ngOnInit(): void {
-    if (this.gameId === 'error') {
+    if (this.gameId === '') {
       this.router.navigateByUrl('/menu');
     }
 

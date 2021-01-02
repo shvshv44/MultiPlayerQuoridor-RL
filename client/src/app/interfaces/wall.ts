@@ -3,5 +3,5 @@ import {Position} from './position';
 
 export interface Wall {
   position: Position;
-  direction: Direction;
+  wallDirection: Direction;
 }

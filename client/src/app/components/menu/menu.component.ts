@@ -9,7 +9,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfigService} from '../../services/config/config.service';
 import {Store} from '@ngrx/store';
 import {setGameId, setPawnName} from '../../reducers/global/global.actions';
-import {addPawns} from '../../reducers/pawns/pawns.actions';
 
 @Component({
   selector: 'app-menu',

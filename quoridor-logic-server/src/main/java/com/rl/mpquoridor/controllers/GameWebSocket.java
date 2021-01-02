@@ -49,13 +49,13 @@ public class GameWebSocket {
         return true;
     }
 
-    @MessageMapping("/turnAction/{gameId}/{playerName}/movePawn")
+    @MessageMapping("/{gameId}/{playerName}/movePawn")
     public void movePawn(@DestinationVariable String gameId, @DestinationVariable String playerName , MovePawnAction action) {
         notifyPlayer(gameId, playerName, action);
     }
 
-    @MessageMapping("/turnAction/{gameId}/{playerName}/putWall")
-    public void putWall(@PathVariable String gameId, @DestinationVariable String playerName , PlaceWallAction action) {
+    @MessageMapping("/{gameId}/{playerName}/putWall")
+    public void putWall(@DestinationVariable String gameId, @DestinationVariable String playerName , PlaceWallAction action) {
         notifyPlayer(gameId, playerName, action);
     }
 

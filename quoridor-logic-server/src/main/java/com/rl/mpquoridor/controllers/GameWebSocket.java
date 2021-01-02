@@ -37,6 +37,8 @@ public class GameWebSocket {
         this.messageSender = messageSender;
         this.roomsManager = roomsManager;
         this.gson = gson;
+
+        this.roomsManager.assignWebSocket(this);
     }
 
     @MessageMapping("/hello")

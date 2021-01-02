@@ -23,12 +23,12 @@ public class TCPPlayer implements Player {
     private List<Pawn> playOrder;
     private Pawn myPawn;
     private ReadOnlyPhysicalBoard board;
-    @Autowired
     private GameWebSocket gameWebSocket;
 
-    public TCPPlayer(String name, String gameId) {
+    public TCPPlayer(String name, String gameId, GameWebSocket gameWebSocket) {
         this.name = name;
         this.gameId = gameId;
+        this.gameWebSocket = gameWebSocket;
     }
 
     @Override

@@ -2,10 +2,8 @@ package com.rl.mpquoridor.controllers;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
-import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
-import com.rl.mpquoridor.models.gameroom.StartGameEvent;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
 import org.slf4j.Logger;
@@ -68,7 +66,6 @@ public class GameAPIController {
             return new ResponseEntity<>("Game room must contain at least two players!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
 
         startRoomGame(gameId);
-        this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, createStartGameEvent(gameId));
         return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -95,14 +92,5 @@ public class GameAPIController {
         return historyResolver.getResultByGameId(gameId);
     }
 
-    private StartGameEvent createStartGameEvent(String gameId) {
-        GameRoomState roomState = gameRoomManager.getRoomState(gameId);
-        StartGameEvent startGame = new StartGameEvent();
-        startGame.setType(WebSocketMessageType.START_GAME_EVENT);
-        startGame.setGameID(gameId);
-        startGame.setPlayers(roomState.getPlayers());
-        startGame.setCurrentPlayerTurn(roomState.getPlayers().get(0));
-        return startGame;
-    }
 
 }

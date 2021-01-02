@@ -4,7 +4,7 @@ import {MenuComponent} from './components/menu/menu.component';
 import {GameHistoryComponent} from './components/game-history/game-history.component';
 import {GameScreenComponent} from './components/game-screen/game-screen.component';
 import {GameRoomScreenComponent} from './components/game-room-screen/game-room-screen.component';
-import {GameRulesComponent} from './game-rules/game-rules.component';
+import {GameRulesComponent} from './components/game-rules/game-rules.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/menu', pathMatch: 'full' },

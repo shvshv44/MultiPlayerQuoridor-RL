@@ -31,7 +31,7 @@ public class HistoryResolverService {
 
         // Fake Data till DB implemented
         Pawn fakePawn = new Pawn();
-        TurnAction fakeTurn = new MovePawnAction(MovementDirection.UP);
+        TurnAction fakeTurn = new MovePawnAction();
         HistoryRecord fakeHistoryRecord = new HistoryRecord(fakePawn, fakeTurn);
         GameResult fakeGameResult = new GameResult(null, Collections.singletonList(fakeHistoryRecord));
         return fakeGameResult;

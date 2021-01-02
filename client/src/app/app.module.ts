@@ -33,7 +33,7 @@ import {WallsEffects} from './reducers/walls/walls.effects';
 import {PawnsEffects} from './reducers/pawns/pawns.effects';
 import {BoardRowComponent} from './components/board-row/board-row.component';
 import {globalReducer} from './reducers/global/global.reducer';
-import {GameRulesComponent} from './game-rules/game-rules.component';
+import {GameRulesComponent} from './components/game-rules/game-rules.component';
 
 @NgModule({
   declarations: [

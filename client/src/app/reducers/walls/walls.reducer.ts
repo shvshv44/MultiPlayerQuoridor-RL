@@ -7,7 +7,7 @@ export interface WallsState extends EntityState<Wall>{
 }
 
 export function selectWallId(wall: Wall): string {
-  return `${wall.position.x}_${wall.position.y}_${wall.direction}`;
+  return `${wall.position.x}_${wall.position.y}_${wall.wallDirection}`;
 }
 
 export const wallEntityAdapter: EntityAdapter<Wall> = createEntityAdapter<Wall>({

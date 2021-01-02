@@ -9,7 +9,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfigService} from '../../services/config/config.service';
 import {Store} from '@ngrx/store';
 import {setGameId, setPawnName} from '../../reducers/global/global.actions';
-import {addPawns} from '../../reducers/pawns/pawns.actions';
 
 @Component({
   selector: 'app-menu',
@@ -87,7 +86,7 @@ export class MenuComponent implements OnInit {
   }
 
   async connectAndGoToRoomScreen(gameId: string, playerName: string): Promise<void> {
-    await this.webSocket._connectToGame(gameId);
+    await this.webSocket._connectToGame(gameId, playerName);
     this.defaultGameState(gameId, playerName);
     this.router.navigateByUrl('/game-room-screen');
   }
@@ -95,7 +94,6 @@ export class MenuComponent implements OnInit {
   private defaultGameState(gameId: string, playerName: string): void {
     this.store.dispatch(setPawnName({pawnName: playerName}));
     this.store.dispatch(setGameId({gameId}));
-    this.store.dispatch(addPawns({pawns: [{name: playerName, position: {x: 0, y: 0}}]}));
   }
 
 }

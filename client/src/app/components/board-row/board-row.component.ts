@@ -58,7 +58,7 @@ export class BoardRowComponent implements OnInit {
 
   public onMouseEnter(x: number, y: number, direction: Direction): void {
     const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
-    if (!this.walls[x + '_' + y + '_' + directionNeedToCheck] && x < this.rowSize - 1 && y < this.rowSize - 1) {
+    if (!this.walls[x + '_' + y + '_' + directionNeedToCheck]) {
       this.emitHoveredWallId.emit(x + '_' + y + '_' + direction);
     }
   }
@@ -77,9 +77,9 @@ export class BoardRowComponent implements OnInit {
         } else if (x < currPawnPosition.x) {
           this.emitCellClicked.emit(Direction.Left);
         } else if (y > currPawnPosition.y) {
-          this.emitCellClicked.emit(Direction.Up);
-        } else if (y < currPawnPosition.y) {
           this.emitCellClicked.emit(Direction.Down);
+        } else if (y < currPawnPosition.y) {
+          this.emitCellClicked.emit(Direction.Up);
         }
       }
     }
@@ -88,7 +88,7 @@ export class BoardRowComponent implements OnInit {
   public onWallClicked(x: number, y: number, direction: Direction): void {
     const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
     if (!this.walls[x + '_' + y + '_' + directionNeedToCheck]) {
-      this.emitWallClicked.emit({position: {x, y}, direction});
+      this.emitWallClicked.emit({position: {x, y}, wallDirection: direction});
     }
   }
 }

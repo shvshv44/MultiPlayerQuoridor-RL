@@ -1,20 +1,18 @@
 package com.rl.mpquoridor.models.board;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
+@NoArgsConstructor
 @ToString
 public class Position {
-    private final int x;
-    private final int y;
+    private int y;
+    private int x;
 
     public Position(Position p) {
-        this.x = p.x;
         this.y = p.y;
+        this.x = p.x;
     }
 }

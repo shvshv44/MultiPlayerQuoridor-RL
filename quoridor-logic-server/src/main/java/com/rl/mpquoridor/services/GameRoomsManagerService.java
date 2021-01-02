@@ -1,11 +1,13 @@
 package com.rl.mpquoridor.services;
 
+import com.rl.mpquoridor.controllers.GameWebSocket;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.TCPPlayer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,6 +18,7 @@ import static com.rl.mpquoridor.models.common.Constants.NUMBER_OF_WALLS_PER_PLAY
 public class GameRoomsManagerService {
 
     private HashMap <String, GameRoomState> gameRooms;
+    private GameWebSocket webSocket;
 
     public GameRoomsManagerService() {
         this.gameRooms = new HashMap<>();
@@ -60,10 +63,14 @@ public class GameRoomsManagerService {
     private List<Player> createPlayersFromNames(List<String> names, String gameId) {
         List<Player> players = new ArrayList<>();
         for (String name : names) {
-            players.add(new TCPPlayer(name, gameId));
+            players.add(new TCPPlayer(name, gameId, webSocket));
         }
 
         return players;
+    }
+
+    public void assignWebSocket(GameWebSocket webSocket) {
+        this.webSocket = webSocket;
     }
 
 }

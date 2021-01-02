@@ -4,6 +4,7 @@ import {MenuComponent} from './components/menu/menu.component';
 import {GameHistoryComponent} from './components/game-history/game-history.component';
 import {GameScreenComponent} from './components/game-screen/game-screen.component';
 import {GameRoomScreenComponent} from './components/game-room-screen/game-room-screen.component';
+import {GameRulesComponent} from './game-rules/game-rules.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/menu', pathMatch: 'full' },
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: 'game-screen', component: GameScreenComponent },
   { path: 'game-history', component: GameHistoryComponent },
   { path: 'game-room-screen', component: GameRoomScreenComponent },
+  { path: 'game-rules', component: GameRulesComponent },
 ];
 
 @NgModule({

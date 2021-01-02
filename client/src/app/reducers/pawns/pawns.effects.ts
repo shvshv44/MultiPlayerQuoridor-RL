@@ -11,7 +11,7 @@ export class PawnsEffects {
   loadWalls$ = createEffect(() => this.actions$.pipe(
     ofType(changePawnPosition),
     switchMap((action) => {
-      this.webSocketApiService._sendPawnMovement(action.pawn.position);
+      this.webSocketApiService._sendPawnMovement(action.direction);
       return from([]);
     })), {dispatch: false});
 

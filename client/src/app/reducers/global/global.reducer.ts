@@ -1,12 +1,19 @@
 import {Action, createReducer, on} from '@ngrx/store';
-import {EndGame, StartGame} from './global.actions';
+import {EndGame, setCurrentPlayerMoves, setGameId, setPawnName, StartGame} from './global.actions';
+import {Position} from '../../interfaces/position';
 
 export interface GlobalState {
   isGameEnded: boolean;
+  currentPlayerMoves: Position[];
+  gameId: string;
+  pawnName: string;
 }
 
 export const initialState: GlobalState = {
-  isGameEnded: false
+  isGameEnded: false,
+  currentPlayerMoves: [],
+  gameId: '',
+  pawnName: ''
 };
 
 const globalReducerAction = createReducer<GlobalState>(initialState,
@@ -16,6 +23,15 @@ const globalReducerAction = createReducer<GlobalState>(initialState,
   on(EndGame, (state) => {
     return {...state, isGameEnded: true};
   }),
+  on(setGameId, (state, {gameId}) => {
+    return {...state, gameId};
+  }),
+  on(setPawnName, (state, {pawnName}) => {
+    return {...state, pawnName};
+  }),
+  on(setCurrentPlayerMoves, (state, {positions}) => {
+    return {...state, currentPlayerMoves: positions};
+  })
 );
 
 export function globalReducer(state: GlobalState | undefined, action: Action): any {

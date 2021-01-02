@@ -1,21 +1,7 @@
 import {Action, createReducer, on} from '@ngrx/store';
-import {addPawn, addPawns, clearPawns, loadPawns, updatePawn,} from './pawns.actions';
+import {addPawn, addPawns, clearPawns, loadPawns, setSelectedPawn, updatePawn,} from './pawns.actions';
 import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
 import {Pawn} from '../../interfaces/pawn';
-
-
-/*
-export const pawns: Map<string, Position> = new Map();
-
-const pawnsReducerAction = createReducer(
-  pawns,
-  on(setPawns, (state: Position[], {pawns}) => ([...pawns])),
-);
-
-export function isGameEndedReducer(state: Position[], action: Action): any {
-  return pawnsReducerAction(state, action);
-}
-*/
 
 export interface PawnsState extends EntityState<Pawn> {
   // additional entities state properties
@@ -43,6 +29,8 @@ const pawnsReducerAction = createReducer(initialState,
   }),
   on(addPawns, (state, {pawns}) => {
     return adapter.addMany(pawns, state);
+  }), on(setSelectedPawn, (state, {pawnName}) => {
+    return {...state, selectedPawnName: pawnName};
   }),
   on(updatePawn, (state, {update}) => {
     return adapter.updateOne(update, state);

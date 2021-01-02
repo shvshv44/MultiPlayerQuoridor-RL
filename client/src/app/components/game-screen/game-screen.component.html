@@ -1,7 +1,9 @@
 <div id="game-container">
 
   <div id="board">
-    <app-board-game [walls]="walls$ | async" [pawns]="pawns$ | async" (emitWallClicked)="handleWallClicked($event)"></app-board-game>
+    <app-board-game [walls]="walls$ | async" [pawns]="pawns$ | async" [currentPawnMoves]="currentPawnMoves$ | async"
+                    [pawnName]="pawnName$ | async" (emitWallClicked)="handleWallClicked($event)"
+                    (emitCellClicked)="handleCellClicked($event)"></app-board-game>
   </div>
 
   <div id="options">

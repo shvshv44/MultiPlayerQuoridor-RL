@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import {GameRoomService} from '../../game-room.service';
 import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
-import {MessageHandlerService} from '../../message-handler.service';
+import {MessageHandlerService} from '../../services/message-handler.service';
 import {Router} from '@angular/router';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WebSocketMessageType} from '../../enums/web-socket-message-type.enum';
 import {Store} from '@ngrx/store';
+import {selectGameId, selectPawnName} from '../../reducers/global/global.selectors';
+import {Pawn} from '../../interfaces/pawn';
+import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
+import {ConfigService} from '../../services/config/config.service';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -14,18 +17,24 @@ import {Store} from '@ngrx/store';
   styleUrls: ['./game-room-screen.component.scss']
 })
 export class GameRoomScreenComponent implements OnInit {
+  private readonly serverURL;
+  private gameId: string = '';
+  private pawnName: string;
+  private pawns: Pawn[] = [];
 
-  private readonly serverURL = 'http://localhost:8080';
-
-  constructor(public gameRoom: GameRoomService,
-              public webSocket: WebSocketApiService,
+  constructor(public webSocket: WebSocketApiService,
               public messageHandler: MessageHandlerService,
               private router: Router,
               private http: HttpClient,
               private snackBar: MatSnackBar,
-              private store: Store) {
+              private store: Store,
+              private config: ConfigService) {
+    this.serverURL = this.config.getConfig().servrUrl;
+    this.store.select(selectGameId).subscribe(gameId => this.gameId = gameId);
+    this.store.select(selectPawnName).subscribe(pawnName => this.pawnName = pawnName);
+    this.store.select(selectPawnArray).subscribe(pawns => this.pawns = pawns);
     messageHandler.assignHandler(WebSocketMessageType.RoomStateResponse, (message) => {
-      this.gameRoom.allPlayers = message.players;
+      console.log(message.players);
     });
 
     messageHandler.assignHandler(WebSocketMessageType.StartGameEvent, (message) => {
@@ -36,19 +45,19 @@ export class GameRoomScreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.gameRoom.gameID === 'error') {
+    if (this.gameId === 'error') {
       this.router.navigateByUrl('/menu');
     }
 
     this.webSocket._sendRoomStatusRequest(
       {
         type: WebSocketMessageType.RoomStateRequest,
-        gameID: this.gameRoom.gameID
+        gameID: this.gameId
       });
   }
 
   async startGame(): Promise<void> {
-    const startGameURL = this.serverURL + '/StartGame/' + this.gameRoom.gameID;
+    const startGameURL = this.serverURL + '/StartGame/' + this.gameId;
     await this.http.get(startGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
       this.snackBar.open(err.error, 'close', {duration: 10000});
     });

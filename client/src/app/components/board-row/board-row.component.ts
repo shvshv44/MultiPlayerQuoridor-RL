@@ -3,6 +3,7 @@ import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
 import {Dictionary} from '@ngrx/entity';
 import {Direction} from '../../enums/direction';
+import {Position} from '../../interfaces/position';
 
 @Component({
   selector: 'app-board-row',
@@ -17,8 +18,11 @@ export class BoardRowComponent implements OnInit {
   @Input() pawns: Pawn[];
   @Input() walls: Dictionary<Wall>;
   @Input() hoveredWallId: string;
+  @Input() currentPawnMoves: Position[];
+  @Input() pawnName: string;
   @Output() emitHoveredWallId: EventEmitter<string> = new EventEmitter<string>();
   @Output() emitWallClicked: EventEmitter<Wall> = new EventEmitter<Wall>();
+  @Output() emitCellClicked: EventEmitter<Direction> = new EventEmitter<Direction>();
 
   Direction = Direction;
 
@@ -42,6 +46,16 @@ export class BoardRowComponent implements OnInit {
     return 0;
   }
 
+  public isLegalPosition(x: number, y: number): boolean {
+    for (const position of this.currentPawnMoves) {
+      if (position.x === x && position.y === y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public onMouseEnter(x: number, y: number, direction: Direction): void {
     const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
     if (!this.walls[x + '_' + y + '_' + directionNeedToCheck] && x < this.rowSize - 1 && y < this.rowSize - 1) {
@@ -53,7 +67,28 @@ export class BoardRowComponent implements OnInit {
     this.emitHoveredWallId.emit('');
   }
 
+  public onCellClicked(x: number, y: number): void {
+    // @ts-ignore
+    const currPawnPosition: Position = this.pawns.find(pawn => pawn.name === this.pawnName).position;
+    for (const position of this.currentPawnMoves) {
+      if (position.x === x && position.y === y) {
+        if (x > currPawnPosition.x) {
+          this.emitCellClicked.emit(Direction.Right);
+        } else if (x < currPawnPosition.x) {
+          this.emitCellClicked.emit(Direction.Left);
+        } else if (y > currPawnPosition.y) {
+          this.emitCellClicked.emit(Direction.Up);
+        } else if (y < currPawnPosition.y) {
+          this.emitCellClicked.emit(Direction.Down);
+        }
+      }
+    }
+  }
+
   public onWallClicked(x: number, y: number, direction: Direction): void {
-    this.emitWallClicked.emit({position: {x, y}, direction});
+    const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
+    if (!this.walls[x + '_' + y + '_' + directionNeedToCheck]) {
+      this.emitWallClicked.emit({position: {x, y}, direction});
+    }
   }
 }

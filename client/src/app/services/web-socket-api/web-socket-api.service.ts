@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
-import {MessageHandlerService} from '../../message-handler.service';
+import {MessageHandlerService} from '../message-handler.service';
 import {ConfigService} from '../config/config.service';
 import {Wall} from '../../interfaces/wall';
 import {Position} from '../../interfaces/position';
+import {Direction} from '../../enums/direction';
 
 
 @Injectable({
@@ -66,9 +67,9 @@ export class WebSocketApiService {
   }
 
   // tslint:disable-next-line:typedef
-  _sendPawnMovement(position: Position) {
+  _sendPawnMovement(direction: Direction) {
     console.log('calling send pawn movement');
-    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(position));
+    this.stompClient.send('/app/' + this.gameId + '/movePawn', {}, JSON.stringify(direction));
   }
 
   // tslint:disable-next-line:typedef

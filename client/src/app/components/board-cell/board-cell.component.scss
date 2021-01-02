@@ -11,10 +11,13 @@
   justify-content: center;
   align-items: center;
 
+  &[legal=true] {
+    background: #c8c8c8 !important;
+  }
 
-  &:hover {
+  &[legal=true]:hover {
     cursor: pointer;
-    animation:hover 1s infinite alternate;
+    animation: hover 1s infinite alternate;
     transition: all 1s;
     background: $cell-hover-color !important;
   }

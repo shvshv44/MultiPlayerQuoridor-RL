@@ -4,10 +4,12 @@ import {PlayDialogComponent} from '../play-dialog/play-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {PlayDialogData} from '../../interfaces/play-dialog-data';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {GameRoomService} from '../../game-room.service';
 import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfigService} from '../../services/config/config.service';
+import {Store} from '@ngrx/store';
+import {setGameId, setPawnName} from '../../reducers/global/global.actions';
+import {addPawns} from '../../reducers/pawns/pawns.actions';
 
 @Component({
   selector: 'app-menu',
@@ -22,10 +24,10 @@ export class MenuComponent implements OnInit {
   constructor(private router: Router,
               private dialog: MatDialog,
               private http: HttpClient,
-              private gameRoom: GameRoomService,
               private webSocket: WebSocketApiService,
               private snackBar: MatSnackBar,
-              private configService: ConfigService) {
+              private configService: ConfigService,
+              private store: Store) {
     this.dialogData = {gameId: '', action: 'none', playerName: ''};
     this.serverURL = this.configService.getConfig().serverUrl;
   }
@@ -91,9 +93,9 @@ export class MenuComponent implements OnInit {
   }
 
   private defaultGameState(gameId: string, playerName: string): void {
-    this.gameRoom.gameID = gameId;
-    this.gameRoom.playerName = playerName;
-    this.gameRoom.allPlayers = [playerName];
+    this.store.dispatch(setPawnName({pawnName: playerName}));
+    this.store.dispatch(setGameId({gameId}));
+    this.store.dispatch(addPawns({pawns: [{name: playerName, position: {x: 0, y: 0}}]}));
   }
 
 }

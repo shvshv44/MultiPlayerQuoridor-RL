@@ -1,8 +1,8 @@
-<div class="cell">
-  <div class="player" [ngClass]="{'player-red':     playerCode == 1,
-                                  'player-yellow':  playerCode == 2,
-                                  'player-green':   playerCode == 3,
-                                  'player-blue':    playerCode == 4}">
+<div class="cell" [attr.legal]="legalPosition" >
+  <div class="player" [ngClass]="{'player-red':     playerCode == PlayerColorEnum.RED,
+                                  'player-yellow':  playerCode == PlayerColorEnum.YELLOW,
+                                  'player-green':   playerCode == PlayerColorEnum.GREEN,
+                                  'player-blue':    playerCode == PlayerColorEnum.BLUE}">
 
   </div>
 </div>

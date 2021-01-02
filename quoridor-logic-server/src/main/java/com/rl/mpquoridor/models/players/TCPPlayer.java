@@ -9,8 +9,8 @@ import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.GameEvent;
+import com.rl.mpquoridor.models.events.StartGameEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -24,6 +24,7 @@ public class TCPPlayer implements Player {
     private Pawn myPawn;
     private ReadOnlyPhysicalBoard board;
     private GameWebSocket gameWebSocket;
+    private TurnAction lastMove;
 
     public TCPPlayer(String name, String gameId, GameWebSocket gameWebSocket) {
         this.name = name;
@@ -60,8 +61,11 @@ public class TCPPlayer implements Player {
             List<Position> currentPlayerMoves = ((TurnActionEvent) event).getCurrentPlayerMoves();
             EndTurnEvent endTurnEvent = new EndTurnEvent(turnAction, nextPlayer,
                     isGameEnded, currentPlayerMoves);
-            gameWebSocket.endTurn(gameId, endTurnEvent);
+            gameWebSocket.sendToPlayer(gameId, name, endTurnEvent);
+        }
 
+        if (event instanceof StartGameEvent) {
+            //TODO: logic
         }
     }
 
@@ -77,7 +81,7 @@ public class TCPPlayer implements Player {
 
     @Override
     public TurnAction play() {
-        while (gameWebSocket.getLastTurnAction() == null) {
+        while (this.lastMove == null) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -85,9 +89,17 @@ public class TCPPlayer implements Player {
             }
         }
 
-        TurnAction turnAction = gameWebSocket.getLastTurnAction();
-        gameWebSocket.resetLastTurnAction();
+        TurnAction turnAction = this.lastMove;
+        resetLastMove();
 
         return turnAction;
+    }
+
+    public void assignLastMove(TurnAction turnAction) {
+        this.lastMove = turnAction;
+    }
+
+    private void resetLastMove() {
+        this.lastMove = null;
     }
 }

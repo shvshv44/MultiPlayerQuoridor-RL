@@ -9,7 +9,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class EndTurnEvent {
+public class EndTurnEvent implements GameEvent {
     private TurnAction currentTurnMove;
     private String nextPlayerTurn;
     private boolean isGameEnded;

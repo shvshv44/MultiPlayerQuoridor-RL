@@ -9,6 +9,7 @@ import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
+import com.rl.mpquoridor.models.events.StartGameEvent;
 import com.rl.mpquoridor.models.events.TurnActionEvent;
 import com.rl.mpquoridor.models.players.Player;
 import org.slf4j.Logger;
@@ -23,11 +24,13 @@ public class GameManager {
     private final Queue<Player> players = new LinkedList<>();
     private BiMap<Player, Pawn> playerPawn;
 
-    public GameManager(List<Player> players, int numberOfWallsPerPlayer) {
+    public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
+    }
 
+    private void notifyStartGameToPlayers() {
         for(Player p: this.players) {
             p.setBoard(this.gameBoard.getReadOnlyPhysicalBoard());
             p.setPlayOrder(this.gameBoard.getPlayOrder());
@@ -50,6 +53,8 @@ public class GameManager {
     public GameResult run() {
         List<HistoryRecord> history = new ArrayList<>();
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
+        notifyStartGameToPlayers();
+        trigger(new StartGameEvent());
 
         while(!isGameEnded) {
             Player currentPlayer = this.players.peek();

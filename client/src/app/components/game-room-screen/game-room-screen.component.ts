@@ -10,6 +10,8 @@ import {selectGameId, selectPawnName} from '../../reducers/global/global.selecto
 import {Pawn} from '../../interfaces/pawn';
 import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
 import {ConfigService} from '../../services/config/config.service';
+import {addPawn} from '../../reducers/pawns/pawns.actions';
+import {setGameId} from '../../reducers/global/global.actions';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -34,12 +36,16 @@ export class GameRoomScreenComponent implements OnInit {
     this.store.select(selectPawnName).subscribe(pawnName => this.pawnName = pawnName);
     this.store.select(selectPawnArray).subscribe(pawns => this.pawns = pawns);
     messageHandler.assignHandler(WebSocketMessageType.RoomStateResponse, (message) => {
+      // TODO: after we will get player that look look like this: {name: 'sharon', position: {x:0, y:0}}
+      //this.store.dispatch(addPawn(message.player))
       console.log(message.players);
     });
 
     messageHandler.assignHandler(WebSocketMessageType.StartGameEvent, (message) => {
       // TODO: Sharon/Guy Raviv need to laod the game data to the Store!!!
+      // sharon: i am not sure that u need this - i expect Guy Raviv to send this
       console.log(message);
+
       router.navigateByUrl('/game-screen');
     });
   }

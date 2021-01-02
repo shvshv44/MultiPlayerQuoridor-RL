@@ -33,6 +33,7 @@ export class GameScreenComponent implements OnInit {
     this.currentPawnMoves$ = this.store.select(selectCurrentPlayerMoves);
     this.pawnName$ = this.store.select(selectSelectedPawnName);
 
+    // TODO: need to delete after getting real data
     this.store.dispatch(addPawn({
       pawn: {
         name: 's',

@@ -1,5 +1,6 @@
 export enum WebSocketMessageType {
   RoomStateRequest = 'RoomStateRequest',
   RoomStateResponse = 'RoomStateResponse',
-  StartGameEvent = 'StartGameEvent'
+  StartGameEvent = 'StartGameEvent',
+  EndTurn = 'EndTurn'
 }

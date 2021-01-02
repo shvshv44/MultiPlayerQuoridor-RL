@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {WebSocketApiService} from '../../services/web-socket-api/web-socket-api.service';
-import {MessageHandlerService} from '../../services/message-handler.service';
+import {MessageHandlerService} from '../../services/message-handler/message-handler.service';
 import {Router} from '@angular/router';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';

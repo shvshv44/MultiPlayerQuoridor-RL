@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
-import {MessageHandlerService} from '../message-handler.service';
+import {MessageHandlerService} from '../message-handler/message-handler.service';
 import {ConfigService} from '../config/config.service';
 import {Wall} from '../../interfaces/wall';
 import {Position} from '../../interfaces/position';

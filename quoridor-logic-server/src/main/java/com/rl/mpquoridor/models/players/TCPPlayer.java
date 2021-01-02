@@ -77,7 +77,7 @@ public class TCPPlayer implements Player {
 
     @Override
     public TurnAction play() {
-        while (gameWebSocket.getLastTurnAction() == null) {
+        while (gameWebSocket.getLastTurnAction(gameId) == null) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -85,8 +85,8 @@ public class TCPPlayer implements Player {
             }
         }
 
-        TurnAction turnAction = gameWebSocket.getLastTurnAction();
-        gameWebSocket.resetLastTurnAction();
+        TurnAction turnAction = gameWebSocket.getLastTurnAction(gameId);
+        gameWebSocket.resetLastTurnAction(gameId);
 
         return turnAction;
     }

@@ -22,6 +22,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 public class GameWebSocket {
 
@@ -30,13 +33,14 @@ public class GameWebSocket {
     private SimpMessagingTemplate messageSender;
     private GameRoomsManagerService roomsManager;
     private Gson gson;
-    private TurnAction lastTurnAction;
+    private Map<String,TurnAction> lastTurnAction;
 
     @Autowired
     public GameWebSocket(SimpMessagingTemplate messageSender, GameRoomsManagerService roomsManager, Gson gson) {
         this.messageSender = messageSender;
         this.roomsManager = roomsManager;
         this.gson = gson;
+        lastTurnAction = new HashMap<>();
 
         this.roomsManager.assignWebSocket(this);
     }
@@ -49,20 +53,20 @@ public class GameWebSocket {
 
     @MessageMapping("/turnAction/{gameId}/movePawn")
     public void movePawn(@PathVariable String gameId, MovePawnAction action) {
-        lastTurnAction = action;
+        this.lastTurnAction.put(gameId,action);
     }
 
     @MessageMapping("/turnAction/{gameId}/putWall")
     public void putWall(@PathVariable String gameId, PlaceWallAction action) {
-        lastTurnAction = action;
+        this.lastTurnAction.put(gameId,action);
     }
 
     public void endTurn(String gameId, EndTurnEvent action) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId, action);
     }
 
-    public TurnAction getLastTurnAction() {
-            return lastTurnAction;
+    public TurnAction getLastTurnAction(String gameId) {
+            return lastTurnAction.get(gameId);
     }
 
     @MessageMapping("/{gameId}/roomStateRequest")
@@ -81,7 +85,7 @@ public class GameWebSocket {
         this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID(), response);
     }
 
-    public void resetLastTurnAction() {
-        this.lastTurnAction = null;
+    public void resetLastTurnAction(String gameId) {
+        this.lastTurnAction.put(gameId, null);
     }
 }

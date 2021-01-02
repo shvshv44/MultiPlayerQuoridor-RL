@@ -11,6 +11,12 @@ public enum WebSocketMessageType {
     ROOM_STATE_RESPONSE,
 
     @JsonProperty("StartGameMessage")
-    START_GAME_EVENT
+    START_GAME_EVENT,
+
+    @JsonProperty("NewTurnEvent")
+    NEW_TURN_EVENT,
+
+    @JsonProperty("GameOverEvent")
+    GAME_OVER_EVENT
 
 }

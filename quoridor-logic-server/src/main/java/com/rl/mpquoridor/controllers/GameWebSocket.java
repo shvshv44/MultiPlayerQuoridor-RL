@@ -9,7 +9,7 @@ import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.gameroom.PlayerPosition;
-import com.rl.mpquoridor.models.websocket.RoomStateRequest;
+import com.rl.mpquoridor.models.websocket.RoomStateRequestMessage;
 import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
 import com.rl.mpquoridor.models.players.TCPPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
@@ -65,23 +65,19 @@ public class GameWebSocket {
 
     @MessageMapping("/{gameId}/{playerName}/roomStateRequest")
     public void roomStateRequest(@DestinationVariable String gameId, @DestinationVariable String playerName, String requestAsString) {
-        RoomStateRequest request = gson.fromJson(requestAsString, RoomStateRequest.class);
+        RoomStateRequestMessage request = gson.fromJson(requestAsString, RoomStateRequestMessage.class);
         logger.info("Game id " + gameId + " , Input : " + request);
         roomStateResponse(request, playerName);
     }
 
-    private void roomStateResponse(RoomStateRequest request, String playerName) {
+    private void roomStateResponse(RoomStateRequestMessage request, String playerName) {
         GameRoomState roomState = roomsManager.getRoomState(request.getGameID());
         RoomStateResponseMessage response = new RoomStateResponseMessage();
         response.setGameID(request.getGameID());
-        response.setType(WebSocketMessageType.ROOM_STATE_RESPONSE);
         response.setPlayers(new ArrayList<>());
 
         for(String currPlayer: roomState.getPlayers().keySet()) {
-            PlayerPosition playerPosition = new PlayerPosition();
-            playerPosition.setName(currPlayer);
-            playerPosition.setPosition(new Position(1,1));
-            response.getPlayers().add(playerPosition);
+            response.getPlayers().add(currPlayer);
         }
 
         for (TCPPlayer player: roomState.getPlayers().values()) {

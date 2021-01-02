@@ -10,7 +10,7 @@ import {selectGameId, selectPawnName} from '../../reducers/global/global.selecto
 import {Pawn} from '../../interfaces/pawn';
 import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
 import {ConfigService} from '../../services/config/config.service';
-import {addPawn, addPawns, setSelectedPawn} from '../../reducers/pawns/pawns.actions';
+import {addPawn, addPawns, addPawnsWithoutPosition, setSelectedPawn} from '../../reducers/pawns/pawns.actions';
 import {setCurrentPlayerMoves, setGameId} from '../../reducers/global/global.actions';
 
 @Component({
@@ -36,8 +36,7 @@ export class GameRoomScreenComponent implements OnInit {
     this.store.select(selectPawnName).subscribe(pawnName => this.pawnName = pawnName);
     this.store.select(selectPawnArray).subscribe(pawns => this.pawns = pawns);
     messageHandler.assignHandler(WebSocketMessageType.RoomStateResponse, (message) => {
-      // TODO: after we will get player that look look like this: {name: 'sharon', position: {x:0, y:0}}
-      this.store.dispatch(addPawns({pawns: message.players}));
+      this.store.dispatch(addPawnsWithoutPosition({pawns: message.players}));
       console.log(message.players);
     });
 

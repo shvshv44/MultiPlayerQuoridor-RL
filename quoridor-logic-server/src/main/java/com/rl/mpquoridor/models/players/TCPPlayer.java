@@ -9,16 +9,21 @@ import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.enums.WebSocketActionType;
 import com.rl.mpquoridor.models.enums.WebSocketMessageType;
+import com.rl.mpquoridor.models.events.NewTurnEvent;
+import com.rl.mpquoridor.models.game.GameOverEvent;
 import com.rl.mpquoridor.models.websocket.EndTurnEventMessage;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.StartGameEvent;
 import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.gameroom.PlayerPosition;
+import com.rl.mpquoridor.models.websocket.GameOverMessage;
+import com.rl.mpquoridor.models.websocket.NewTurnMessage;
 import com.rl.mpquoridor.models.websocket.StartGameMessage;
 import com.rl.mpquoridor.models.websocket.actions.WebSocketAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason;
 
@@ -30,6 +35,7 @@ public class TCPPlayer implements Player {
     private ReadOnlyPhysicalBoard board;
     private GameWebSocket gameWebSocket;
     private TurnAction lastMove;
+    private Map<Pawn, String> pawnPerPlayerName;
 
     public TCPPlayer(String name, String gameId, GameWebSocket gameWebSocket) {
         this.name = name;
@@ -72,18 +78,38 @@ public class TCPPlayer implements Player {
 
         if (event instanceof StartGameEvent) {
             //TODO: logic
+            StartGameEvent startGameEvent = (StartGameEvent) event;
+            this.pawnPerPlayerName = startGameEvent.getPawnPerPlayerName();
+
             StartGameMessage message = new StartGameMessage();
             message.setGameID(gameId);
-            message.setType(WebSocketMessageType.START_GAME_EVENT);
             message.setPlayers(new ArrayList<>());
-            StartGameEvent startGameEvent = (StartGameEvent) event;
             for(Pawn currPawn: startGameEvent.getPawnPerPlayerName().keySet()) {
                 PlayerPosition playerPosition = new PlayerPosition();
                 playerPosition.setName(startGameEvent.getPawnPerPlayerName().get(currPawn));
-                playerPosition.setPosition(new Position(1,1));
+                playerPosition.setPosition(this.board.getPawnPosition(currPawn));
 
                 message.getPlayers().add(playerPosition);
             }
+            gameWebSocket.sendToPlayer(gameId, name, message);
+        }
+
+        if (event instanceof NewTurnEvent) {
+            //TODO: logic
+            NewTurnEvent newTurnEvent = ((NewTurnEvent) event);
+            NewTurnMessage message = new NewTurnMessage();
+            message.setNextPlayerToPlay(pawnPerPlayerName.get(newTurnEvent.getPawn()));
+            message.setGameID(gameId);
+            message.setAvialiableMoves(newTurnEvent.getCurrentPawnMoves());
+
+            gameWebSocket.sendToPlayer(gameId, name, message);
+        }
+
+        if(event instanceof GameOverEvent) {
+            GameOverEvent gameOverEvent = (GameOverEvent) event;
+            GameOverMessage message = new GameOverMessage();
+            message.setWinnerName(this.pawnPerPlayerName.get(gameOverEvent.getWinner()));
+
             gameWebSocket.sendToPlayer(gameId, name, message);
         }
     }

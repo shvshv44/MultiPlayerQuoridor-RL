@@ -1,0 +1,37 @@
+.game-rules {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rules-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 50px;
+}
+
+.rules-details {
+  flex-direction: column;
+  display: flex;
+  flex: 2;
+  justify-content: space-around;
+}
+
+.content {
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  padding: 25px;
+}
+
+.content > mat-card {
+  width: 400px;
+}
+
+img {
+  margin: auto;
+  width: 50%;
+  display: flex;
+}

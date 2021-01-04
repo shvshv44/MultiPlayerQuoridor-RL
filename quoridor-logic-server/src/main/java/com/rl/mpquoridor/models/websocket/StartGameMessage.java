@@ -11,9 +11,9 @@ import java.util.Collection;
 public class StartGameMessage extends WebSocketMessage {
 
     private Collection<PlayerPosition> players;
+    private int numOfWalls;
 
     public StartGameMessage() {
         this.setType(WebSocketMessageType.START_GAME_EVENT);
     }
-
 }

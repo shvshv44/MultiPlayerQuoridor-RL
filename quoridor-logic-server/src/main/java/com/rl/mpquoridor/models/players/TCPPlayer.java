@@ -5,23 +5,22 @@ import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.Pawn;
-import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.enums.WebSocketActionType;
-import com.rl.mpquoridor.models.enums.WebSocketMessageType;
-import com.rl.mpquoridor.models.events.NewTurnEvent;
-import com.rl.mpquoridor.models.game.GameOverEvent;
-import com.rl.mpquoridor.models.websocket.EndTurnEventMessage;
-import com.rl.mpquoridor.models.events.GameEvent;
-import com.rl.mpquoridor.models.events.StartGameEvent;
 import com.rl.mpquoridor.models.events.EndTurnEvent;
+import com.rl.mpquoridor.models.events.GameEvent;
+import com.rl.mpquoridor.models.events.NewTurnEvent;
+import com.rl.mpquoridor.models.events.StartGameEvent;
+import com.rl.mpquoridor.models.game.GameOverEvent;
 import com.rl.mpquoridor.models.gameroom.PlayerPosition;
+import com.rl.mpquoridor.models.websocket.EndTurnEventMessage;
 import com.rl.mpquoridor.models.websocket.GameOverMessage;
 import com.rl.mpquoridor.models.websocket.NewTurnMessage;
 import com.rl.mpquoridor.models.websocket.StartGameMessage;
 import com.rl.mpquoridor.models.websocket.actions.WebSocketAction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +70,7 @@ public class TCPPlayer implements Player {
             } else if (turnAction instanceof PlaceWallAction) {
                 action.setType(WebSocketActionType.PLACE_WALL);
                 action.setWall(((PlaceWallAction) turnAction).getWall());
+                action.setNumOfWalls(this.board.getPawnWalls().get(endTurnEvent.getPlayedPawn()));
             }
 
             EndTurnEventMessage endTurnEventMessage = new EndTurnEventMessage();
@@ -81,14 +81,14 @@ public class TCPPlayer implements Player {
         }
 
         if (event instanceof StartGameEvent) {
-            //TODO: logic
             StartGameEvent startGameEvent = (StartGameEvent) event;
             this.pawnPerPlayerName = startGameEvent.getPawnPerPlayerName();
 
             StartGameMessage message = new StartGameMessage();
             message.setGameID(gameId);
             message.setPlayers(new ArrayList<>());
-            for(Pawn currPawn: startGameEvent.getPawnPerPlayerName().keySet()) {
+            message.setNumOfWalls(((StartGameEvent) event).getNumOfWalls());
+            for (Pawn currPawn : startGameEvent.getPawnPerPlayerName().keySet()) {
                 PlayerPosition playerPosition = new PlayerPosition();
                 playerPosition.setName(startGameEvent.getPawnPerPlayerName().get(currPawn));
                 playerPosition.setPosition(this.board.getPawnPosition(currPawn));
@@ -99,17 +99,16 @@ public class TCPPlayer implements Player {
         }
 
         if (event instanceof NewTurnEvent) {
-            //TODO: logic
             NewTurnEvent newTurnEvent = ((NewTurnEvent) event);
             NewTurnMessage message = new NewTurnMessage();
             message.setNextPlayerToPlay(pawnPerPlayerName.get(newTurnEvent.getPawn()));
             message.setGameID(gameId);
-            message.setAvialiableMoves(newTurnEvent.getCurrentPawnMoves());
+            message.setAvialiableMoves(this.myPawn == newTurnEvent.getPawn() ? newTurnEvent.getCurrentPawnMoves() : Collections.emptyList());
 
             gameWebSocket.sendToPlayer(gameId, name, message);
         }
 
-        if(event instanceof GameOverEvent) {
+        if (event instanceof GameOverEvent) {
             GameOverEvent gameOverEvent = (GameOverEvent) event;
             GameOverMessage message = new GameOverMessage();
             message.setGameID(gameId);

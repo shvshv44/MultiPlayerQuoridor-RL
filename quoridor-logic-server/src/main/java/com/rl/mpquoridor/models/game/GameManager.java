@@ -7,10 +7,10 @@ import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.GameBoard;
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
+import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.StartGameEvent;
-import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.players.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +23,17 @@ public class GameManager {
     private final GameBoard gameBoard;
     private final Queue<Player> players = new LinkedList<>();
     private BiMap<Player, Pawn> playerPawn;
+    private int numberOfWallsPerPlayer;
 
     public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
+        this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
     }
 
     private void notifyStartGameToPlayers() {
-        for(Player p: this.players) {
+        for (Player p : this.players) {
             p.setBoard(this.gameBoard.getReadOnlyPhysicalBoard());
             p.setPlayOrder(this.gameBoard.getPlayOrder());
             p.setMyPawn(playerPawn.get(p));
@@ -39,24 +41,25 @@ public class GameManager {
     }
 
     public void initPlayerPawn() {
-        this.playerPawn =  HashBiMap.create(this.players.size());
+        this.playerPawn = HashBiMap.create(this.players.size());
         List<Pawn> playOrder = this.gameBoard.getPlayOrder();
 
         Iterator<Player> itPlayer = this.players.iterator();
         Iterator<Pawn> itPawn = playOrder.iterator();
 
-        while(itPawn.hasNext() && itPlayer.hasNext()) {
+        while (itPawn.hasNext() && itPlayer.hasNext()) {
             this.playerPawn.put(itPlayer.next(), itPawn.next());
         }
 
     }
+
     public GameResult run() {
         List<HistoryRecord> history = new ArrayList<>();
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
-        trigger(new StartGameEvent(playerPawn.inverse()));
+        trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
 
-        while(!isGameEnded) {
+        while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
             trigger(new NewTurnEvent(currentPawn, this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer))));

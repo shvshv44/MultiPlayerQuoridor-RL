@@ -2,8 +2,10 @@
 
   <div id="board">
     <app-board-game [walls]="walls$ | async" [pawns]="pawns$ | async" [currentPawnMoves]="currentPawnMoves$ | async"
-                    [pawnName]="pawnName$ | async" (emitWallClicked)="handleWallClicked($event)"
+                    [pawnName]="pawnName$ | async" [isMyTurn]="isMyTurn$ | async"
+                    (emitWallClicked)="handleWallClicked($event)"
                     (emitCellClicked)="handleCellClicked($event)"></app-board-game>
+    <app-walls [pawns]="pawns$ | async"></app-walls>
   </div>
 
   <div id="options">

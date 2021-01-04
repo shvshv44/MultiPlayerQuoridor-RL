@@ -11,5 +11,6 @@ public class WebSocketAction {
     private WebSocketActionType type;
     private Wall wall;
     private Position pawnPosition;
+    private int numOfWalls;
 
 }

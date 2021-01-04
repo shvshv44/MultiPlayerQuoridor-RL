@@ -13,7 +13,7 @@
       </mat-form-field>
     </li>
     <li>
-      <button mat-raised-button color="basic" class="button dialog-button" (click)="onCreateGame()">Create Game</button>
+      <button mat-raised-button color="basic" class="button dialog-button" (click)="onCreateGame()" [disabled]=!data.playerName>Create Game</button>
       <button mat-raised-button color="basic" class="button dialog-button" (click)="onJoinGame()" [disabled]=!data.gameId>Join Game</button>
     </li>
   </ol>

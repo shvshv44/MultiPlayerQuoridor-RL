@@ -6,11 +6,9 @@ import lombok.Data;
 
 @Data
 public class GameOverMessage extends WebSocketMessage {
+    private String winnerName;
 
     public GameOverMessage() {
         this.setType(WebSocketMessageType.GAME_OVER_EVENT);
     }
-
-    private String winnerName;
-
 }

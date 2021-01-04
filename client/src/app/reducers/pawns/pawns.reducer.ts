@@ -1,5 +1,5 @@
 import {Action, createReducer, on} from '@ngrx/store';
-import {addPawn, addPawns, addPawnsWithoutPosition, clearPawns, loadPawns, setSelectedPawn, updatePawn,} from './pawns.actions';
+import {addPawn, addPawns, addPawnsWithoutPosition, clearPawns, loadPawns, setSelectedPawn, updatePawn} from './pawns.actions';
 import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
 import {Pawn} from '../../interfaces/pawn';
 
@@ -31,7 +31,7 @@ const pawnsReducerAction = createReducer(initialState,
     return adapter.upsertMany(pawns, state);
   }),
   on(addPawnsWithoutPosition, (state, {pawns}) => {
-    const pawnsWithPosition: Pawn[] = pawns.map(pawn => ({name: pawn, position: {x: -1, y: -1}}) );
+    const pawnsWithPosition: Pawn[] = pawns.map(pawn => ({name: pawn, position: {x: -1, y: -1}, numOfWalls: 0}));
     return adapter.upsertMany(pawnsWithPosition, state);
   }), on(setSelectedPawn, (state, {pawnName}) => {
     return {...state, selectedPawnName: pawnName};

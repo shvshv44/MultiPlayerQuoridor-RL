@@ -34,6 +34,7 @@ import {PawnsEffects} from './reducers/pawns/pawns.effects';
 import {BoardRowComponent} from './components/board-row/board-row.component';
 import {globalReducer} from './reducers/global/global.reducer';
 import {GameRulesComponent} from './components/game-rules/game-rules.component';
+import { WallsComponent } from './components/walls/walls.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import {GameRulesComponent} from './components/game-rules/game-rules.component';
     PlayDialogComponent,
     GameRoomScreenComponent,
     BoardRowComponent,
-    GameRulesComponent
+    GameRulesComponent,
+    WallsComponent
   ],
   imports: [
     BrowserModule,

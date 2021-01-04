@@ -7,14 +7,14 @@
       </mat-form-field>
     </li>
     <li>
-      <button mat-raised-button color="basic" class="button dialog-button" (click)="onCreateGame()">Create Game</button>
-      <button mat-raised-button color="basic" class="button dialog-button" (click)="onJoinGame()">Join Game</button>
-    </li>
-    <li>
       <mat-form-field>
         <mat-label>Enter Game ID</mat-label>
-        <input matInput [(ngModel)]="data.gameId">
+        <input matInput [(ngModel)]="data.gameId" #gameId>
       </mat-form-field>
+    </li>
+    <li>
+      <button mat-raised-button color="basic" class="button dialog-button" (click)="onCreateGame()">Create Game</button>
+      <button mat-raised-button color="basic" class="button dialog-button" (click)="onJoinGame()" [disabled]=!data.gameId>Join Game</button>
     </li>
   </ol>
 </div>

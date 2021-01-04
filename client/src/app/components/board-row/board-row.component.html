@@ -1,15 +1,15 @@
 <span *ngFor="let item of counter(rowSize); let i = index">
 <app-board-wall *ngIf="rowIndex != 0" [isVertical]="false"
-                [isHovered]="(i + '_' + rowIndex + '_' + Direction.Right) === hoveredWallId || ((i - 1) + '_' + rowIndex + '_' + Direction.Right) === hoveredWallId"
-                [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Right] || walls[(i - 1) + '_' + rowIndex + '_' + Direction.Right]"
+                [isHovered]="isMyTurn && ((i + '_' + rowIndex + '_' + Direction.Right) === hoveredWallId || ((i + 1) + '_' + rowIndex + '_' + Direction.Right) === hoveredWallId)"
+                [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Right] || walls[(i + 1) + '_' + rowIndex + '_' + Direction.Right]"
                 (mouseenter)="onMouseEnter(i ,rowIndex ,Direction.Right)"
                 (mouseleave)="onMouseLeave()"
                 (click)="onWallClicked(i,rowIndex , Direction.Right)"></app-board-wall>
 </span>
 <span *ngFor="let item of counter(rowSize); let i = index">
   <app-board-wall *ngIf="i != 0" [isVertical]="true"
-                  [isHovered]="(i + '_' + rowIndex + '_' + Direction.Down) === hoveredWallId || (i + '_' + (rowIndex -1) + '_' + Direction.Down) === hoveredWallId"
-                  [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Down] || walls[i + '_' + (rowIndex -1) + '_' + Direction.Down]"
+                  [isHovered]="isMyTurn && ((i + '_' + rowIndex + '_' + Direction.Down) === hoveredWallId || (i + '_' + (rowIndex + 1) + '_' + Direction.Down) === hoveredWallId)"
+                  [isActive]="walls[i + '_' + rowIndex + '_' + Direction.Down] || walls[i + '_' + (rowIndex  + 1) + '_' + Direction.Down]"
                   (mouseenter)="onMouseEnter(i,rowIndex , Direction.Down)"
                   (mouseleave)="onMouseLeave()"
                   (click)="onWallClicked(i,rowIndex , Direction.Down)"></app-board-wall>

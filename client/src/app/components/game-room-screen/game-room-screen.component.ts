@@ -19,9 +19,9 @@ import {addPawns, addPawnsWithoutPosition} from '../../reducers/pawns/pawns.acti
 })
 export class GameRoomScreenComponent implements OnInit {
   private readonly serverURL;
-  private gameId: string = '';
-  private pawnName: string;
-  private pawns: Pawn[] = [];
+  gameId: string;
+  pawnName: string;
+  pawns: Pawn[] = [];
 
   constructor(public webSocket: WebSocketApiService,
               public messageHandler: MessageHandlerService,

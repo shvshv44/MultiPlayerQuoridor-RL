@@ -9,6 +9,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfigService} from '../../services/config/config.service';
 import {Store} from '@ngrx/store';
 import {setGameId, setPawnName} from '../../reducers/global/global.actions';
+import {Clipboard} from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-menu',
@@ -26,7 +27,8 @@ export class MenuComponent implements OnInit {
               private webSocket: WebSocketApiService,
               private snackBar: MatSnackBar,
               private configService: ConfigService,
-              private store: Store) {
+              private store: Store,
+              private clipboard: Clipboard) {
     this.dialogData = {gameId: '', action: 'none', playerName: ''};
     this.serverURL = this.configService.getConfig().serverUrl;
   }
@@ -48,8 +50,8 @@ export class MenuComponent implements OnInit {
 
   async onPlayButtonClick(): Promise<void> {
     const dialogRef = this.dialog.open(PlayDialogComponent, {
-      height: '400px',
-      width: '600px',
+      height: '300px',
+      width: '450px',
       data: this.dialog
     });
 
@@ -71,13 +73,14 @@ export class MenuComponent implements OnInit {
   async createGame(playerName: string): Promise<void> {
     const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
     const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+    this.clipboard.copy(returnedGameId);
     await this.connectAndGoToRoomScreen(returnedGameId, playerName);
   }
 
   async joinGame(gameId: string, playerName: string): Promise<void> {
     const joinGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
     const returnedGameId = await this.http.get(joinGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
-      this.snackBar.open(err.error, 'close', {duration: 10000,});
+      this.snackBar.open(err.error, 'close', {duration: 10000});
     });
 
     if (typeof returnedGameId === 'string') {

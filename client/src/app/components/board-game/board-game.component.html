@@ -1,7 +1,7 @@
 <div class="board-container">
   <div *ngFor="let item of counter(boardRowSize); let i = index">
     <app-board-row [rowIndex]="i" [pawns]="pawns" [walls]="walls" [currentPawnMoves]="currentPawnMoves"
-                   [rowSize]="boardRowSize" [pawnName]="pawnName"
+                   [rowSize]="boardRowSize" [pawnName]="pawnName" [isMyTurn]="isMyTurn"
                    [hoveredWallId]="currentHoveredWallId" (emitWallClicked)="handleWallClicked($event)"
                    (emitCellClicked)="handleCellClicked($event)"
                    (emitHoveredWallId)="handleHover($event)"></app-board-row>

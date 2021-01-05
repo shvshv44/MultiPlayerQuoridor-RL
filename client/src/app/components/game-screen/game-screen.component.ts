@@ -58,7 +58,7 @@ export class GameScreenComponent implements OnInit {
         this.store.dispatch(updatePawn({
           update: {
             id: message.playerPlayed,
-            changes: {numOfWalls: message.numOfWalls}
+            changes: {numOfWalls: message.currentTurnMove.numOfWalls}
           }
         }));
       }

@@ -38,22 +38,35 @@ public class GameAPIController {
     @CrossOrigin
     @GetMapping("/CreateGame/{playerName}")
     @ResponseBody
-    public String createGame(@PathVariable String playerName) {
+    public ResponseEntity<String> createGame(@PathVariable String playerName) {
+        if(playerName == null || playerName.equals(""))
+            return createBasicBadRequestResponse("Name must contain at least one character!");
+
         String gameId = gameRoomManager.createGame(playerName);
         logger.info(playerName + " has been created game room with id: " + gameId);
-        return gameId;
+        return createBasicOKResponse(gameId);
     }
 
     @CrossOrigin
     @GetMapping("/JoinGame/{gameId}/{playerName}")
     @ResponseBody
     public ResponseEntity<String> joinGame(@PathVariable String gameId, @PathVariable String playerName) {
+
+        if(playerName == null || playerName.equals(""))
+            return createBasicBadRequestResponse("Name must contain at least one character!");
+
+        if(gameRoomManager.getRoomState(gameId).getPlayers().containsKey(playerName))
+            return createBasicBadRequestResponse("This name was already taken by another room member... replace it please.");
+
+        if (gameRoomManager.getRoomState(gameId).isGameStarted())
+            return createBasicBadRequestResponse("Cannot join room, the game is already started!");
+
         try {
             gameRoomManager.joinGame(gameId, playerName);
             logger.info("Player " + playerName + " has been joined to game room with id: " + gameId);
-            return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
+            return createBasicOKResponse(gameId);
         } catch (InvalidOperationException ex) {
-            return new ResponseEntity<>(ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            return createBasicBadRequestResponse(ex.getMessage());
         }
     }
 
@@ -63,10 +76,13 @@ public class GameAPIController {
     public ResponseEntity<String> startGame(@PathVariable String gameId) {
         GameRoomState roomState = gameRoomManager.getRoomState(gameId);
         if (roomState.getPlayers().size() < Constants.MIN_NUMBER_PLAYERS)
-            return new ResponseEntity<>("Game room must contain at least two players!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            return createBasicBadRequestResponse("Game room must contain at least two players!");
+
+        if (roomState.isGameStarted())
+            return createBasicBadRequestResponse("Game is already started!");
 
         startRoomGame(gameId);
-        return new ResponseEntity<>(gameId, new HttpHeaders(), HttpStatus.OK);
+        return createBasicOKResponse(gameId);
     }
 
     private void startRoomGame(@PathVariable String gameId) {
@@ -92,5 +108,15 @@ public class GameAPIController {
         return historyResolver.getResultByGameId(gameId);
     }
 
+    private ResponseEntity<String> createBasicBadRequestResponse(String message) {
+        return createBasicResponse(message, HttpStatus.BAD_REQUEST);
+    }
 
+    private ResponseEntity<String> createBasicOKResponse(String message) {
+        return createBasicResponse(message, HttpStatus.OK);
+    }
+
+    private ResponseEntity<String> createBasicResponse(String message, HttpStatus status) {
+        return new ResponseEntity<>(message, new HttpHeaders(), status);
+    }
 }

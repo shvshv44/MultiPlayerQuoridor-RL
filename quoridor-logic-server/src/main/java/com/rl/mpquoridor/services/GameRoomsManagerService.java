@@ -28,6 +28,7 @@ public class GameRoomsManagerService {
         state.setId(gameId);
         state.setPlayers(new HashMap<>());
         state.getPlayers().put(playerName, new TCPPlayer(playerName, gameId, webSocket));
+        state.setGameStarted(false);
 
         gameRooms.put(gameId, state);
         return gameId;
@@ -50,7 +51,9 @@ public class GameRoomsManagerService {
         GameRoomState gameRoomState = gameRooms.get(gameId);
         GameManager gameManager = new GameManager(new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
-        gameManager.run();
+        gameRoomState.setGameStarted(true);
+
+        new Thread(() -> gameManager.run()).start();
     }
 
     public GameRoomState getRoomState(String gameId) {

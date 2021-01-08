@@ -71,20 +71,28 @@ export class MenuComponent implements OnInit {
   }
 
   async createGame(playerName: string): Promise<void> {
-    const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
-    const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
-    this.clipboard.copy(returnedGameId);
-    await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+    if (playerName !== undefined) {
+      const createGameURL = this.serverURL + '/CreateGame' + '/' + playerName;
+      const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+      this.clipboard.copy(returnedGameId);
+      await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+    } else {
+      this.snackBar.open('You must choose a name!', 'close', {duration: 10000});
+    }
   }
 
   async joinGame(gameId: string, playerName: string): Promise<void> {
-    const joinGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
-    const returnedGameId = await this.http.get(joinGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
-      this.snackBar.open(err.error, 'close', {duration: 10000});
-    });
+    if (playerName !== undefined) {
+      const joinGameURL = this.serverURL + '/JoinGame/' + gameId + '/' + playerName;
+      const returnedGameId = await this.http.get(joinGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+        this.snackBar.open(err.error, 'close', {duration: 10000});
+      });
 
-    if (typeof returnedGameId === 'string') {
-      await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+      if (typeof returnedGameId === 'string') {
+        await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+      }
+    } else {
+      this.snackBar.open('You must choose a name!', 'close', {duration: 10000});
     }
   }
 

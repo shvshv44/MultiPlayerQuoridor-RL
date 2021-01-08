@@ -10,7 +10,7 @@ import {AddWall, AddWallServer} from '../../reducers/walls/walls.actions';
 import {Direction} from '../../enums/direction';
 import {Dictionary} from '@ngrx/entity';
 import {Position} from '../../interfaces/position';
-import {selectCurrentPlayerMoves, selectIsMyTurn} from '../../reducers/global/global.selectors';
+import {selectCurrentPlayerMoves, selectIsMyTurn, selectPawnName} from '../../reducers/global/global.selectors';
 import {setCurrentPlayerMoves} from '../../reducers/global/global.actions';
 import {MessageHandlerService} from '../../services/message-handler/message-handler.service';
 import {WebSocketMessageType} from '../../enums/web-socket-message-type.enum';
@@ -65,19 +65,33 @@ export class GameScreenComponent implements OnInit {
     }));
 
     this.msgHandler.assignHandler(WebSocketMessageType.GameOverEvent, (message => {
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: `The winner is - ${message.winnerName}`,
-        showConfirmButton: true,
-        timer: 5000,
-        showCancelButton: false,
-        confirmButtonColor: '#5ed659',
-        confirmButtonText: 'you are loser'
+      this.store.select(selectPawnName).subscribe(pawnName => {
+        if (pawnName === message.winnerName) {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `YOU ARE THE WINNER !`,
+            showConfirmButton: true,
+            timer: 5000,
+            showCancelButton: false,
+            confirmButtonColor: '#5ed659',
+            confirmButtonText: 'winner'
+          });
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: `The winner is - ${message.winnerName}`,
+            showConfirmButton: true,
+            timer: 5000,
+            showCancelButton: false,
+            confirmButtonColor: '#5ed659',
+            confirmButtonText: 'loser'
+          });
+        }
 
+        router.navigateByUrl('/menu');
       });
-
-      router.navigateByUrl('/menu');
     }));
   }
 

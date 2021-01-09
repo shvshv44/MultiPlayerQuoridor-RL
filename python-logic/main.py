@@ -16,6 +16,6 @@ def join_game_random_player(game_id):
 
 
 if __name__ == '__main__':
-    game_id = "e166a63d-9615-439b-9d18-5d8b4559ef94"
-    join_game_random_player(game_id)
+    # game_id = "e166a63d-9615-439b-9d18-5d8b4559ef94"
+    # join_game_random_player(game_id)
     tcp = TCP()

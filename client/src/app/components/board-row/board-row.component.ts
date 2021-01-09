@@ -59,11 +59,11 @@ export class BoardRowComponent implements OnInit {
 
   public onMouseEnter(x: number, y: number, direction: Direction): void {
     const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
-    if (direction === Direction.Right && x !== this.rowSize - 1) {
+    if (direction === Direction.Right && x !== this.rowSize - 1 && !this.walls[x + 1 + '_' + y + '_' + direction]) {
       this.emitHoveredWallId.emit(x + '_' + y + '_' + direction);
     }
 
-    if (direction === Direction.Down && y !== this.rowSize - 1) {
+    if (direction === Direction.Down && y !== this.rowSize - 1 && !this.walls[x + '_' + y + 1 + '_' + direction]) {
       this.emitHoveredWallId.emit(x + '_' + y + '_' + direction);
     }
   }
@@ -91,13 +91,15 @@ export class BoardRowComponent implements OnInit {
   }
 
   public onWallClicked(x: number, y: number, direction: Direction): void {
-    const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
-    if (direction === Direction.Right && x !== this.rowSize - 1) {
-      this.emitWallClicked.emit({position: {x, y}, wallDirection: direction});
-    }
+    if (this.isMyTurn) {
+      const directionNeedToCheck: Direction = direction === Direction.Down ? Direction.Right : Direction.Down;
+      if (direction === Direction.Right && x !== this.rowSize - 1 && !this.walls[x + 1 + '_' + y + '_' + direction]) {
+        this.emitWallClicked.emit({position: {x, y}, wallDirection: direction});
+      }
 
-    if (direction === Direction.Down && y !== this.rowSize - 1) {
-      this.emitWallClicked.emit({position: {x, y}, wallDirection: direction});
+      if (direction === Direction.Down && y !== this.rowSize - 1 && !this.walls[x + '_' + y + 1 + '_' + direction]) {
+        this.emitWallClicked.emit({position: {x, y}, wallDirection: direction});
+      }
     }
   }
 }

@@ -5,13 +5,13 @@ import {Observable} from 'rxjs';
 import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
 import {selectWallsDictionary} from '../../reducers/walls/walls.selectors';
-import {changePawnPosition, setSelectedPawn, updatePawn} from '../../reducers/pawns/pawns.actions';
-import {AddWall, AddWallServer} from '../../reducers/walls/walls.actions';
+import {changePawnPosition, clearPawns, setSelectedPawn, updatePawn} from '../../reducers/pawns/pawns.actions';
+import {AddWall, AddWallServer, ClearAllWalls} from '../../reducers/walls/walls.actions';
 import {Direction} from '../../enums/direction';
 import {Dictionary} from '@ngrx/entity';
 import {Position} from '../../interfaces/position';
 import {selectCurrentPlayerMoves, selectIsMyTurn, selectPawnName} from '../../reducers/global/global.selectors';
-import {setCurrentPlayerMoves} from '../../reducers/global/global.actions';
+import {clearGlobal, setCurrentPlayerMoves} from '../../reducers/global/global.actions';
 import {MessageHandlerService} from '../../services/message-handler/message-handler.service';
 import {WebSocketMessageType} from '../../enums/web-socket-message-type.enum';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -65,33 +65,40 @@ export class GameScreenComponent implements OnInit {
     }));
 
     this.msgHandler.assignHandler(WebSocketMessageType.GameOverEvent, (message => {
-      this.store.select(selectPawnName).subscribe(pawnName => {
-        if (pawnName === message.winnerName) {
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `YOU ARE THE WINNER !`,
-            showConfirmButton: true,
-            timer: 5000,
-            showCancelButton: false,
-            confirmButtonColor: '#5ed659',
-            confirmButtonText: 'winner'
-          });
-        } else {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: `The winner is - ${message.winnerName}`,
-            showConfirmButton: true,
-            timer: 5000,
-            showCancelButton: false,
-            confirmButtonColor: '#5ed659',
-            confirmButtonText: 'loser'
-          });
-        }
+      const subscribeEndGame: any = this.store.select(selectPawnName).subscribe(pawnName => {
+        if (pawnName !== '') {
+          if (pawnName === message.winnerName) {
+            Swal.fire({
+              position: 'center',
+              icon: 'success',
+              title: `YOU ARE THE WINNER !`,
+              showConfirmButton: true,
+              timer: 5000,
+              showCancelButton: false,
+              confirmButtonColor: '#5ed659',
+              confirmButtonText: 'winner'
+            });
+          } else {
+            Swal.fire({
+              position: 'center',
+              icon: 'error',
+              title: `The winner is - ${message.winnerName}`,
+              showConfirmButton: true,
+              timer: 5000,
+              showCancelButton: false,
+              confirmButtonColor: '#5ed659',
+              confirmButtonText: 'loser'
+            });
+          }
 
-        router.navigateByUrl('/menu');
+          this.store.dispatch(ClearAllWalls());
+          this.store.dispatch(clearPawns());
+          this.store.dispatch(clearGlobal());
+          router.navigateByUrl('/menu');
+        }
       });
+
+      subscribeEndGame.unsubscribe();
     }));
   }
 

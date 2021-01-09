@@ -9,10 +9,11 @@ import lombok.Data;
 @Data
 public class EndTurnEventMessage extends WebSocketMessage {
 
+    private WebSocketAction currentTurnMove;
+    private String playerPlayed;
+
     public EndTurnEventMessage() {
         this.setType(WebSocketMessageType.END_TURN_EVENT);
     }
 
-    private WebSocketAction currentTurnMove;
-    private String playerPlayed;
 }

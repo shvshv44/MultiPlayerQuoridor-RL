@@ -5,16 +5,17 @@ import {Observable} from 'rxjs';
 import {Pawn} from '../../interfaces/pawn';
 import {Wall} from '../../interfaces/wall';
 import {selectWallsDictionary} from '../../reducers/walls/walls.selectors';
-import {addPawn, changePawnPosition, setSelectedPawn, updatePawn} from '../../reducers/pawns/pawns.actions';
+import {changePawnPosition, setSelectedPawn, updatePawn} from '../../reducers/pawns/pawns.actions';
 import {AddWall, AddWallServer} from '../../reducers/walls/walls.actions';
 import {Direction} from '../../enums/direction';
 import {Dictionary} from '@ngrx/entity';
 import {Position} from '../../interfaces/position';
-import {selectCurrentPlayerMoves, selectIsMyTurn} from '../../reducers/global/global.selectors';
-import {setCurrentPlayerMoves, setPawnName} from '../../reducers/global/global.actions';
+import {selectCurrentPlayerMoves, selectIsMyTurn, selectPawnName} from '../../reducers/global/global.selectors';
+import {setCurrentPlayerMoves} from '../../reducers/global/global.actions';
 import {MessageHandlerService} from '../../services/message-handler/message-handler.service';
 import {WebSocketMessageType} from '../../enums/web-socket-message-type.enum';
-import {first} from 'rxjs/operators';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import {Router} from '@angular/router';
 
 // @ts-ignore
 @Component({
@@ -30,7 +31,8 @@ export class GameScreenComponent implements OnInit {
   pawnName$: Observable<string>;
 
   constructor(private store: Store,
-              private msgHandler: MessageHandlerService) {
+              private msgHandler: MessageHandlerService,
+              private router: Router) {
     this.pawns$ = this.store.select(selectPawnArray);
     this.store.select(selectPawnArray).subscribe(v => console.log(v));
     this.walls$ = this.store.select(selectWallsDictionary);
@@ -41,59 +43,58 @@ export class GameScreenComponent implements OnInit {
     this.msgHandler.assignHandler(WebSocketMessageType.NewTurnEvent, (message => {
       this.store.dispatch(setSelectedPawn({pawnName: message.nextPlayerToPlay}));
       this.store.dispatch(setCurrentPlayerMoves({positions: message.avialiableMoves}));
-    }) );
+    }));
 
     this.msgHandler.assignHandler(WebSocketMessageType.EndTurnEvent, (message => {
       if (message.currentTurnMove.type === 'MovePawn') {
-        this.store.dispatch(updatePawn({update: {id: message.playerPlayed, changes: {position: message.currentTurnMove.pawnPosition }}}));
+        this.store.dispatch(updatePawn({
+          update: {
+            id: message.playerPlayed,
+            changes: {position: message.currentTurnMove.pawnPosition}
+          }
+        }));
       } else {
         this.store.dispatch(AddWall({wall: message.currentTurnMove.wall}));
+        this.store.dispatch(updatePawn({
+          update: {
+            id: message.playerPlayed,
+            changes: {numOfWalls: message.currentTurnMove.numOfWalls}
+          }
+        }));
       }
+    }));
 
-    }) );
+    this.msgHandler.assignHandler(WebSocketMessageType.GameOverEvent, (message => {
+      this.store.select(selectPawnName).subscribe(pawnName => {
+        if (pawnName === message.winnerName) {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `YOU ARE THE WINNER !`,
+            showConfirmButton: true,
+            timer: 5000,
+            showCancelButton: false,
+            confirmButtonColor: '#5ed659',
+            confirmButtonText: 'winner'
+          });
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: `The winner is - ${message.winnerName}`,
+            showConfirmButton: true,
+            timer: 5000,
+            showCancelButton: false,
+            confirmButtonColor: '#5ed659',
+            confirmButtonText: 'loser'
+          });
+        }
 
-    // // TODO: need to delete after getting real data
-    // this.store.dispatch(addPawn({
-    //   pawn: {
-    //     name: 's',
-    //     position: {
-    //       x: 0, y: 0
-    //     }
-    //   }
-    // }));
-    //
-    // this.store.dispatch(setSelectedPawn({
-    //   pawnName: 's'
-    // }));
-    //
-    // this.store.dispatch(addPawn({
-    //   pawn: {
-    //     name: 'tamir',
-    //     position: {
-    //       x: 5, y: 5
-    //     }
-    //   }
-    // }));
-    //
-    //
-    // this.store.dispatch(AddWall({
-    //   wall: {
-    //     direction: Direction.Right, position: {
-    //       x: 0, y: 0
-    //     }
-    //   }
-    // }));
-    //
-    // this.store.dispatch(setCurrentPlayerMoves({
-    //   positions: [{
-    //     x: 0, y: 1
-    //   }]
-    // }));
-    //
-    // this.store.dispatch(setPawnName({
-    //   pawnName: 's'
-    // }));
+        router.navigateByUrl('/menu');
+      });
+    }));
   }
+
 
   ngOnInit(): void {
   }

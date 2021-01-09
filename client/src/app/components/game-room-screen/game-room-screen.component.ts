@@ -10,8 +10,7 @@ import {selectGameId, selectPawnName} from '../../reducers/global/global.selecto
 import {Pawn} from '../../interfaces/pawn';
 import {selectPawnArray} from '../../reducers/pawns/pawns.selectors';
 import {ConfigService} from '../../services/config/config.service';
-import {addPawn, addPawns, addPawnsWithoutPosition, setSelectedPawn} from '../../reducers/pawns/pawns.actions';
-import {setCurrentPlayerMoves, setGameId} from '../../reducers/global/global.actions';
+import {addPawns, addPawnsWithoutPosition} from '../../reducers/pawns/pawns.actions';
 
 @Component({
   selector: 'app-game-room-screen',
@@ -20,9 +19,9 @@ import {setCurrentPlayerMoves, setGameId} from '../../reducers/global/global.act
 })
 export class GameRoomScreenComponent implements OnInit {
   private readonly serverURL;
-  private gameId: string = '';
-  private pawnName: string;
-  private pawns: Pawn[] = [];
+  gameId: string;
+  pawnName: string;
+  pawns: Pawn[] = [];
 
   constructor(public webSocket: WebSocketApiService,
               public messageHandler: MessageHandlerService,
@@ -41,10 +40,13 @@ export class GameRoomScreenComponent implements OnInit {
     });
 
     messageHandler.assignHandler(WebSocketMessageType.StartGameMessage, (message) => {
-      this.store.dispatch(addPawns({pawns: message.players}));
-      console.log(message);
+      const pawns: Pawn[] = message.players.map(player => {
+        return {
+          position: player.position, name: player.name, numOfWalls: message.numOfWalls
+        };
+      });
 
-
+      this.store.dispatch(addPawns({pawns}));
       router.navigateByUrl('/game-screen');
     });
 

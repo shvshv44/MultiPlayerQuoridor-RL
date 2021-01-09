@@ -15,6 +15,7 @@ export class BoardGameComponent implements OnInit {
   @Input() walls: Dictionary<Wall>;
   @Input() currentPawnMoves: Position[];
   @Input() pawnName: string;
+  @Input() isMyTurn: boolean;
   @Output() emitWallClicked: EventEmitter<Wall> = new EventEmitter<Wall>();
   @Output() emitCellClicked: EventEmitter<Direction> = new EventEmitter<Direction>();
 

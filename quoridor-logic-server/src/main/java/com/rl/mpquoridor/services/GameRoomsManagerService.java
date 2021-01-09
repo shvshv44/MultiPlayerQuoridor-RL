@@ -5,7 +5,7 @@ import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
-import com.rl.mpquoridor.models.players.TCPPlayer;
+import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,7 +27,8 @@ public class GameRoomsManagerService {
         GameRoomState state = new GameRoomState();
         state.setId(gameId);
         state.setPlayers(new HashMap<>());
-        state.getPlayers().put(playerName, new TCPPlayer(playerName, gameId, webSocket));
+        state.getPlayers().put(playerName, new WebSocketPlayer(playerName, gameId, webSocket));
+        state.setGameStarted(false);
 
         gameRooms.put(gameId, state);
         return gameId;
@@ -40,7 +41,7 @@ public class GameRoomsManagerService {
 
         GameRoomState roomState =  gameRooms.get(gameId);
         if (roomState.getPlayers().size() < Constants.MAX_NUMBER_PLAYERS) {
-            roomState.getPlayers().put(playerName, new TCPPlayer(playerName, gameId, webSocket));
+            roomState.getPlayers().put(playerName, new WebSocketPlayer(playerName, gameId, webSocket));
         } else  {
             throw new InvalidOperationException("Game room is full!");
         }
@@ -50,7 +51,9 @@ public class GameRoomsManagerService {
         GameRoomState gameRoomState = gameRooms.get(gameId);
         GameManager gameManager = new GameManager(new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
-        gameManager.run();
+        gameRoomState.setGameStarted(true);
+
+        new Thread(() -> gameManager.run()).start();
     }
 
     public GameRoomState getRoomState(String gameId) {

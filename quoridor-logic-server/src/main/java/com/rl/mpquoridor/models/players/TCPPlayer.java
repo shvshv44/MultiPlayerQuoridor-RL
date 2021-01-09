@@ -48,7 +48,6 @@ public class TCPPlayer extends SocketPlayer {
     public TurnAction play() {
         while(true) {
             try {
-                gameTCPSocket.send(ASK_FOR_PLAY_MESSAGE);
                 String msg = gameTCPSocket.read();
                 return parseMessageToTurnAction(msg);
             } catch (JsonParseException e) {

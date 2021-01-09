@@ -109,6 +109,12 @@ public class GameBoard {
     }
 
     private void placeWall (Pawn pawn, Wall wall)  throws IllegalMovementException {
+        simulatePlaceWall(pawn, wall);
+        this.getPhysicalBoard().putWall(wall);
+        this.getPhysicalBoard().reduceWallToPawn(pawn);
+    }
+
+    private void simulatePlaceWall(Pawn pawn, Wall wall) throws IllegalMovementException{
         // Make sure the pawn has enough walls
         if(getPhysicalBoard().getPawnWalls().get(pawn) == 0) {
             throw new IllegalMovementException(NO_WALLS_LEFT);
@@ -121,18 +127,34 @@ public class GameBoard {
 
         // Checking the wall is in the bounds of the board
         if(wall.getPosition().getY() < 0 || wall.getPosition().getY() >= this.getPhysicalBoard().getSize() ||
-           wall.getPosition().getX() < 0 || wall.getPosition().getX() >= this.getPhysicalBoard().getSize() )  {
+                wall.getPosition().getX() < 0 || wall.getPosition().getX() >= this.getPhysicalBoard().getSize() )  {
             throw new IllegalMovementException(WALL_IS_OUTSIDE_THE_BOARD_BOUNDS);
         }
 
         // Make sure all the pawns have an available path
         this.getPhysicalBoard().putWall(wall); // Putting this, if pawn has no path, remove this wall.
         if(!isAllPawnsHavePath()) {
-            this.getPhysicalBoard().removeWall(wall); // removing the illegal wall.
+            this.getPhysicalBoard().removeWall(wall);
             throw new IllegalMovementException(NO_PATH_AVAILABLE);
         }
+        this.getPhysicalBoard().removeWall(wall);
+    }
 
-        this.getPhysicalBoard().reduceWallToPawn(pawn);
+    public Set<Wall> getAvailableWalls(Pawn pawn) {
+        Set<Wall> ret = new HashSet<>();
+        for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
+            for (int j = 0; j < this.getPhysicalBoard().getSize(); j++) {
+                for(WallDirection direction : WallDirection.values()) {
+                    Wall w = new Wall(new Position(i, j), direction);
+                    try {
+                        this.simulatePlaceWall(pawn, w);
+                        ret.add(w);
+                    } catch (IllegalMovementException ignored) {}
+                }
+            }
+        }
+
+        return ret;
     }
 
     public void executeAction(Pawn pawn, TurnAction action) throws  IllegalMovementException{

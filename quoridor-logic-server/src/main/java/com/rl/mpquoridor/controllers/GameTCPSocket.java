@@ -14,6 +14,7 @@ public class GameTCPSocket implements Closeable {
     public void send(String msg) throws IOException {
         byte[] buffer = msg.getBytes();
         client.getOutputStream().write(buffer);
+        client.getOutputStream().flush();
     }
 
     public String read() throws IOException {

@@ -8,14 +8,11 @@ import com.rl.mpquoridor.exceptions.IllegalMovementException;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
-import com.rl.mpquoridor.models.board.Pawn;
-import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.common.EventMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 public class TCPPlayer extends SocketPlayer {
 
@@ -39,31 +36,13 @@ public class TCPPlayer extends SocketPlayer {
         }
     }
 
-    @Override
-    public void setPlayOrder(List<Pawn> playOrder) {
-        this.playOrder = playOrder;
-    }
 
-    @Override
-    public void setMyPawn(Pawn myPawn) {
-        this.myPawn = myPawn;
-    }
 
     @Override
     public void illegalMovePlayed(IllegalMovementException.Reason reason) {
         // TODO
     }
 
-
-    @Override
-    public void setBoard(ReadOnlyPhysicalBoard board) {
-        this.board = board;
-    }
-
-    @Override
-    public String getPlayerName() {
-        return this.name;
-    }
 
     @Override
     public TurnAction play() {

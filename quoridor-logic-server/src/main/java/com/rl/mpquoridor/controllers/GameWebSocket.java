@@ -6,6 +6,7 @@ import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.common.EventMessage;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
+import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.models.websocket.RoomStateRequestMessage;
 import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
@@ -35,8 +36,6 @@ public class GameWebSocket {
         this.messageSender = messageSender;
         this.roomsManager = roomsManager;
         this.gson = gson;
-
-        this.roomsManager.assignWebSocket(this);
     }
 
     @MessageMapping("/hello")
@@ -75,12 +74,12 @@ public class GameWebSocket {
             response.getPlayers().add(currPlayer);
         }
 
-        for (WebSocketPlayer player: roomState.getPlayers().values()) {
+        for (Player player: roomState.getPlayers().values()) {
             this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID() + "/" + player.getPlayerName(), response);
         }
     }
 
     private void notifyPlayer(String gameId, String playerName, TurnAction action) {
-        this.roomsManager.getRoomState(gameId).getPlayers().get(playerName).assignLastMove(action);
+        ((WebSocketPlayer)this.roomsManager.getRoomState(gameId).getPlayers().get(playerName)).assignLastMove(action);
     }
 }

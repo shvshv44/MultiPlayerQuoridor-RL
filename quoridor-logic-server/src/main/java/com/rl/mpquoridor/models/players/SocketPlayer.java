@@ -96,4 +96,26 @@ public abstract class SocketPlayer implements Player{
     }
 
 
+    @Override
+    public final void setPlayOrder(List<Pawn> playOrder) {
+        this.playOrder = playOrder;
+    }
+
+    @Override
+    public final void setMyPawn(Pawn myPawn) {
+        this.myPawn = myPawn;
+    }
+
+
+    @Override
+    public final String getPlayerName() {
+        return this.name;
+    }
+
+    @Override
+    public void setBoard(ReadOnlyPhysicalBoard board) {
+        this.board = board;
+    }
+
+
 }

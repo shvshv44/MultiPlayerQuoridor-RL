@@ -1,24 +1,23 @@
 package com.rl.mpquoridor;
 
-import com.rl.mpquoridor.models.game.GameManager;
-import com.rl.mpquoridor.models.players.CMDPlayer;
-import com.rl.mpquoridor.models.players.Player;
-import com.rl.mpquoridor.models.players.RandomPlayer;
+import com.rl.mpquoridor.controllers.GameTCPSocket;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.net.ServerSocket;
 
 public class Main {
-    public static void main(String[] args) {
-        Player p1 = new CMDPlayer();
-        Player p2 = new RandomPlayer();
+    public static void main(String[] args) throws IOException {
 
-        List<Player> players = new ArrayList<>();
-        players.add(p1);
-        players.add(p2);
-        GameManager gameManager = new GameManager(players, 5);
+        ServerSocket serverSocket = new ServerSocket(4000);
 
-        gameManager.run();
+        GameTCPSocket gameTCPSocket = new GameTCPSocket(serverSocket.accept());
+
+        System.out.println(gameTCPSocket.read());
+        gameTCPSocket.send("aaaaaa");
+
+        gameTCPSocket.close();
+        serverSocket.close();
+
 
     }
 }

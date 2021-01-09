@@ -1,6 +1,6 @@
 package com.rl.mpquoridor.models.players;
 
-import com.rl.mpquoridor.controllers.GameWebSocket;
+import com.rl.mpquoridor.controllers.GameTCPSocket;
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.Pawn;

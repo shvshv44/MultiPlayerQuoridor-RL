@@ -2,9 +2,12 @@ package com.rl.mpquoridor.services;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
+import com.rl.mpquoridor.models.common.EventMessage;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
+import com.rl.mpquoridor.models.players.SocketPlayer;
+import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,7 +36,7 @@ public class GameRoomsManagerService {
         return gameId;
     }
 
-    public void joinGame(String gameId, Player player) {
+    public void joinGame(String gameId, SocketPlayer player) {
 
         if (!gameRooms.containsKey(gameId))
             throw new InvalidOperationException("Game with id " + gameId + " does not exist!");
@@ -44,6 +47,20 @@ public class GameRoomsManagerService {
         } else  {
             throw new InvalidOperationException("Game room is full!");
         }
+
+        notifyPlayers(gameId, roomStateResponse(gameId));
+    }
+
+    private RoomStateResponseMessage roomStateResponse(String gameId) {
+        GameRoomState roomState = this.getRoomState(gameId);
+        RoomStateResponseMessage response = new RoomStateResponseMessage();
+        response.setPlayers(new ArrayList<>());
+
+        for(String currPlayer: roomState.getPlayers().keySet()) {
+            response.getPlayers().add(currPlayer);
+        }
+
+        return response;
     }
 
     public void startGame(String gameId) {
@@ -59,4 +76,11 @@ public class GameRoomsManagerService {
         return gameRooms.get(gameId);
     }
 
+    public void notifyPlayers(String gameId, EventMessage message) {
+        GameRoomState roomState = getRoomState(gameId);
+
+        for(SocketPlayer currPlayer: roomState.getPlayers().values()) {
+            currPlayer.sendEvent(message);
+        }
+    }
 }

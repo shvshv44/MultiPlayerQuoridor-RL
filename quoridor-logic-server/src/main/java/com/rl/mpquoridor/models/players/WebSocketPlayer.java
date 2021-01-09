@@ -23,7 +23,7 @@ public class WebSocketPlayer extends SocketPlayer {
     }
 
     @Override
-    protected void sendEvent(EventMessage message) {
+    public void sendEvent(EventMessage message) {
         gameWebSocket.sendToPlayer(gameId, name, message);
     }
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class GameTCPSocket implements Closeable {
-    private Socket client;
+    private final Socket client;
 
     public GameTCPSocket(Socket client) {
         this.client = client;

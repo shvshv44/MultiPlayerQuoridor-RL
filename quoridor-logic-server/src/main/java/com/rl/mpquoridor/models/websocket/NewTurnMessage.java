@@ -1,17 +1,17 @@
 package com.rl.mpquoridor.models.websocket;
 
 import com.rl.mpquoridor.models.board.Position;
-import com.rl.mpquoridor.models.common.WebSocketMessage;
-import com.rl.mpquoridor.models.enums.WebSocketMessageType;
+import com.rl.mpquoridor.models.common.EventMessage;
+import com.rl.mpquoridor.models.enums.MessageType;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class NewTurnMessage extends WebSocketMessage {
+public class NewTurnMessage extends EventMessage {
 
     public NewTurnMessage() {
-        this.setType(WebSocketMessageType.NEW_TURN_EVENT);
+        this.setType(MessageType.NEW_TURN_EVENT);
     }
 
     private String nextPlayerToPlay;

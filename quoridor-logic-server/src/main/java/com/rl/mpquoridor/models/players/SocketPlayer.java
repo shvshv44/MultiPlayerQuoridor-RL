@@ -36,7 +36,7 @@ public abstract class SocketPlayer implements Player{
         this.name = name;
     }
 
-    protected abstract void sendEvent(EventMessage message);
+    public abstract void sendEvent(EventMessage message);
 
     @Override
     public final void trigger(GameEvent event) {

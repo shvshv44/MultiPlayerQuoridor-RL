@@ -28,7 +28,7 @@ public class TCPPlayer extends SocketPlayer {
     }
 
     @Override
-    protected void sendEvent(EventMessage message) {
+    public void sendEvent(EventMessage message) {
         try {
             gameTCPSocket.send(gson.toJson(message, message.getClass()));
         } catch (IOException e) {

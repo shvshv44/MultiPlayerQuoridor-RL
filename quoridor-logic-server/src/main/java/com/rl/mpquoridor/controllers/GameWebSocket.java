@@ -3,15 +3,12 @@ package com.rl.mpquoridor.controllers;
 import com.google.gson.Gson;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
-import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.common.WebSocketMessage;
-import com.rl.mpquoridor.models.enums.WebSocketMessageType;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
-import com.rl.mpquoridor.models.gameroom.PlayerPosition;
 import com.rl.mpquoridor.models.websocket.RoomStateRequestMessage;
 import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
-import com.rl.mpquoridor.models.players.TCPPlayer;
+import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 
@@ -80,7 +76,7 @@ public class GameWebSocket {
             response.getPlayers().add(currPlayer);
         }
 
-        for (TCPPlayer player: roomState.getPlayers().values()) {
+        for (WebSocketPlayer player: roomState.getPlayers().values()) {
             this.messageSender.convertAndSend("/topic/gameStatus/" + request.getGameID() + "/" + player.getPlayerName(), response);
         }
     }

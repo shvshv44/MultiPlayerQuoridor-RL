@@ -1,14 +1,14 @@
 package com.rl.mpquoridor.models.websocket;
 
-import com.rl.mpquoridor.models.common.WebSocketMessage;
-import com.rl.mpquoridor.models.enums.WebSocketMessageType;
+import com.rl.mpquoridor.models.common.EventMessage;
+import com.rl.mpquoridor.models.enums.MessageType;
 import lombok.Data;
 
 @Data
-public class GameOverMessage extends WebSocketMessage {
+public class GameOverMessage extends EventMessage {
     private String winnerName;
 
     public GameOverMessage() {
-        this.setType(WebSocketMessageType.GAME_OVER_EVENT);
+        this.setType(MessageType.GAME_OVER_EVENT);
     }
 }

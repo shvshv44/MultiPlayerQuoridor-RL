@@ -1,64 +1,91 @@
 package com.rl.mpquoridor.models.players;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.rl.mpquoridor.controllers.GameTCPSocket;
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
+import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
-import com.rl.mpquoridor.models.events.GameEvent;
+import com.rl.mpquoridor.models.common.EventMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-public class TCPPlayer implements Player {
+public class TCPPlayer extends SocketPlayer {
 
-    private String name;
-    private String gameId;
-    private List<Pawn> playOrder;
-    private Pawn myPawn;
-    private ReadOnlyPhysicalBoard board;
-    private GameTCPSocket gameWebSocket;
-    private TurnAction lastMove;
-    private Map<Pawn, String> pawnPerPlayerName;
+    private static final String ASK_FOR_PLAY_MESSAGE = "play";
+    private static final Logger logger = LoggerFactory.getLogger(TCPPlayer.class);
+    private static final Gson gson = new Gson();
 
-    public TCPPlayer(String name, String gameId, GameTCPSocket gameTCPSocket) {
-        this.name = name;
-        this.gameId = gameId;
-        this.gameWebSocket = gameTCPSocket;
+    private GameTCPSocket gameTCPSocket;
+
+    public TCPPlayer(String name, GameTCPSocket gameTCPSocket) {
+        super(name);
+        this.gameTCPSocket = gameTCPSocket;
+    }
+
+    @Override
+    protected void sendEvent(EventMessage message) {
+        try {
+            gameTCPSocket.send(gson.toJson(message, message.getClass()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void setPlayOrder(List<Pawn> playOrder) {
-
+        this.playOrder = playOrder;
     }
 
     @Override
     public void setMyPawn(Pawn myPawn) {
-
+        this.myPawn = myPawn;
     }
 
     @Override
     public void illegalMovePlayed(IllegalMovementException.Reason reason) {
-
+        // TODO
     }
 
-    @Override
-    public void trigger(GameEvent event) {
-
-    }
 
     @Override
     public void setBoard(ReadOnlyPhysicalBoard board) {
-
+        this.board = board;
     }
 
     @Override
     public String getPlayerName() {
-        return null;
+        return this.name;
     }
 
     @Override
     public TurnAction play() {
-        return null;
+        while(true) {
+            try {
+                gameTCPSocket.send(ASK_FOR_PLAY_MESSAGE);
+                String msg = gameTCPSocket.read();
+                return parseMessageToTurnAction(msg);
+            } catch (JsonParseException e) {
+                logger.error("TCP Player " + this.name + " got JsonParseException while playing", e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private TurnAction parseMessageToTurnAction(String msg) {
+        JsonObject json = gson.fromJson(msg, JsonObject.class);
+        if(json.keySet().contains("wall")) {
+            return gson.fromJson(msg, PlaceWallAction.class);
+        } else {
+            return gson.fromJson(msg, MovePawnAction.class);
+        }
     }
 }

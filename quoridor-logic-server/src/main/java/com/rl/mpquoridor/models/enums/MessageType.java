@@ -2,7 +2,7 @@ package com.rl.mpquoridor.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum WebSocketMessageType {
+public enum MessageType {
 
     @JsonProperty("RoomStateRequest")
     ROOM_STATE_REQUEST,

@@ -3,12 +3,12 @@ package com.rl.mpquoridor.controllers;
 import com.google.gson.Gson;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
-import com.rl.mpquoridor.models.common.WebSocketMessage;
 import com.rl.mpquoridor.models.actions.TurnAction;
+import com.rl.mpquoridor.models.common.EventMessage;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
+import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.models.websocket.RoomStateRequestMessage;
 import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
-import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class GameWebSocket {
         notifyPlayer(gameId, playerName, action);
     }
 
-    public void sendToPlayer(String gameId, String playerName, WebSocketMessage event) {
+    public void sendToPlayer(String gameId, String playerName, EventMessage event) {
         this.messageSender.convertAndSend("/topic/gameStatus/" + gameId + "/" + playerName, event);
     }
 
@@ -69,7 +69,6 @@ public class GameWebSocket {
     private void roomStateResponse(RoomStateRequestMessage request, String playerName) {
         GameRoomState roomState = roomsManager.getRoomState(request.getGameID());
         RoomStateResponseMessage response = new RoomStateResponseMessage();
-        response.setGameID(request.getGameID());
         response.setPlayers(new ArrayList<>());
 
         for(String currPlayer: roomState.getPlayers().keySet()) {

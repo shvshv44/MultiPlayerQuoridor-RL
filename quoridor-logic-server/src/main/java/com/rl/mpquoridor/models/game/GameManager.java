@@ -62,7 +62,7 @@ public class GameManager {
         while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
-            trigger(new NewTurnEvent(currentPawn, this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer))));
+            trigger(new NewTurnEvent(currentPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn)));
 
             TurnAction action = currentPlayer.play();
             try {

@@ -4,6 +4,7 @@ import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
+import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.ServerSocket;
 import java.util.List;
 
 @RestController
@@ -25,14 +27,18 @@ public class GameAPIController {
     private GameRoomsManagerService gameRoomManager;
     private HistoryResolverService historyResolver;
     private SimpMessagingTemplate messageSender;
+    private GameWebSocket gameWebSocket;
+    private ServerSocket server;
 
     @Autowired
     public GameAPIController(GameRoomsManagerService gameRoomManager,
                              HistoryResolverService historyResolver,
-                             SimpMessagingTemplate messageSender) {
+                             SimpMessagingTemplate messageSender,
+                             GameWebSocket gameWebSocket) {
         this.gameRoomManager = gameRoomManager;
         this.historyResolver = historyResolver;
         this.messageSender = messageSender;
+        this.gameWebSocket = gameWebSocket;
     }
 
     @CrossOrigin
@@ -42,9 +48,9 @@ public class GameAPIController {
         if(playerName == null || playerName.equals(""))
             return createBasicBadRequestResponse("Name must contain at least one character!");
 
-        String gameId = gameRoomManager.createGame(playerName);
+        String gameId = gameRoomManager.createGame();
         logger.info(playerName + " has been created game room with id: " + gameId);
-        return createBasicOKResponse(gameId);
+        return this.joinGame(gameId, playerName);
     }
 
     @CrossOrigin
@@ -62,7 +68,8 @@ public class GameAPIController {
             return createBasicBadRequestResponse("Cannot join room, the game is already started!");
 
         try {
-            gameRoomManager.joinGame(gameId, playerName);
+            WebSocketPlayer player = new WebSocketPlayer(playerName, gameId, gameWebSocket);
+            gameRoomManager.joinGame(gameId, player);
             logger.info("Player " + playerName + " has been joined to game room with id: " + gameId);
             return createBasicOKResponse(gameId);
         } catch (InvalidOperationException ex) {
@@ -119,4 +126,6 @@ public class GameAPIController {
     private ResponseEntity<String> createBasicResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(message, new HttpHeaders(), status);
     }
+
+
 }

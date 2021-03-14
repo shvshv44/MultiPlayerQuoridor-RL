@@ -27,7 +27,7 @@ class QuoridorEnv(gym.Env):
             # The opponent cell location
             spaces.Discrete(81),
             # 64 horizontal walls possibilities - 0 is without wall and 1 is with wall
-            spaces.MultiBinary([8,8]),
+            spaces.MultiBinary([8, 8]),
             # 64 vertical walls possibilities - 0 is without wall and 1 is with wall
             spaces.MultiBinary([8, 8])
         ))
@@ -40,26 +40,13 @@ class QuoridorEnv(gym.Env):
     def step(self, action):
         assert self.action_space.contains(action)
 
-        reward = 0
-        done = False
-
-        for player in self.players_names:
-            if self.players_targets[player].contains(self.players_locations[player]):
-                done = True
-                if player == self.player_name:
-                    reward = 1
-                else:
-                    reward = -1
-                break
-
-        return self.get_observation(), reward, done, self.get_info()
+        self.update_board(action)
+        reward, done = self.calculate_reward()
+        return self.current_board, reward, done, self.get_info()
 
     def reset(self):
         # TODO: implement
         print("reset")
-
-    def get_observation(self):
-        return self.current_board
 
     def get_info(self):
         # TODO: implement
@@ -86,3 +73,21 @@ class QuoridorEnv(gym.Env):
              [0, 0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0, 0]]
         )
+
+    def calculate_reward(self):
+        reward = 0
+        done = False
+
+        for player in self.players_names:
+            if self.players_targets[player].contains(self.players_locations[player]):
+                done = True
+                if player == self.player_name:
+                    reward = 1
+                else:
+                    reward = -1
+                break
+
+        return reward, done
+
+    def update_board(self, action):
+        print("TODO!: update the board!")

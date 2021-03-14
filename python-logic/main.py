@@ -1,7 +1,8 @@
 import requests
 import logging
+import gym
 
-from TCP import TCP
+from tcp import TCP
 
 logging.basicConfig(level=logging.INFO)
 

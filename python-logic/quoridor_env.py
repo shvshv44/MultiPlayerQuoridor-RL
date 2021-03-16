@@ -57,7 +57,7 @@ class QuoridorEnv(gym.Env):
 
         self.update_board(self.players[self.main_player_index], action)
         reward, done = self.calculate_reward()
-        return self.board, reward, done, self.get_info()
+        return tuple(self.board), reward, done, self.get_info()
 
     def reset(self):
         # TODO: implement
@@ -68,19 +68,19 @@ class QuoridorEnv(gym.Env):
         return {}
 
     def init_board(self):
-        return (
+        return [
             self.players[0].start_location,
             self.players[1].start_location,
             zeros(shape=(8, 8)),
             zeros(shape=(8, 8))
-        )
+        ]
 
     def calculate_reward(self):
         reward = 0
         done = False
 
         for player in self.players:
-            if player.targets.contains(player.location):
+            if self.board[player.index] in player.targets:
                 done = True
                 if player.index == self.main_player_index:
                     reward = 1
@@ -91,15 +91,14 @@ class QuoridorEnv(gym.Env):
         return reward, done
 
     def update_board(self, player, action):
-        print(player, action)
         if action[0] == 0:
             self.board[player.index] = self.get_new_cell_position( self.board[player.index], action[1])
         if action[0] == 1:
             assert 0 <= action[2] <= 64 * 2
             if action[2] < 64:
-                self.board[len(self.players)][action[2] // 8][action[2] % 8] = True
+                self.board[len(self.players)][action[2] // 8][action[2] % 8] = 1
             else:
-                self.board[len(self.players) + 1][(action[2] - 64) // 8][(action[2] - 64) % 8] = True
+                self.board[len(self.players) + 1][(action[2] - 64) // 8][(action[2] - 64) % 8] = 1
 
     def get_new_cell_position(self, cur_location, direction):
         if direction == 0:
@@ -113,3 +112,58 @@ class QuoridorEnv(gym.Env):
 
         assert 0 <= cur_location <= 81
         return cur_location
+
+    def print_board(self):
+        self.print_matrix(self.board_to_print_matrix())
+
+    def board_to_print_matrix(self):
+        matrix = self.init_print_matrix()
+
+        for i in range(10):
+            for j in range(9):
+                inew = i*2
+                jnew = j*2 + 1
+                matrix[inew][jnew] = '---'
+
+        for i in range(9):
+            for j in range(10):
+                matrix[i*2 + 1][j*2] = ' | '
+
+        self.add_location_to_print_matrix(matrix, self.board[0], ' P ')
+        self.add_location_to_print_matrix(matrix, self.board[1], ' O ')
+
+        for i in range(8):
+            for j in range(8):
+                if self.board[3][i, j] == 1:
+                    matrix[i * 2 + 1][j*2 + 2] = '|||'
+                    matrix[i * 2 + 3][j * 2 + 2] = '|||'
+
+        for i in range(8):
+            for j in range(8):
+                if self.board[2][i, j] == 1:
+                    matrix[i * 2 + 2][j*2 + 1] = '==='
+                    matrix[i * 2 + 2][j * 2 + 3] = '==='
+
+        return matrix
+
+    def print_matrix(self, matrix):
+        for row in matrix:
+            for col in row:
+                print(col, end='')
+            print('')
+
+    def init_print_matrix(self):
+        rows, cols = (19, 19)
+        matrix = []
+        for i in range(rows):
+            col = []
+            for j in range(cols):
+                col.append('   ')
+            matrix.append(col)
+        return matrix
+
+    def add_location_to_print_matrix(self, matrix, location, symbol):
+        i = location // 9
+        j = location % 9
+
+        matrix[i*2 + 1][j*2 + 1] = symbol

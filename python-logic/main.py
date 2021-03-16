@@ -29,3 +29,7 @@ if __name__ == '__main__':
 
     env = QuoridorEnv(players, 1)
     env.step((0, 0, 0)) # AI Player Going Up!
+    env.step((1, 0, 65))
+    env.step((1, 0, 61))
+
+    env.print_board()

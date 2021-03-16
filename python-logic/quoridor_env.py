@@ -3,8 +3,15 @@ from gym import spaces
 from numpy import zeros
 
 
-class QuoridorEnv(gym.Env):
+class Player:
+    def __init__(self, index, start_location, name, targets):
+        self.index = index
+        self.start_location = start_location
+        self.name = name
+        self.targets = targets
 
+
+class QuoridorEnv(gym.Env):
     """
     players: {
         index: number,
@@ -48,7 +55,7 @@ class QuoridorEnv(gym.Env):
     def step(self, action):
         assert self.action_space.contains(action)
 
-        self.update_board(self.main_player_index, action)
+        self.update_board(self.players[self.main_player_index], action)
         reward, done = self.calculate_reward()
         return self.board, reward, done, self.get_info()
 
@@ -84,15 +91,15 @@ class QuoridorEnv(gym.Env):
         return reward, done
 
     def update_board(self, player, action):
+        print(player, action)
         if action[0] == 0:
-            player.location = self.get_new_cell_position(player.location, action[1])
+            self.board[player.index] = self.get_new_cell_position( self.board[player.index], action[1])
         if action[0] == 1:
-            assert 0 <= action[2] <= 64*2
+            assert 0 <= action[2] <= 64 * 2
             if action[2] < 64:
                 self.board[len(self.players)][action[2] // 8][action[2] % 8] = True
             else:
                 self.board[len(self.players) + 1][(action[2] - 64) // 8][(action[2] - 64) % 8] = True
-
 
     def get_new_cell_position(self, cur_location, direction):
         if direction == 0:

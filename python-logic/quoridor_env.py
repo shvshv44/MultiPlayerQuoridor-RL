@@ -57,15 +57,28 @@ class QuoridorEnv(gym.Env):
 
         self.update_board(self.players[self.main_player_index], action)
         reward, done = self.calculate_reward()
-        return tuple(self.board), reward, done, self.get_info()
+        return tuple(self.board), reward, done, self.get_info(action)
 
     def reset(self):
-        # TODO: implement
-        print("reset")
+        self.board = self.init_board()
 
-    def get_info(self):
-        # TODO: implement
-        return {}
+    def get_info(self, action):
+        action_details = ""
+
+        if action[0] == 0:
+            i, j = self.cell_location_to_indexes(self.board[self.main_player_index])
+            _, direction_name = self.move_direction_to_data(action[1])
+            action_details = "Player moved " + direction_name + " and its new location is (" + str(i) + "," + str(j) + ")"
+        elif action[0] == 1:
+            if action[2] < 64:
+                i, j = self.cell_location_to_indexes(action[2])
+                wall_type = "HORIZONTAL"
+            else:
+                i, j = self.cell_location_to_indexes(action[2] - 64)
+                wall_type = "VERTICAL"
+            action_details = "Player put wall of type " + wall_type + " and its location is (" + str(i) + "," + str(j) + ")"
+
+        return {"action:": action_details}
 
     def init_board(self):
         return [
@@ -92,7 +105,7 @@ class QuoridorEnv(gym.Env):
 
     def update_board(self, player, action):
         if action[0] == 0:
-            self.board[player.index] = self.get_new_cell_position( self.board[player.index], action[1])
+            self.board[player.index] = self.get_new_cell_position(self.board[player.index], action[1])
         if action[0] == 1:
             assert 0 <= action[2] <= 64 * 2
             if action[2] < 64:
@@ -101,15 +114,8 @@ class QuoridorEnv(gym.Env):
                 self.board[len(self.players) + 1][(action[2] - 64) // 8][(action[2] - 64) % 8] = 1
 
     def get_new_cell_position(self, cur_location, direction):
-        if direction == 0:
-            cur_location -= 9  # UP
-        elif direction == 1:
-            cur_location += 9  # DOWN
-        elif direction == 2:
-            cur_location -= 1  # LEFT
-        elif direction == 3:
-            cur_location += 1  # RIGHT
-
+        addition, _ = self.move_direction_to_data(direction)
+        cur_location += addition
         assert 0 <= cur_location <= 81
         return cur_location
 
@@ -121,13 +127,13 @@ class QuoridorEnv(gym.Env):
 
         for i in range(10):
             for j in range(9):
-                inew = i*2
-                jnew = j*2 + 1
+                inew = i * 2
+                jnew = j * 2 + 1
                 matrix[inew][jnew] = '---'
 
         for i in range(9):
             for j in range(10):
-                matrix[i*2 + 1][j*2] = ' | '
+                matrix[i * 2 + 1][j * 2] = ' | '
 
         self.add_location_to_print_matrix(matrix, self.board[0], ' P ')
         self.add_location_to_print_matrix(matrix, self.board[1], ' O ')
@@ -135,13 +141,13 @@ class QuoridorEnv(gym.Env):
         for i in range(8):
             for j in range(8):
                 if self.board[3][i, j] == 1:
-                    matrix[i * 2 + 1][j*2 + 2] = '|||'
+                    matrix[i * 2 + 1][j * 2 + 2] = '|||'
                     matrix[i * 2 + 3][j * 2 + 2] = '|||'
 
         for i in range(8):
             for j in range(8):
                 if self.board[2][i, j] == 1:
-                    matrix[i * 2 + 2][j*2 + 1] = '==='
+                    matrix[i * 2 + 2][j * 2 + 1] = '==='
                     matrix[i * 2 + 2][j * 2 + 3] = '==='
 
         return matrix
@@ -163,7 +169,24 @@ class QuoridorEnv(gym.Env):
         return matrix
 
     def add_location_to_print_matrix(self, matrix, location, symbol):
-        i = location // 9
-        j = location % 9
+        i, j = self.cell_location_to_indexes(location)
+        matrix[i * 2 + 1][j * 2 + 1] = symbol
 
-        matrix[i*2 + 1][j*2 + 1] = symbol
+    def cell_location_to_indexes(self, location):
+        return location // 9, location % 9
+
+    def wall_location_to_indexes(self, location):
+        return location // 8, location % 8
+
+    def move_direction_to_data(self, direction):
+        # return the location addition + direction name
+        if direction == 0:
+            return -9, "UP"
+        elif direction == 1:
+            return 9, "DOWN"
+        elif direction == 2:
+            return -1, "LEFT"
+        elif direction == 3:
+            return 1, "RIGHT"
+
+        raise ValueError(direction + " is not a valid action!")

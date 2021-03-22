@@ -71,10 +71,10 @@ class QuoridorEnv(gym.Env):
             action_details = "Player moved " + direction_name + " and its new location is (" + str(i) + "," + str(j) + ")"
         elif action[0] == 1:
             if action[2] < 64:
-                i, j = self.cell_location_to_indexes(action[2])
+                i, j = self.wall_location_to_indexes(action[2])
                 wall_type = "HORIZONTAL"
             else:
-                i, j = self.cell_location_to_indexes(action[2] - 64)
+                i, j = self.wall_location_to_indexes(action[2] - 64)
                 wall_type = "VERTICAL"
             action_details = "Player put wall of type " + wall_type + " and its location is (" + str(i) + "," + str(j) + ")"
 

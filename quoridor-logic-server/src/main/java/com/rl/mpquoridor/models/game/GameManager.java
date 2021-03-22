@@ -54,7 +54,7 @@ public class GameManager {
     }
 
     public GameResult run() {
-        List<HistoryRecord> history = new ArrayList<>();
+        List<HistoryRecord> history = new LinkedList<>();
         GameResult gameResult = new GameResult();
         gameResult.setStartingWallCount(numberOfWallsPerPlayer);
         gameResult.setPlayOrder(this.gameBoard.getPlayOrder());

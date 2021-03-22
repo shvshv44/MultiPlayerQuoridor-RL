@@ -33,7 +33,9 @@ public class HistoryResolverService {
         Pawn fakePawn = new Pawn();
         TurnAction fakeTurn = new MovePawnAction();
         HistoryRecord fakeHistoryRecord = new HistoryRecord(fakePawn, fakeTurn);
-        GameResult fakeGameResult = new GameResult(null, Collections.singletonList(fakeHistoryRecord));
+        GameResult fakeGameResult = new GameResult();
+        fakeGameResult.setWinner(fakePawn);
+        fakeGameResult.setHistory(Collections.singletonList(fakeHistoryRecord));
         return fakeGameResult;
     }
 

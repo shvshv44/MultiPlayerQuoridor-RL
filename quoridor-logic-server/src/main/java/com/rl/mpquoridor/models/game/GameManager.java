@@ -55,10 +55,12 @@ public class GameManager {
 
     public GameResult run() {
         List<HistoryRecord> history = new ArrayList<>();
+        GameResult gameResult = new GameResult();
+        gameResult.setStartingWallCount(numberOfWallsPerPlayer);
+        gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
-
         while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
@@ -81,7 +83,9 @@ public class GameManager {
         }
 
         trigger(new GameOverEvent(this.gameBoard.getWinner()));
-        return new GameResult(this.playerPawn.inverse().get(this.gameBoard.getWinner()), history);
+        gameResult.setHistory(history);
+        gameResult.setWinner(this.gameBoard.getWinner());
+        return gameResult;
     }
 
     private void trigger(GameEvent event) {

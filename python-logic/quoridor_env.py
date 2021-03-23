@@ -1,6 +1,6 @@
 import gym
 from gym import spaces
-from numpy import zeros
+import numpy as np
 
 
 class Player:
@@ -84,8 +84,8 @@ class QuoridorEnv(gym.Env):
         return [
             self.players[0].start_location,
             self.players[1].start_location,
-            zeros(shape=(8, 8)),
-            zeros(shape=(8, 8))
+            np.zeros(shape=(8, 8)),
+            np.zeros(shape=(8, 8))
         ]
 
     def calculate_reward(self):

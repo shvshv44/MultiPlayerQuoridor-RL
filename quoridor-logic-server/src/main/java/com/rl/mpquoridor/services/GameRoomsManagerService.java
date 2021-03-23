@@ -1,11 +1,11 @@
 package com.rl.mpquoridor.services;
 
+import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.common.EventMessage;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
-import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.SocketPlayer;
 import com.rl.mpquoridor.models.websocket.RoomStateResponseMessage;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static com.rl.mpquoridor.models.common.Constants.NUMBER_OF_WALLS_PER_PLAYER;
 
@@ -69,7 +70,7 @@ public class GameRoomsManagerService {
         gameRoomState.setManager(gameManager);
         gameRoomState.setGameStarted(true);
 
-        new Thread(gameManager::run).start();
+        CompletableFuture.supplyAsync(gameManager::run).thenAcceptAsync(MongoDB.getInstance()::save);
     }
 
     public GameRoomState getRoomState(String gameId) {

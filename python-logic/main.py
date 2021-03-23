@@ -2,6 +2,8 @@ import requests
 import logging
 import gym
 from quoridor_env import QuoridorEnv, Player
+from model import Model
+from agent import Agent
 
 from tcp import TCP
 
@@ -28,6 +30,9 @@ if __name__ == '__main__':
     ]
 
     env = QuoridorEnv(players, 1)
+    model = Model(env)
+    Agent = Agent(model)
+
     board, reward, done, info = env.step((1, 0, 65))
     print("board =", board)
     print("reward =", reward)

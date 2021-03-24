@@ -1,20 +1,49 @@
 package com.rl.mpquoridor.models.game;
 
-import com.rl.mpquoridor.models.players.Player;
-import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.rl.mpquoridor.models.board.Pawn;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@AllArgsConstructor
+@NoArgsConstructor
 public class GameResult {
-    @Getter
-    private final Player winner;
-    private final List<HistoryRecord> history;
+    private Pawn winner;
+    private List<HistoryRecord> history;
+    private List<Pawn> playOrder;
+    private int startingWallCount;
+
+    public Pawn getWinner() {
+        return winner;
+    }
+
+    public int getStartingWallCount() {
+        return startingWallCount;
+    }
+
+    public void setStartingWallCount(int startingWallCount) {
+        this.startingWallCount = startingWallCount;
+    }
+
+    public void setWinner(Pawn winner) {
+        this.winner = winner;
+    }
+
+    public void setHistory(List<HistoryRecord> history) {
+        this.history = new ArrayList<>(history);
+    }
+
+    public void setPlayOrder(List<Pawn> playOrder) {
+        this.playOrder = new ArrayList<>(playOrder);
+    }
 
     public List<HistoryRecord> getHistory() {
         return Collections.unmodifiableList(history);
     }
+
+    public List<Pawn> getPlayOrder() {
+        return Collections.unmodifiableList(playOrder);
+    }
+
 }

@@ -7,3 +7,8 @@ class MovementDirection(Enum):
     Down = 'Down'
     Left = 'Left'
     Right = 'Right'
+
+
+class MovePawnAction:
+    def __init__(self, direction):
+        self.direction = direction

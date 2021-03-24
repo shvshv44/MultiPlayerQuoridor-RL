@@ -1,10 +1,7 @@
-import socket
-import sys
-import threading
 import json
-from json.encoder import JSONEncoder
-from MovePawnAction import *
-from MovementDirection import *
+import socket
+import threading
+from api import MovementDirection, MovePawnAction
 import random
 
 class TCP:
@@ -22,7 +19,7 @@ class TCP:
             self.client.connect(('127.0.0.1', 14000))
             receive_thread = threading.Thread(target=self.receive)
             receive_thread.start()
-            self.write(game_id)
+            self.write("e533ebd4-746a-4016-a124-182c08210327")
         except:
             print("Could not connect to the server")
 

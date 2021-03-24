@@ -11,4 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlaceWallAction implements TurnAction {
     private Wall wall;
+
+    @Override
+    public ActionType getActionType() {
+        return ActionType.PLACE_WALL;
+    }
 }

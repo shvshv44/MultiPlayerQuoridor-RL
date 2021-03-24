@@ -25,11 +25,23 @@ public class GameManager {
     private BiMap<Player, Pawn> playerPawn;
     private int numberOfWallsPerPlayer;
 
+    public BiMap<Player, Pawn> getPlayerPawn() {
+        return playerPawn;
+    }
+
     public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
+    }
+
+    public Queue<Player> getPlayers() {
+        return players;
+    }
+
+    public GameBoard getGameBoard() {
+        return gameBoard;
     }
 
     private void notifyStartGameToPlayers() {

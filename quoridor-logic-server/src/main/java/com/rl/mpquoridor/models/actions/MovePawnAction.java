@@ -11,4 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MovePawnAction implements TurnAction {
     private MovementDirection direction;
+
+    @Override
+    public ActionType getActionType() {
+        return ActionType.MOVE_PAWN;
+    }
 }

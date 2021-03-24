@@ -1,9 +1,15 @@
 package com.rl.mpquoridor.controllers;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.board.Position;
+import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
+import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.common.Constants;
+import com.rl.mpquoridor.models.enums.WallDirection;
+import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
+import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
@@ -17,7 +23,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.ServerSocket;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class GameAPIController {
@@ -39,6 +46,56 @@ public class GameAPIController {
         this.historyResolver = historyResolver;
         this.messageSender = messageSender;
         this.gameWebSocket = gameWebSocket;
+    }
+
+    @CrossOrigin
+    @GetMapping("/BoardStatus/{gameId}")
+    @ResponseBody
+    public Map<String, Object> boardStatus(@PathVariable String gameId) {
+        GameRoomState gameRoomState = gameRoomManager.getRoomState(gameId);
+        GameManager gameManager = gameRoomState.getManager();
+
+        Queue<Player> copiedPlayers = new LinkedList<>(gameManager.getPlayers());
+
+        List<Position> playersPositions = copiedPlayers.stream().map(gameManager.getPlayerPawn()::get)
+                .map(gameManager.getGameBoard().getReadOnlyPhysicalBoard()::getPawnPosition).collect(Collectors.toList());
+
+        int[][] horizontalWalls = new int[9][9];
+        int[][] verticalWalls = new int[9][9];
+
+        horizontalWalls = initHorizontalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
+        verticalWalls = initVerticalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("players", playersPositions);
+        map.put("horizontalWalls", horizontalWalls);
+        map.put("verticalWalls", verticalWalls);
+
+        return map;
+    }
+
+    private int[][] initVerticalWalls(ReadOnlyPhysicalBoard board) {
+        int[][] verticalWalls = new int[9][9];
+
+        board.getWalls().stream()
+                .filter(wall -> WallDirection.DOWN.equals(wall.getWallDirection()))
+                .map(Wall::getPosition)
+                .forEach(pos -> verticalWalls[pos.getY()][pos.getX()] = 1);
+
+
+        return verticalWalls;
+    }
+
+    private int[][] initHorizontalWalls(ReadOnlyPhysicalBoard board) {
+        int[][] horizontalWalls = new int[9][9];
+
+        board.getWalls().stream()
+                .filter(wall -> WallDirection.RIGHT.equals(wall.getWallDirection()))
+                .map(Wall::getPosition)
+                .forEach(pos -> horizontalWalls[pos.getY()][pos.getX()] = 1);
+
+
+        return horizontalWalls;
     }
 
     @CrossOrigin

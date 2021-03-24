@@ -25,11 +25,23 @@ public class GameManager {
     private BiMap<Player, Pawn> playerPawn;
     private int numberOfWallsPerPlayer;
 
+    public BiMap<Player, Pawn> getPlayerPawn() {
+        return playerPawn;
+    }
+
     public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
+    }
+
+    public Queue<Player> getPlayers() {
+        return players;
+    }
+
+    public GameBoard getGameBoard() {
+        return gameBoard;
     }
 
     private void notifyStartGameToPlayers() {
@@ -54,11 +66,13 @@ public class GameManager {
     }
 
     public GameResult run() {
-        List<HistoryRecord> history = new ArrayList<>();
+        List<HistoryRecord> history = new LinkedList<>();
+        GameResult gameResult = new GameResult();
+        gameResult.setStartingWallCount(numberOfWallsPerPlayer);
+        gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
-
         while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
@@ -81,7 +95,9 @@ public class GameManager {
         }
 
         trigger(new GameOverEvent(this.gameBoard.getWinner()));
-        return new GameResult(this.playerPawn.inverse().get(this.gameBoard.getWinner()), history);
+        gameResult.setHistory(history);
+        gameResult.setWinner(this.gameBoard.getWinner());
+        return gameResult;
     }
 
     private void trigger(GameEvent event) {

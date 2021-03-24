@@ -19,10 +19,18 @@ def join_game_random_player(game_id):
     return response
 
 
+def get_game_id():
+    join_game_url = serverUrl + "/JoinGame/" + game_id + "/randomPlayer"
+    response = requests.get(join_game_url)
+
+    return response
+
+
 if __name__ == '__main__':
-    # game_id = "e166a63d-9615-439b-9d18-5d8b4559ef94"
+    game_id = "e166a63d-9615-439b-9d18-5d8b4559ef94"
     # join_game_random_player(game_id)
-    # tcp = TCP()
+
+    tcp = TCP(game_id)
 
     players = [
         Player(0, 4, "red", [72, 73, 74, 75, 76, 77, 78, 79, 80]),

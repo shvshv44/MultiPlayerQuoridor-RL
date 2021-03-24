@@ -2,17 +2,9 @@ import gym
 import numpy as np
 from gym import spaces
 from numpy import zeros
-from rest_api import RestApi
+from rest_api import join_game, get_board
 import json
 from tcp import TCP
-
-
-class Player:
-    def __init__(self, index, start_location, name, targets):
-        self.index = index
-        self.start_location = start_location
-        self.name = name
-        self.targets = targets
 
 
 class QuoridorEnv(gym.Env):
@@ -26,9 +18,15 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def  __init__(self, gameId):
-        self.gameId = gameId
-        self.tcp = TCP(gameId)
+    def  __init__(self, game_id, player_name):
+        self.game_id = game_id
+        self.player_name = player_name
+        self.is_my_turn = False
+
+        #join_game(self.game_id, self.player_name)
+
+        self.tcp = TCP(game_id, player_name, self.on_recieved)
+        self.wait_for_my_turn()
         self.board = self.get_and_convert_board()
 
         self.action_space = spaces.Discrete(4 + 8 * 8 * 2)
@@ -40,13 +38,6 @@ class QuoridorEnv(gym.Env):
             spaces.MultiBinary([9, 9])
         ))
 
-        sample = self.observation_space.sample()
-        g = self.sample_to_input(sample)
-
-        #self.observation_space.shape = self.to_shape()
-
-
-
         self.seed()
 
         # Start the first game
@@ -56,31 +47,21 @@ class QuoridorEnv(gym.Env):
         assert self.action_space.contains(action)
 
         self.update_board(action)
-        #JAVA
+        self.wait_for_my_turn()
+
         reward, done = self.calculate_reward()
-        return tuple(self.board), reward, done, self.get_info(action)
+        self.is_my_turn = False
+        return tuple(self.board), reward, done, {}
+
+    def wait_for_my_turn(self):
+        while not self.is_my_turn:
+            pass
 
     def reset(self):
         # self.board = self.init_board()
         pass
 
-    def get_info(self, action):
-        action_details = ""
-
-        if action[0] == 0:
-            i, j = self.cell_location_to_indexes(self.board[self.main_player_index])
-            _, direction_name = self.move_direction_to_data(action[1])
-            action_details = "Player moved " + direction_name + " and its new location is (" + str(i) + "," + str(j) + ")"
-        elif action[0] == 1:
-            if action[2] < 64:
-                i, j = self.wall_location_to_indexes(action[2])
-                wall_type = "HORIZONTAL"
-            else:
-                i, j = self.wall_location_to_indexes(action[2] - 64)
-                wall_type = "VERTICAL"
-            action_details = "Player put wall of type " + wall_type + " and its location is (" + str(i) + "," + str(j) + ")"
-
-        return {"action:": action_details}
+    # NEED TO CHANGE
 
     def calculate_reward(self):
         reward = 0
@@ -103,7 +84,6 @@ class QuoridorEnv(gym.Env):
         self.board = self.get_and_convert_board()
 
 
-
     def get_new_cell_position(self, cur_location, direction):
         addition, _ = self.move_direction_to_data(direction)
         cur_location += addition
@@ -112,75 +92,6 @@ class QuoridorEnv(gym.Env):
 
     def print_board(self):
         self.print_matrix(self.board_to_print_matrix())
-
-    def board_to_print_matrix(self):
-        matrix = self.init_print_matrix()
-
-        for i in range(10):
-            for j in range(9):
-                inew = i * 2
-                jnew = j * 2 + 1
-                matrix[inew][jnew] = '---'
-
-        for i in range(9):
-            for j in range(10):
-                matrix[i * 2 + 1][j * 2] = ' | '
-
-        self.add_location_to_print_matrix(matrix, self.board[0], ' P ')
-        self.add_location_to_print_matrix(matrix, self.board[1], ' O ')
-
-        for i in range(8):
-            for j in range(8):
-                if self.board[3][i, j] == 1:
-                    matrix[i * 2 + 1][j * 2 + 2] = '|||'
-                    matrix[i * 2 + 3][j * 2 + 2] = '|||'
-
-        for i in range(8):
-            for j in range(8):
-                if self.board[2][i, j] == 1:
-                    matrix[i * 2 + 2][j * 2 + 1] = '==='
-                    matrix[i * 2 + 2][j * 2 + 3] = '==='
-
-        return matrix
-
-    def print_matrix(self, matrix):
-        for row in matrix:
-            for col in row:
-                print(col, end='')
-            print('')
-
-    def init_print_matrix(self):
-        rows, cols = (19, 19)
-        matrix = []
-        for i in range(rows):
-            col = []
-            for j in range(cols):
-                col.append('   ')
-            matrix.append(col)
-        return matrix
-
-    def add_location_to_print_matrix(self, matrix, location, symbol):
-        i, j = self.cell_location_to_indexes(location)
-        matrix[i * 2 + 1][j * 2 + 1] = symbol
-
-    def cell_location_to_indexes(self, location):
-        return location // 9, location % 9
-
-    def wall_location_to_indexes(self, location):
-        return location // 9, location % 9
-
-    def move_direction_to_data(self, direction):
-        # return the location addition + direction name
-        if direction == 0:
-            return -9, "UP"
-        elif direction == 1:
-            return 9, "DOWN"
-        elif direction == 2:
-            return -1, "LEFT"
-        elif direction == 3:
-            return 1, "RIGHT"
-
-        raise ValueError(direction + " is not a valid action!")
 
     def to_shape(self):
         return np.ndarray(9,9,4)
@@ -197,12 +108,12 @@ class QuoridorEnv(gym.Env):
 #         return np.ndarray(dim1, dim2, dim3)
 
     def get_and_convert_board(self):
-        board = json.loads(RestApi.get_board(self.gameId))
-        dim1 = np.zeros((9, 9, 1))
-        dim2 = np.zeros((9, 9, 1))
-        dim1[board["players"][0]["x"],board["players"][0]["y"]] = 1
-        dim2[board["players"][1]["x"],board["players"][1]["y"]] = 1
-        return np.ndarray(dim1, dim2, board["verticalWalls"], board["horizontalWalls"])
+        board = json.loads(get_board(self.game_id).content)
+        dim1 = np.zeros((9, 9, 1), dtype=int)
+        dim2 = np.zeros((9, 9, 1), dtype=int)
+        dim1[board["players"][0]["x"]][board["players"][0]["y"]] = 1
+        dim2[board["players"][1]["x"]][board["players"][1]["y"]] = 1
+        return np.ndarray(dim1.astype(int), dim2.astype(int),  np.array(board["verticalWalls"]).astype(int),  np.array(board["horizontalWalls"]).astype(int))
 
     def convert_action_to_server(self, action):
         output = json.dumps({})
@@ -233,4 +144,10 @@ class QuoridorEnv(gym.Env):
 
     def send_to_server(self, operation):
         self.tcp.write(operation)
+
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.player_name:
+                self.board = self.get_and_convert_board()
+                self.is_my_turn = True
 

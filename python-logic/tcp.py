@@ -1,11 +1,11 @@
 import json
 import socket
 import threading
-from api import MovementDirection, MovePawnAction
+from api import MovementDirection
 import random
 
 class TCP:
-    def __init__(self, game_id, receive_func):
+    def __init__(self, game_id, name, receive_func):
         # Connecting To Server
         self.num_of_walls = ""
         self.players = ""
@@ -17,9 +17,9 @@ class TCP:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect(('127.0.0.1', 14000))
-            receive_thread = threading.Thread(target=self.receive(receive_func))
+            receive_thread = threading.Thread(target=self.receive, args=[receive_func])
             receive_thread.start()
-            self.write("e533ebd4-746a-4016-a124-182c08210327")
+            self.write({"gameId": game_id, "name": name})
         except:
             print("Could not connect to the server")
 
@@ -28,6 +28,7 @@ class TCP:
             try:
                 # Receive Message From Server
                 message = self.client.recv(1024 * 100).decode('ascii')
+                print(message)
                 json_message = json.loads(message)
 
                 receiveFunc(json_message)
@@ -67,4 +68,4 @@ class TCP:
 
     # Sending Messages To Server
     def write(self, message):
-        self.client.send(message.encode('ascii'))
+        self.client.send(str(message).replace('\'', '\"').encode('ascii'))

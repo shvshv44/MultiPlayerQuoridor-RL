@@ -113,7 +113,8 @@ class QuoridorEnv(gym.Env):
         dim2 = np.zeros((9, 9, 1), dtype=int)
         dim1[board["players"][0]["x"]][board["players"][0]["y"]] = 1
         dim2[board["players"][1]["x"]][board["players"][1]["y"]] = 1
-        return np.ndarray(dim1.astype(int), dim2.astype(int),  np.array(board["verticalWalls"]).astype(int),  np.array(board["horizontalWalls"]).astype(int))
+        // NEDD TO FIX
+        return np.ndarray(dim1, dim2, board["verticalWalls"], board["horizontalWalls"])
 
     def convert_action_to_server(self, action):
         output = json.dumps({})

@@ -27,7 +27,7 @@ def get_game_id():
 
 
 if __name__ == '__main__':
-    game_id = "6cf4da43-2580-460c-b14a-fa6301db1d16"
+    game_id = "3c6edf17-3b3f-4b4c-b466-52a1df76c79e"
     # join_game_random_player(game_id)
 
     env = QuoridorEnv(game_id, "team600")

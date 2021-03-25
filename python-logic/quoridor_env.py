@@ -1,3 +1,5 @@
+from enum import Enum
+
 import gym
 import numpy as np
 from gym import spaces
@@ -5,6 +7,12 @@ from numpy import zeros
 from rest_api import join_game, get_board
 import json
 from tcp import TCP
+
+
+class GameWinnerStatus(Enum):
+    NoWinner = 0
+    EnvWinner = 1
+    EnvLoser = 2
 
 
 class QuoridorEnv(gym.Env):
@@ -18,12 +26,13 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def  __init__(self, game_id, player_name):
+    def __init__(self, game_id, player_name):
         self.game_id = game_id
         self.player_name = player_name
         self.is_my_turn = False
+        self.winner_status = GameWinnerStatus.NoWinner
 
-        #join_game(self.game_id, self.player_name)
+        # join_game(self.game_id, self.player_name)
 
         self.tcp = TCP(game_id, player_name, self.on_recieved)
         self.wait_for_my_turn()
@@ -61,28 +70,23 @@ class QuoridorEnv(gym.Env):
         # self.board = self.init_board()
         pass
 
-    # NEED TO CHANGE
-
     def calculate_reward(self):
         reward = 0
         done = False
 
-        for player in self.players: # CURRENT PROBLEM
-            if self.board[player.index] in player.targets:
-                done = True
-                if player.index == self.main_player_index: # CURRENT PROBLEM
-                    reward = 1
-                else:
-                    reward = -1
-                break
+        if self.winner_status != GameWinnerStatus.NoWinner:
+            done = True
+            if self.winner_status == GameWinnerStatus.EnvWinner:
+                reward = 1
+            elif self.winner_status == GameWinnerStatus.EnvLoser:
+                reward = -1
 
         return reward, done
 
     def update_board(self, action):
         operation = self.convert_action_to_server(action)
-        self.send_to_server(operation) # WAITING
+        self.send_to_server(operation)  # WAITING
         self.board = self.get_and_convert_board()
-
 
     def get_new_cell_position(self, cur_location, direction):
         addition, _ = self.move_direction_to_data(direction)
@@ -94,21 +98,22 @@ class QuoridorEnv(gym.Env):
         self.print_matrix(self.board_to_print_matrix())
 
     def to_shape(self):
-        return np.ndarray(9,9,4)
+        return np.ndarray(9, 9, 4)
 
-# NOT WORKING
-#     def sample_to_input(self, sample):
-#         dim1 = np.zeros((9,9,1))
-#         i1,j1 = self.cell_location_to_indexes(sample[0])
-#         i2,j2 = self.cell_location_to_indexes(sample[1])
-#         dim1[i1,j1] = 1
-#         dim1[i2,j2] = 2
-#         dim2 = sample[2]
-#         dim3 = sample[3]
-#         return np.ndarray(dim1, dim2, dim3)
+    # NOT WORKING
+    #     def sample_to_input(self, sample):
+    #         dim1 = np.zeros((9,9,1))
+    #         i1,j1 = self.cell_location_to_indexes(sample[0])
+    #         i2,j2 = self.cell_location_to_indexes(sample[1])
+    #         dim1[i1,j1] = 1
+    #         dim1[i2,j2] = 2
+    #         dim2 = sample[2]
+    #         dim3 = sample[3]
+    #         return np.ndarray(dim1, dim2, dim3)
 
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
+        print(board)
         dim1 = np.zeros((9, 9), dtype=int)
         dim2 = np.zeros((9, 9), dtype=int)
         dim1[board["players"][0]["x"]][board["players"][0]["y"]] = 1
@@ -138,14 +143,14 @@ class QuoridorEnv(gym.Env):
 
             output = json.dumps({
                 'wall': {
-                    "position":{
-                        "x":x,
-                        "y":y
+                    "position": {
+                        "x": x,
+                        "y": y
                     },
                     "wallDirection": dir
                 }
             }
-        )
+            )
 
         return output
 
@@ -157,4 +162,3 @@ class QuoridorEnv(gym.Env):
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True
-

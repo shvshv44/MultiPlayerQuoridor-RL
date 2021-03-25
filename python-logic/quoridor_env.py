@@ -67,10 +67,10 @@ class QuoridorEnv(gym.Env):
         reward = 0
         done = False
 
-        for player in self.players:
+        for player in self.players: # CURRENT PROBLEM
             if self.board[player.index] in player.targets:
                 done = True
-                if player.index == self.main_player_index:
+                if player.index == self.main_player_index: # CURRENT PROBLEM
                     reward = 1
                 else:
                     reward = -1
@@ -109,17 +109,23 @@ class QuoridorEnv(gym.Env):
 
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
-        dim1 = np.zeros((9, 9, 1), dtype=int)
-        dim2 = np.zeros((9, 9, 1), dtype=int)
+        dim1 = np.zeros((9, 9), dtype=int)
+        dim2 = np.zeros((9, 9), dtype=int)
         dim1[board["players"][0]["x"]][board["players"][0]["y"]] = 1
         dim2[board["players"][1]["x"]][board["players"][1]["y"]] = 1
-        // NEDD TO FIX
-        return np.ndarray(dim1, dim2, board["verticalWalls"], board["horizontalWalls"])
+
+        all_dims = []
+        all_dims.append(dim1)
+        all_dims.append(dim2)
+        all_dims.append(board["verticalWalls"])
+        all_dims.append(board["horizontalWalls"])
+
+        return np.asarray(all_dims)
 
     def convert_action_to_server(self, action):
         output = json.dumps({})
         if 0 <= action <= 3:
-            output = json.dumps({'direction': self.movements[action]})
+            output = json.dumps({'direction': self.tcp.movements[action].value})
         elif 4 <= action <= 131:
             dir = "Right"
             value = action - 4

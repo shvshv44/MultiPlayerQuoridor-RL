@@ -7,12 +7,21 @@ from numpy import zeros
 from rest_api import join_game, get_board
 import json
 from tcp import TCP
+import utils
 
 
 class GameWinnerStatus(Enum):
     NoWinner = 0
     EnvWinner = 1
     EnvLoser = 2
+
+
+def action_shape():
+    return np.ndarray(1)
+
+
+def observation_shape():
+    return np.ndarray(9, 9, 4)
 
 
 class QuoridorEnv(gym.Env):
@@ -83,31 +92,8 @@ class QuoridorEnv(gym.Env):
         return reward, done
 
     def update_board(self, action):
-        operation = self.convert_action_to_server(action)
+        operation = utils.convert_action_to_server(action)
         self.send_to_server(operation)  # WAITING
-
-    def get_new_cell_position(self, cur_location, direction):
-        addition, _ = self.move_direction_to_data(direction)
-        cur_location += addition
-        assert 0 <= cur_location <= 81
-        return cur_location
-
-    def print_board(self):
-        self.print_matrix(self.board_to_print_matrix())
-
-    def to_shape(self):
-        return np.ndarray(9, 9, 4)
-
-    # NOT WORKING
-    #     def sample_to_input(self, sample):
-    #         dim1 = np.zeros((9,9,1))
-    #         i1,j1 = self.cell_location_to_indexes(sample[0])
-    #         i2,j2 = self.cell_location_to_indexes(sample[1])
-    #         dim1[i1,j1] = 1
-    #         dim1[i2,j2] = 2
-    #         dim2 = sample[2]
-    #         dim3 = sample[3]
-    #         return np.ndarray(dim1, dim2, dim3)
 
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
@@ -124,33 +110,6 @@ class QuoridorEnv(gym.Env):
         all_dims.append(board["verticalWalls"])
 
         return np.asarray(all_dims)
-
-    def convert_action_to_server(self, action):
-        output = json.dumps({})
-        if 0 <= action <= 3:
-            output = json.dumps({'direction': self.tcp.movements[action].value})
-        elif 4 <= action <= 131:
-            dir = "Right"
-            value = action - 4
-
-            if value > 64 - 1:
-                dir = "Down"
-                value -= 64
-
-            x, y = value % 8, value // 8
-
-            output = json.dumps({
-                'wall': {
-                    "position": {
-                        "x": x,
-                        "y": y
-                    },
-                    "wallDirection": dir
-                }
-            }
-            )
-
-        return output
 
     def send_to_server(self, operation):
         self.tcp.write(operation)

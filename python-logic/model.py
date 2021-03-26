@@ -6,9 +6,9 @@ from tensorflow.keras.optimizers import Adam
 
 class Model:
 
-    def __init__(self, env):
-        self.states = env.observation_space.shape
-        self.actions = env.action_space.n
+    def __init__(self, observation_input_shape, action_input_shape):
+        self.states = observation_input_shape
+        self.actions = action_input_shape
         self.model = self.build_model(self.states, self.actions)
         self.model.summery()
 

@@ -36,7 +36,6 @@ class QuoridorEnv(gym.Env):
 
         self.tcp = TCP(game_id, player_name, self.on_recieved)
         self.wait_for_my_turn()
-        self.board = self.get_and_convert_board()
 
         self.action_space = spaces.Discrete(4 + 8 * 8 * 2)
 
@@ -86,7 +85,6 @@ class QuoridorEnv(gym.Env):
     def update_board(self, action):
         operation = self.convert_action_to_server(action)
         self.send_to_server(operation)  # WAITING
-        self.board = self.get_and_convert_board()
 
     def get_new_cell_position(self, cur_location, direction):
         addition, _ = self.move_direction_to_data(direction)
@@ -116,14 +114,14 @@ class QuoridorEnv(gym.Env):
         print(board)
         dim1 = np.zeros((9, 9), dtype=int)
         dim2 = np.zeros((9, 9), dtype=int)
-        dim1[board["players"][0]["x"]][board["players"][0]["y"]] = 1
-        dim2[board["players"][1]["x"]][board["players"][1]["y"]] = 1
+        dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
+        dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
 
         all_dims = []
         all_dims.append(dim1)
         all_dims.append(dim2)
-        all_dims.append(board["verticalWalls"])
         all_dims.append(board["horizontalWalls"])
+        all_dims.append(board["verticalWalls"])
 
         return np.asarray(all_dims)
 
@@ -162,3 +160,9 @@ class QuoridorEnv(gym.Env):
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True
+        elif json_message["type"] == "GameOverEvent":
+            self.is_my_turn = True
+            if json_message["winnerName"] == self.player_name:
+                self.winner_status = GameWinnerStatus.EnvWinner
+            else:
+                self.winner_status = GameWinnerStatus.EnvLoser

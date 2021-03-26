@@ -27,7 +27,7 @@ def get_game_id():
 
 
 if __name__ == '__main__':
-    game_id = "3c6edf17-3b3f-4b4c-b466-52a1df76c79e"
+    game_id = "edf2c4b2-95b4-4abf-829f-8920c357c13e"
     # join_game_random_player(game_id)
 
     env = QuoridorEnv(game_id, "team600")
@@ -36,8 +36,14 @@ if __name__ == '__main__':
     # Agent.train_agent(env)
 
     done = False
+    stam = True
     while not done:
-        board, reward, done, info = env.step(3)
+        if stam:
+            board, reward, done, info = env.step(0)
+            stam = not stam
+        else:
+            board, reward, done, info = env.step(1)
+            stam = not stam
         print("reward:{} , done:{}".format(reward, done))
         print(board)
         print("*************************")

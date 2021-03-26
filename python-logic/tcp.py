@@ -3,13 +3,15 @@ import socket
 import threading
 from api import MovementDirection
 import random
+import traceback
 
 class TCP:
     def __init__(self, game_id, name, receive_func):
         # Connecting To Server
         self.num_of_walls = ""
         self.players = ""
-        self.movements = [MovementDirection.Left, MovementDirection.Right, MovementDirection.Up, MovementDirection.Down]
+        self.movements = list(map(lambda c: c, MovementDirection))
+        self.json_dec = json.JSONDecoder()
 
         rows, cols = (18, 18)
         self.board = [[0] * cols] * rows
@@ -28,26 +30,22 @@ class TCP:
             try:
                 # Receive Message From Server
                 message = self.client.recv(1024 * 100).decode('ascii')
-                print(message)
-                json_message = json.loads(message)
+                # print(message)
+                # json_message = json.loads(message)
+                # receiveFunc(json_message)
 
-                receiveFunc(json_message)
-                # if json_message["type"] == 'StartGameMessage':
-                #     self.handle_start_game_message(json_message)
-                #
-                # if json_message["type"] == 'EndTurnEvent':
-                #     self.handle_end_turn_event(json_message)
-                #
-                # if json_message["type"] == 'NewTurnEvent':
-                #     self.handle_new_turn_event(json_message)
-
-                print(message)
-
+                pos = 0
+                while not pos == len(str(message)):
+                    j, json_len = self.json_dec.raw_decode(str(message)[pos:])
+                    pos += json_len
+                    print(j)
+                    receiveFunc(j)
 
             except Exception as e:
                 # Close Connection When Error
-                print(e)
                 print("An error occured!")
+                print(e)
+                traceback.print_exc()
                 self.client.close()
                 break
 

@@ -1,14 +1,18 @@
+from enum import Enum
+
 import gym
+import numpy as np
 from gym import spaces
 from numpy import zeros
+from rest_api import join_game, get_board
+import json
+from tcp import TCP
 
 
-class Player:
-    def __init__(self, index, start_location, name, targets):
-        self.index = index
-        self.start_location = start_location
-        self.name = name
-        self.targets = targets
+class GameWinnerStatus(Enum):
+    NoWinner = 0
+    EnvWinner = 1
+    EnvLoser = 2
 
 
 class QuoridorEnv(gym.Env):
@@ -22,29 +26,24 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def __init__(self, players, main_player_index):
-        self.players = players
-        self.main_player_index = main_player_index
-        self.board = self.init_board()
+    def __init__(self, game_id, player_name):
+        self.game_id = game_id
+        self.player_name = player_name
+        self.is_my_turn = False
+        self.winner_status = GameWinnerStatus.NoWinner
 
-        self.action_space = spaces.Tuple((
-            # choosing either to move or put wall
-            spaces.Discrete(2),
-            # 4 directions to move - 0 = UP, 1 = DOWN, 2 = LEFT, 3 = RIGHT
-            spaces.Discrete(4),
-            # 64 walls to put horizontally and 64 walls to put vertically
-            spaces.Discrete(8 * 8 * 2)
-        ))
+        # join_game(self.game_id, self.player_name)
+
+        self.tcp = TCP(game_id, player_name, self.on_recieved)
+        self.wait_for_my_turn()
+
+        self.action_space = spaces.Discrete(4 + 8 * 8 * 2)
 
         self.observation_space = spaces.Tuple((
-            # The player cell location
-            spaces.Discrete(81),
-            # The opponent cell location
-            spaces.Discrete(81),
-            # 64 horizontal walls possibilities - 0 is without wall and 1 is with wall
-            spaces.MultiBinary([8, 8]),
-            # 64 vertical walls possibilities - 0 is without wall and 1 is with wall
-            spaces.MultiBinary([8, 8])
+            spaces.MultiBinary([9, 9]),
+            spaces.MultiBinary([9, 9]),
+            spaces.MultiBinary([9, 9]),
+            spaces.MultiBinary([9, 9])
         ))
 
         self.seed()
@@ -55,63 +54,37 @@ class QuoridorEnv(gym.Env):
     def step(self, action):
         assert self.action_space.contains(action)
 
-        self.update_board(self.players[self.main_player_index], action)
+        self.update_board(action)
+        self.wait_for_my_turn()
+
         reward, done = self.calculate_reward()
-        return tuple(self.board), reward, done, self.get_info(action)
+        self.is_my_turn = False
+        return tuple(self.board), reward, done, {}
+
+    def wait_for_my_turn(self):
+        while not self.is_my_turn:
+            pass
 
     def reset(self):
-        self.board = self.init_board()
-
-    def get_info(self, action):
-        action_details = ""
-
-        if action[0] == 0:
-            i, j = self.cell_location_to_indexes(self.board[self.main_player_index])
-            _, direction_name = self.move_direction_to_data(action[1])
-            action_details = "Player moved " + direction_name + " and its new location is (" + str(i) + "," + str(j) + ")"
-        elif action[0] == 1:
-            if action[2] < 64:
-                i, j = self.wall_location_to_indexes(action[2])
-                wall_type = "HORIZONTAL"
-            else:
-                i, j = self.wall_location_to_indexes(action[2] - 64)
-                wall_type = "VERTICAL"
-            action_details = "Player put wall of type " + wall_type + " and its location is (" + str(i) + "," + str(j) + ")"
-
-        return {"action:": action_details}
-
-    def init_board(self):
-        return [
-            self.players[0].start_location,
-            self.players[1].start_location,
-            zeros(shape=(8, 8)),
-            zeros(shape=(8, 8))
-        ]
+        # self.board = self.init_board()
+        pass
 
     def calculate_reward(self):
         reward = 0
         done = False
 
-        for player in self.players:
-            if self.board[player.index] in player.targets:
-                done = True
-                if player.index == self.main_player_index:
-                    reward = 1
-                else:
-                    reward = -1
-                break
+        if self.winner_status != GameWinnerStatus.NoWinner:
+            done = True
+            if self.winner_status == GameWinnerStatus.EnvWinner:
+                reward = 1
+            elif self.winner_status == GameWinnerStatus.EnvLoser:
+                reward = -1
 
         return reward, done
 
-    def update_board(self, player, action):
-        if action[0] == 0:
-            self.board[player.index] = self.get_new_cell_position(self.board[player.index], action[1])
-        if action[0] == 1:
-            assert 0 <= action[2] <= 64 * 2
-            if action[2] < 64:
-                self.board[len(self.players)][action[2] // 8][action[2] % 8] = 1
-            else:
-                self.board[len(self.players) + 1][(action[2] - 64) // 8][(action[2] - 64) % 8] = 1
+    def update_board(self, action):
+        operation = self.convert_action_to_server(action)
+        self.send_to_server(operation)  # WAITING
 
     def get_new_cell_position(self, cur_location, direction):
         addition, _ = self.move_direction_to_data(direction)
@@ -122,71 +95,74 @@ class QuoridorEnv(gym.Env):
     def print_board(self):
         self.print_matrix(self.board_to_print_matrix())
 
-    def board_to_print_matrix(self):
-        matrix = self.init_print_matrix()
+    def to_shape(self):
+        return np.ndarray(9, 9, 4)
 
-        for i in range(10):
-            for j in range(9):
-                inew = i * 2
-                jnew = j * 2 + 1
-                matrix[inew][jnew] = '---'
+    # NOT WORKING
+    #     def sample_to_input(self, sample):
+    #         dim1 = np.zeros((9,9,1))
+    #         i1,j1 = self.cell_location_to_indexes(sample[0])
+    #         i2,j2 = self.cell_location_to_indexes(sample[1])
+    #         dim1[i1,j1] = 1
+    #         dim1[i2,j2] = 2
+    #         dim2 = sample[2]
+    #         dim3 = sample[3]
+    #         return np.ndarray(dim1, dim2, dim3)
 
-        for i in range(9):
-            for j in range(10):
-                matrix[i * 2 + 1][j * 2] = ' | '
+    def get_and_convert_board(self):
+        board = json.loads(get_board(self.game_id).content)
+        print(board)
+        dim1 = np.zeros((9, 9), dtype=int)
+        dim2 = np.zeros((9, 9), dtype=int)
+        dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
+        dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
 
-        self.add_location_to_print_matrix(matrix, self.board[0], ' P ')
-        self.add_location_to_print_matrix(matrix, self.board[1], ' O ')
+        all_dims = []
+        all_dims.append(dim1)
+        all_dims.append(dim2)
+        all_dims.append(board["horizontalWalls"])
+        all_dims.append(board["verticalWalls"])
 
-        for i in range(8):
-            for j in range(8):
-                if self.board[3][i, j] == 1:
-                    matrix[i * 2 + 1][j * 2 + 2] = '|||'
-                    matrix[i * 2 + 3][j * 2 + 2] = '|||'
+        return np.asarray(all_dims)
 
-        for i in range(8):
-            for j in range(8):
-                if self.board[2][i, j] == 1:
-                    matrix[i * 2 + 2][j * 2 + 1] = '==='
-                    matrix[i * 2 + 2][j * 2 + 3] = '==='
+    def convert_action_to_server(self, action):
+        output = json.dumps({})
+        if 0 <= action <= 3:
+            output = json.dumps({'direction': self.tcp.movements[action].value})
+        elif 4 <= action <= 131:
+            dir = "Right"
+            value = action - 4
 
-        return matrix
+            if value > 64 - 1:
+                dir = "Down"
+                value -= 64
 
-    def print_matrix(self, matrix):
-        for row in matrix:
-            for col in row:
-                print(col, end='')
-            print('')
+            x, y = value % 8, value // 8
 
-    def init_print_matrix(self):
-        rows, cols = (19, 19)
-        matrix = []
-        for i in range(rows):
-            col = []
-            for j in range(cols):
-                col.append('   ')
-            matrix.append(col)
-        return matrix
+            output = json.dumps({
+                'wall': {
+                    "position": {
+                        "x": x,
+                        "y": y
+                    },
+                    "wallDirection": dir
+                }
+            }
+            )
 
-    def add_location_to_print_matrix(self, matrix, location, symbol):
-        i, j = self.cell_location_to_indexes(location)
-        matrix[i * 2 + 1][j * 2 + 1] = symbol
+        return output
 
-    def cell_location_to_indexes(self, location):
-        return location // 9, location % 9
+    def send_to_server(self, operation):
+        self.tcp.write(operation)
 
-    def wall_location_to_indexes(self, location):
-        return location // 8, location % 8
-
-    def move_direction_to_data(self, direction):
-        # return the location addition + direction name
-        if direction == 0:
-            return -9, "UP"
-        elif direction == 1:
-            return 9, "DOWN"
-        elif direction == 2:
-            return -1, "LEFT"
-        elif direction == 3:
-            return 1, "RIGHT"
-
-        raise ValueError(direction + " is not a valid action!")
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.player_name:
+                self.board = self.get_and_convert_board()
+                self.is_my_turn = True
+        elif json_message["type"] == "GameOverEvent":
+            self.is_my_turn = True
+            if json_message["winnerName"] == self.player_name:
+                self.winner_status = GameWinnerStatus.EnvWinner
+            else:
+                self.winner_status = GameWinnerStatus.EnvLoser

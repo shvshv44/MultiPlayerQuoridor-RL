@@ -20,3 +20,9 @@ def join_game(game_id, name):
     join_url = server + "/JoinGame/" + game_id + "/" + name
     response = http.get(join_url)
     return response
+
+
+def start_game(game_id):
+    start_url = server + "/StartGame/" + game_id
+    response = http.get(start_url)
+    return response

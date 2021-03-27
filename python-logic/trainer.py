@@ -1,4 +1,4 @@
-import requests as http
+import json
 import rest_api
 from tcp import TCP
 from quoridor_env import QuoridorEnv
@@ -13,10 +13,10 @@ class Trainer:
         self.name = "Trainer"
 
     def start_training_session(self):
-        game_id = rest_api.create_game()
-        print("Trainer created game with id: {}".format(game_id))
-        self.tcp = TCP(game_id, self.name, self.on_recieved)
-        self.start_game_with_agent(game_id)
+        self.game_id = rest_api.create_game(self.name).content.decode("utf-8")
+        print("Trainer created game with id: {}".format(self.game_id))
+        self.tcp = TCP(self.game_id, self.name, self.on_recieved)
+        self.start_game_with_agent(self.game_id)
 
     def start_game_with_agent(self, game_id):
         env = QuoridorEnv(game_id, "Agent")
@@ -31,3 +31,6 @@ class Trainer:
 
         elif json_message["type"] == "GameOverEvent":
             pass
+        elif json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)

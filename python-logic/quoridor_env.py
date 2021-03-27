@@ -8,6 +8,7 @@ from rest_api import join_game, get_board
 import json
 from tcp import TCP
 import utils
+from globals import Global
 
 
 class GameWinnerStatus(Enum):
@@ -17,11 +18,11 @@ class GameWinnerStatus(Enum):
 
 
 def action_shape():
-    return np.ndarray(1)
+    return 1
 
 
 def observation_shape():
-    return np.ndarray(9, 9, 4)
+    return (1,) + (9, 9, 4) # window length + board shape
 
 
 class QuoridorEnv(gym.Env):
@@ -46,7 +47,7 @@ class QuoridorEnv(gym.Env):
         self.tcp = TCP(game_id, player_name, self.on_recieved)
         self.wait_for_my_turn()
 
-        self.action_space = spaces.Discrete(4 + 8 * 8 * 2)
+        self.action_space = spaces.Discrete(Global.num_of_actions)
 
         self.observation_space = spaces.Tuple((
             spaces.MultiBinary([9, 9]),
@@ -63,6 +64,8 @@ class QuoridorEnv(gym.Env):
     def step(self, action):
         assert self.action_space.contains(action)
 
+        action = int(action)
+
         self.update_board(action)
         self.wait_for_my_turn()
 
@@ -76,7 +79,7 @@ class QuoridorEnv(gym.Env):
 
     def reset(self):
         # self.board = self.init_board()
-        pass
+        return self.board
 
     def calculate_reward(self):
         reward = 0
@@ -103,13 +106,15 @@ class QuoridorEnv(gym.Env):
         dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
         dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
 
-        all_dims = []
-        all_dims.append(dim1)
-        all_dims.append(dim2)
-        all_dims.append(board["horizontalWalls"])
-        all_dims.append(board["verticalWalls"])
+        # all_dims = []
+        # all_dims.append(dim1)
+        # all_dims.append(dim2)
+        # all_dims.append(board["horizontalWalls"])
+        # all_dims.append(board["verticalWalls"])
 
-        return np.asarray(all_dims)
+        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"]))
+        return all_dims
+        # return np.asarray(all_dims)
 
     def send_to_server(self, operation):
         self.tcp.write(operation)

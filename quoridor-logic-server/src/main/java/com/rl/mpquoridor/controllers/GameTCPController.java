@@ -45,6 +45,7 @@ public class GameTCPController {
             int read = client.getInputStream().read(buffer);
             String joinReqBuffer = new String(buffer, 0, read);
             Map<String, String> map = new ObjectMapper().readValue(joinReqBuffer, Map.class);
+            System.out.println("Player " + map.get("name") + " connected via tcp for game " + map.get("gameId"));
             TCPPlayer player = new TCPPlayer(map.get("name"), new GameTCPSocket(client));
             gameRoomManager.joinGame(map.get("gameId"), player);
 

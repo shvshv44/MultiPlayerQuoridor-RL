@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras.optimizers import Adam
 
 
@@ -10,11 +10,13 @@ class Model:
         self.states = observation_input_shape
         self.actions = action_input_shape
         self.model = self.build_model(self.states, self.actions)
-        self.model.summery()
+        self.model.summary()
 
     def build_model(self, states, actions):
         model = Sequential()
-        model.add(Dense(24, activation='relu', input_shape=(9,9,3)))
-        model.add(Dense(24, activation='relu'))
+        model.add(Conv2D(8, (3,3), padding='same', input_shape=states))
+        model.add(Conv2D(16, (3, 3), padding='same', input_shape=states))
+        model.add(Flatten())
+        model.add(Dense(324, activation='relu'))
         model.add(Dense(actions, activation='linear'))
         return model

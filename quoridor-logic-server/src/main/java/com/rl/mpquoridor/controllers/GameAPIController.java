@@ -13,6 +13,7 @@ import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
 import com.rl.mpquoridor.services.HistoryResolverService;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

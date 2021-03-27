@@ -161,8 +161,8 @@ public class GameAPIController {
     @CrossOrigin
     @GetMapping("/History")
     @ResponseBody
-    public List<String> history() {
-        return historyResolver.fetchAllHistoryGameIds();
+    public List<Document> history() {
+        return this.historyResolver.fetchAllHistoryGameIds();
     }
 
     @CrossOrigin

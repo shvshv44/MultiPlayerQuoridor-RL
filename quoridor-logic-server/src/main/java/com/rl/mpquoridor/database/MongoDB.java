@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.client.FindIterable;
 import com.rl.mpquoridor.models.game.GameResult;
 import org.bson.Document;
 
@@ -34,6 +35,10 @@ public class MongoDB implements AutoCloseable{
 
     public void save(GameResult result) {
         this.mongo.getDatabase(DB).getCollection(COLLECTION).insertOne(convert(result));
+    }
+
+    public FindIterable<Document> selectAll() {
+        return this.mongo.getDatabase(DB).getCollection(COLLECTION).find();
     }
 
     private Document convert(GameResult obj) {

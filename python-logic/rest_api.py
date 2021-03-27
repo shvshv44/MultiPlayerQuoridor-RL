@@ -1,7 +1,13 @@
 import requests as http
 from globals import Global
 
-server = "http://localhost:8080"
+server = Global.server
+
+
+def create_game(name):
+    create_game_url = server + "/CreateGame/" + name
+    response = http.get(create_game_url)
+    return response
 
 
 def get_board(game_id):
@@ -13,4 +19,10 @@ def get_board(game_id):
 def join_game(game_id, name):
     join_url = server + "/JoinGame/" + game_id + "/" + name
     response = http.get(join_url)
+    return response
+
+
+def start_game(game_id):
+    start_url = server + "/StartGame/" + game_id
+    response = http.get(start_url)
     return response

@@ -4,14 +4,15 @@ import threading
 from api import MovementDirection
 import random
 import traceback
+from globals import Global
 
 class TCP:
     def __init__(self, game_id, name, receive_func):
         # Connecting To Server
         self.num_of_walls = ""
         self.players = ""
-        self.movements = list(map(lambda c: c, MovementDirection))
         self.json_dec = json.JSONDecoder()
+        self.name = name
 
         rows, cols = (18, 18)
         self.board = [[0] * cols] * rows
@@ -21,7 +22,7 @@ class TCP:
             self.client.connect(('127.0.0.1', 14000))
             receive_thread = threading.Thread(target=self.receive, args=[receive_func])
             receive_thread.start()
-            self.write({"gameId": game_id, "name": name})
+            self.write({"gameId": game_id, "name": self.name})
         except:
             print("Could not connect to the server")
 
@@ -38,7 +39,7 @@ class TCP:
                 while not pos == len(str(message)):
                     j, json_len = self.json_dec.raw_decode(str(message)[pos:])
                     pos += json_len
-                    print(j)
+                    print("{} : {}".format(self.name, j))
                     receiveFunc(j)
 
             except Exception as e:
@@ -62,7 +63,7 @@ class TCP:
         avialiable_moves = json_message["avialiableMoves"]
         available_walls = json_message["availableWalls"]
         if len(next_player_to_play) > 15:
-            self.write(json.dumps({'direction': random.choice(self.movements).value}))
+            self.write(json.dumps({'direction': random.choice(Global.movements).value}))
 
     # Sending Messages To Server
     def write(self, message):

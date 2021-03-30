@@ -37,7 +37,7 @@ public class MongoDB implements AutoCloseable{
         this.mongo.getDatabase(DB).getCollection(COLLECTION).insertOne(convert(result));
     }
 
-    public FindIterable<Document> selectAll() {
+    public FindIterable<Document> selectHistory() {
         return this.mongo.getDatabase(DB).getCollection(COLLECTION).find();
     }
 
@@ -46,12 +46,12 @@ public class MongoDB implements AutoCloseable{
         return new Document(map);
     }
 
-    public FindIterable<Document> selectAllId() {
-        return this.selectAll().projection(new Document("gameId", 1));
+    public FindIterable<Document> selectHistoryGameIds() {
+        return this.selectHistory().projection(new Document("gameId", 1));
     }
 
-    public Document selectByGameId(String id) {
-        Document doc = this.mongo.getDatabase(DB).getCollection(COLLECTION).find(new Document("gameId", id)).first();
+    public Document selectHistoryByGameId(String gameId) {
+        Document doc = this.mongo.getDatabase(DB).getCollection(COLLECTION).find(new Document("gameId", gameId)).first();
         if(doc != null) {
             doc.remove("_id");
         }

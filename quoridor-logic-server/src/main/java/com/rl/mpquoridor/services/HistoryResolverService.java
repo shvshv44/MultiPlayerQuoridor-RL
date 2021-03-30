@@ -13,16 +13,16 @@ import java.util.function.Supplier;
 public class HistoryResolverService {
 
     public List<Document> fetchHistory() {
-        return getByMongoDBSupplier(MongoDB.getInstance()::selectAll);
+        return getByMongoDBSupplier(MongoDB.getInstance()::selectHistory);
 
     }
 
     public List<Document> fetchHistoryGameIds() {
-        return getByMongoDBSupplier(MongoDB.getInstance()::selectAllId);
+        return getByMongoDBSupplier(MongoDB.getInstance()::selectHistoryGameIds);
     }
 
     public Document getById(String id) {
-        return MongoDB.getInstance().selectByGameId(id);
+        return MongoDB.getInstance().selectHistoryByGameId(id);
     }
 
     private List<Document> getByMongoDBSupplier(Supplier<FindIterable<Document>> dbSupplier) {

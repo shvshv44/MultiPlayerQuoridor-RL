@@ -169,7 +169,7 @@ public class GameAPIController {
     @CrossOrigin
     @GetMapping("/HistoryIds")
     @ResponseBody
-    public List<Document> getAllIds() {
+    public List<Document> historyGameIds() {
         return this.historyResolver.fetchHistoryGameIds();
     }
 

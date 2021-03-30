@@ -18,6 +18,13 @@ class Trainer:
         self.tcp = TCP(self.game_id, self.name, self.on_recieved)
         self.start_game_with_agent(self.game_id)
 
+    def wait_join_game(self, api):
+        self.game_id = api.wait_to_adding_game()
+        rest_api.join_game(self.game_id, self.name).content.decode("utf-8")
+        print("Trainer join game with id: {}".format(self.game_id))
+        self.tcp = TCP(self.game_id, self.name, self.on_recieved)
+        self.start_game_with_agent(self.game_id)
+
     def start_game_with_agent(self, game_id):
         env = QuoridorEnv(game_id, "Agent")
         self.agent.train_agent(env)

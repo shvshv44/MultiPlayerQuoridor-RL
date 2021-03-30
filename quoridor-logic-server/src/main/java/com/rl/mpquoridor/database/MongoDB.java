@@ -45,4 +45,17 @@ public class MongoDB implements AutoCloseable{
         Map<String, Object> map = mapper.convertValue(obj, new TypeReference<Map<String, Object>>() {});
         return new Document(map);
     }
+
+    public FindIterable<Document> selectAllId() {
+        return this.selectAll().projection(new Document("gameId", 1));
+    }
+
+    public Document selectByGameId(String id) {
+        Document doc = this.mongo.getDatabase(DB).getCollection(COLLECTION).find(new Document("gameId", id)).first();
+        if(doc != null) {
+            doc.remove("_id");
+        }
+
+        return doc;
+    }
 }

@@ -7,7 +7,6 @@ import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.enums.WallDirection;
 import com.rl.mpquoridor.models.game.GameManager;
-import com.rl.mpquoridor.models.game.GameResult;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
 import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.WebSocketPlayer;
@@ -37,6 +36,7 @@ public class GameAPIController {
     private SimpMessagingTemplate messageSender;
     private GameWebSocket gameWebSocket;
     private ServerSocket server;
+    private static final Document NOT_FOUND_DOCUMENT = new Document("not_found", 1);
 
     @Autowired
     public GameAPIController(GameRoomsManagerService gameRoomManager,
@@ -163,14 +163,27 @@ public class GameAPIController {
     @GetMapping("/History")
     @ResponseBody
     public List<Document> history() {
-        return this.historyResolver.fetchAllHistoryGameIds();
+        return this.historyResolver.fetchHistory();
     }
 
     @CrossOrigin
-    @GetMapping("/History/{gameId}")
+    @GetMapping("/HistoryIds")
     @ResponseBody
-    public GameResult historyByGameId(@PathVariable String gameId) {
-        return historyResolver.getResultByGameId(gameId);
+    public List<Document> getAllIds() {
+        return this.historyResolver.fetchHistoryGameIds();
+    }
+
+    @CrossOrigin
+    @GetMapping("/History/{id}")
+    @ResponseBody
+    public ResponseEntity<Document> historyByGameId(@PathVariable String id) {
+        Document d = historyResolver.getById(id);
+        if( d == null) {
+            return createBasicResponse(NOT_FOUND_DOCUMENT, HttpStatus.NOT_FOUND);
+        } else {
+            return createBasicResponse(d, HttpStatus.OK);
+
+        }
     }
 
     private ResponseEntity<String> createBasicBadRequestResponse(String message) {
@@ -181,7 +194,7 @@ public class GameAPIController {
         return createBasicResponse(message, HttpStatus.OK);
     }
 
-    private ResponseEntity<String> createBasicResponse(String message, HttpStatus status) {
+    private <T> ResponseEntity<T> createBasicResponse(T message, HttpStatus status) {
         return new ResponseEntity<>(message, new HttpHeaders(), status);
     }
 

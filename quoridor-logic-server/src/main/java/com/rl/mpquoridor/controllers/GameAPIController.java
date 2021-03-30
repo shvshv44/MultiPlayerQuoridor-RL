@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.ServerSocket;
 import java.util.*;
@@ -35,17 +36,22 @@ public class GameAPIController {
     private HistoryResolverService historyResolver;
     private SimpMessagingTemplate messageSender;
     private GameWebSocket gameWebSocket;
+    private RestTemplate restTemplate;
     private ServerSocket server;
+    private String pythonServerURL = "http://localhost:8000/";
+    private String addAgentToGameEndpoint = "addAgentToGame/";
 
     @Autowired
     public GameAPIController(GameRoomsManagerService gameRoomManager,
                              HistoryResolverService historyResolver,
                              SimpMessagingTemplate messageSender,
-                             GameWebSocket gameWebSocket) {
+                             GameWebSocket gameWebSocket,
+                             RestTemplate restTemplate) {
         this.gameRoomManager = gameRoomManager;
         this.historyResolver = historyResolver;
         this.messageSender = messageSender;
         this.gameWebSocket = gameWebSocket;
+        this.restTemplate = restTemplate;
     }
 
     @CrossOrigin
@@ -108,6 +114,28 @@ public class GameAPIController {
         String gameId = gameRoomManager.createGame();
         logger.info(playerName + " has been created game room with id: " + gameId);
         return this.joinGame(gameId, playerName);
+    }
+
+    @CrossOrigin
+    @GetMapping("/CreateGameAgainstAgent/{playerName}")
+    @ResponseBody
+    public ResponseEntity<String> createGameAgainstAgent(@PathVariable String playerName) {
+        if(playerName == null || playerName.equals(""))
+            return createBasicBadRequestResponse("Name must contain at least one character!");
+
+        String gameId = gameRoomManager.createGame();
+        logger.info(playerName + " has been created game room with id: " + gameId);
+
+        ResponseEntity<String> joinGameResponse= this.joinGame(gameId, playerName);
+        joinAgentToTheGame(gameId);
+
+        return joinGameResponse;
+    }
+
+    private void joinAgentToTheGame(String gameId) {
+        ResponseEntity<String> response = restTemplate.getForEntity(pythonServerURL + addAgentToGameEndpoint + gameId, String.class);
+        logger.info("Send joining agent to the python server with game id " + gameId);
+        logger.info("Python server response " + response.getBody());
     }
 
     @CrossOrigin

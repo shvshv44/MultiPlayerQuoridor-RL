@@ -66,7 +66,7 @@ public class GameRoomsManagerService {
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
         gameRoomState.setManager(gameManager);
         gameRoomState.setGameStarted(true);
 

@@ -23,14 +23,16 @@ public class GameManager {
     private final GameBoard gameBoard;
     private final Queue<Player> players = new LinkedList<>();
     private BiMap<Player, Pawn> playerPawn;
-    private int numberOfWallsPerPlayer;
+    private final int numberOfWallsPerPlayer;
+    private final String gameId;
 
     public BiMap<Player, Pawn> getPlayerPawn() {
         return playerPawn;
     }
 
-    public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
+    public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
+        this.gameId = gameId;
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
@@ -68,6 +70,7 @@ public class GameManager {
     public GameResult run() {
         List<HistoryRecord> history = new LinkedList<>();
         GameResult gameResult = new GameResult();
+        gameResult.setGameId(this.gameId);
         gameResult.setStartingWallCount(numberOfWallsPerPlayer);
         gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);

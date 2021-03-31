@@ -20,6 +20,9 @@ class Agent:
     def train_agent(self, env):
         self.dqn.fit(env, nb_steps=5000, visualize=False, verbose=1)
 
+    def predict(self, env):
+        self.dqn.model.predict(env.get_and_convert_board())
+
 
 
 

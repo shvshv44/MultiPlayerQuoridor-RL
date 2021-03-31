@@ -1,10 +1,10 @@
 import logging
-import threading
 
 import requests
 from flask import Flask
+
 import quoridor_env
-import rest_api
+from auto_agent import AutoAgent
 from agent import Agent
 from globals import Global
 from model import Model
@@ -13,19 +13,23 @@ from trainer import Trainer
 logging.basicConfig(level=logging.INFO)
 
 serverUrl = Global.server
+app = Flask(__name__)
+
+
+@app.route('/addAgentToGame/<game_id_to_join>', methods=['GET'])
+def add_agent_to_game(game_id_to_join):
+    model = Model(quoridor_env.observation_shape(), Global.num_of_actions)
+    agent = Agent(model)
+    auto_agent = AutoAgent(agent)
+
+    auto_agent.join_game(game_id_to_join)
+    return "Add agent to game id " + game_id_to_join
 
 def join_game_random_player(game_id):
     join_game_url = serverUrl + "/JoinGame/" + game_id + "/randomPlayer"
     response = requests.get(join_game_url)
 
     return response
-
-
-def startTrainer(is_trainer_create_game, api):
-    if is_trainer_create_game:
-        trainer.start_training_session()
-    else:
-        trainer.wait_join_game(api)
 
 
 if __name__ == '__main__':
@@ -51,13 +55,9 @@ if __name__ == '__main__':
     agent = Agent(model)
     trainer = Trainer(agent)
 
-    api = rest_api.API()
+    if is_trainer_create_game:
+        trainer.start_training_session()
 
-    logging.INFO("Init the api")
-
-    startTrainer(is_trainer_create_game, api)
-
-    logging.INFO("Start the trainer")
-
+    app.run(host="127.0.0.1", port=8000)
 
 

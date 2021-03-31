@@ -67,6 +67,8 @@ export class MenuComponent implements OnInit {
       await this.createGame(result.playerName);
     } else if (result.action === 'join') {
       await this.joinGame(result.gameId, result.playerName);
+    } else if (result.action === 'createAgainstAgent') {
+      await this.createGameAgainstAgent(result.playerName);
     }
   }
 
@@ -96,6 +98,17 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  async createGameAgainstAgent(playerName: string): Promise<void> {
+    if (playerName !== undefined) {
+      const createGameURL = this.serverURL + '/CreateGameAgainstAgent' + '/' + playerName;
+      const returnedGameId = await this.http.get(createGameURL, {responseType: 'text'}).toPromise();
+      this.clipboard.copy(returnedGameId);
+      await this.connectAndGoToRoomScreen(returnedGameId, playerName);
+    } else {
+      this.snackBar.open('You must choose a name!', 'close', {duration: 10000});
+    }
+  }
+
   async connectAndGoToRoomScreen(gameId: string, playerName: string): Promise<void> {
     await this.webSocket._connectToGame(gameId, playerName);
     this.defaultGameState(gameId, playerName);
@@ -106,5 +119,4 @@ export class MenuComponent implements OnInit {
     this.store.dispatch(setPawnName({pawnName: playerName}));
     this.store.dispatch(setGameId({gameId}));
   }
-
 }

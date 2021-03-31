@@ -41,6 +41,7 @@ class QuoridorEnv(gym.Env):
         self.player_name = player_name
         self.is_my_turn = False
         self.winner_status = GameWinnerStatus.NoWinner
+        self.last_turn_illegal = False
 
         # join_game(self.game_id, self.player_name)
 
@@ -71,7 +72,7 @@ class QuoridorEnv(gym.Env):
 
         reward, done = self.calculate_reward()
         self.is_my_turn = False
-        return tuple(self.board), reward, done, {}
+        return self.board, reward, done, {}
 
     def wait_for_my_turn(self):
         while not self.is_my_turn:
@@ -85,12 +86,16 @@ class QuoridorEnv(gym.Env):
         reward = 0
         done = False
 
+        if self.last_turn_illegal:
+            reward = -1
+            self.last_turn_illegal = False
+
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 1
+                reward = 10
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -1
+                reward = -10
 
         return reward, done
 
@@ -100,17 +105,10 @@ class QuoridorEnv(gym.Env):
 
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
-        print(board)
         dim1 = np.zeros((9, 9), dtype=int)
         dim2 = np.zeros((9, 9), dtype=int)
         dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
         dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
-
-        # all_dims = []
-        # all_dims.append(dim1)
-        # all_dims.append(dim2)
-        # all_dims.append(board["horizontalWalls"])
-        # all_dims.append(board["verticalWalls"])
 
         all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"]))
         return all_dims
@@ -120,7 +118,11 @@ class QuoridorEnv(gym.Env):
         self.tcp.write(operation)
 
     def on_recieved(self, json_message):
-        if json_message["type"] == "NewTurnEvent":
+
+        if json_message["type"] == "IllegalMove":
+            #self.is_my_turn = True
+            self.last_turn_illegal = True
+        elif json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True
@@ -130,3 +132,9 @@ class QuoridorEnv(gym.Env):
                 self.winner_status = GameWinnerStatus.EnvWinner
             else:
                 self.winner_status = GameWinnerStatus.EnvLoser
+
+    def action_shape(self):
+        return action_shape()
+
+    def observation_shape(self):
+        return observation_shape()

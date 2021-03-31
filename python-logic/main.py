@@ -8,6 +8,7 @@ from agent import Agent
 from tcp import TCP
 from globals import Global
 from trainer import Trainer
+import costum_agent
 
 logging.basicConfig(level=logging.INFO)
 
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     #     print(board)
     #     print("*************************")
 
-    model = Model(quoridor_env.observation_shape(), Global.num_of_actions)
-    agent = Agent(model)
+    model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+    agent = costum_agent.Agent(model.model)
     trainer = Trainer(agent)
-    trainer.start_training_session()
+    trainer.start_training_session(50)

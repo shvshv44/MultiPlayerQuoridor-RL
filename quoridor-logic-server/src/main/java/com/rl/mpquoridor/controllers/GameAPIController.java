@@ -25,6 +25,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,6 +43,7 @@ public class GameAPIController {
     private ServerSocket server;
     private String pythonServerURL = "http://localhost:8000/";
     private String addAgentToGameEndpoint = "addAgentToGame/";
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
     public GameAPIController(GameRoomsManagerService gameRoomManager,
@@ -127,7 +131,7 @@ public class GameAPIController {
         logger.info(playerName + " has been created game room with id: " + gameId);
 
         ResponseEntity<String> joinGameResponse= this.joinGame(gameId, playerName);
-        joinAgentToTheGame(gameId);
+        executor.submit(() -> joinAgentToTheGame(gameId));
 
         return joinGameResponse;
     }

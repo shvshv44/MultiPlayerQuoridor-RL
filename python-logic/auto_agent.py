@@ -14,4 +14,5 @@ class AutoAgent:
 
     def start_game_with_agent(self, game_id):
         env = QuoridorEnv(game_id, self.name)
-        self.agent.predict(env)
+        self.agent.load_wights()
+        self.agent.test(env)

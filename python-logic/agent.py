@@ -23,7 +23,7 @@ class Agent:
     def test(self, env):
         self.dqn.test(env, nb_episodes=5, visualize=False)
 
-    def load_wights(self):
+    def load_weights(self):
         self.dqn.load_weights('dqn_weights.h5f')
 
 

@@ -1,42 +1,37 @@
 package com.rl.mpquoridor.services;
 
-import com.rl.mpquoridor.models.actions.MovePawnAction;
-import com.rl.mpquoridor.models.actions.TurnAction;
-import com.rl.mpquoridor.models.board.Pawn;
-import com.rl.mpquoridor.models.enums.MovementDirection;
-import com.rl.mpquoridor.models.game.GameResult;
-import com.rl.mpquoridor.models.game.HistoryRecord;
+import com.mongodb.client.FindIterable;
+import com.rl.mpquoridor.database.MongoDB;
+import org.bson.Document;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 public class HistoryResolverService {
 
-    public List<String> fetchAllHistoryGameIds() {
-        // TODO: use mongo JPA Repository to fetch it from DB
+    public List<Document> fetchHistory() {
+        return getByMongoDBSupplier(MongoDB.getInstance()::selectHistory);
 
-        // Fake Data till DB implemented
-        ArrayList<String> fakeIds = new ArrayList<>();
-        fakeIds.add("game1");
-        fakeIds.add("game2");
-        fakeIds.add("game3");
-        return fakeIds;
     }
 
-    public GameResult getResultByGameId(String gameId) {
-        // TODO: use mongo JPA Repository to fetch it from DB
+    public List<Document> fetchHistoryGameIds() {
+        return getByMongoDBSupplier(MongoDB.getInstance()::selectHistoryGameIds);
+    }
 
-        // Fake Data till DB implemented
-        Pawn fakePawn = new Pawn();
-        TurnAction fakeTurn = new MovePawnAction();
-        HistoryRecord fakeHistoryRecord = new HistoryRecord(fakePawn, fakeTurn);
-        GameResult fakeGameResult = new GameResult();
-        fakeGameResult.setWinner(fakePawn);
-        fakeGameResult.setHistory(Collections.singletonList(fakeHistoryRecord));
-        return fakeGameResult;
+    public Document getById(String id) {
+        return MongoDB.getInstance().selectHistoryByGameId(id);
+    }
+
+    private List<Document> getByMongoDBSupplier(Supplier<FindIterable<Document>> dbSupplier) {
+        List<Document> lst = new LinkedList<>();
+        for(Document d: dbSupplier.get()) {
+            d.remove("_id");
+            lst.add(d);
+        }
+        return lst;
     }
 
 }

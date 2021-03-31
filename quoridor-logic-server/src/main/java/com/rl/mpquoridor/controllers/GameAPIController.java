@@ -1,8 +1,8 @@
 package com.rl.mpquoridor.controllers;
 
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.board.PhysicalBoard;
 import com.rl.mpquoridor.models.board.Position;
-import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.enums.WallDirection;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Collectors;
 
 @RestController
@@ -61,11 +62,8 @@ public class GameAPIController {
         List<Position> playersPositions = copiedPlayers.stream().map(gameManager.getPlayerPawn()::get)
                 .map(gameManager.getGameBoard().getReadOnlyPhysicalBoard()::getPawnPosition).collect(Collectors.toList());
 
-        int[][] horizontalWalls = new int[9][9];
-        int[][] verticalWalls = new int[9][9];
-
-        horizontalWalls = initHorizontalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
-        verticalWalls = initVerticalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
+        int[][] horizontalWalls = initHorizontalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
+        int[][] verticalWalls = initVerticalWalls(gameRoomState.getManager().getGameBoard().getReadOnlyPhysicalBoard());
 
         Map<String, Object> map = new HashMap<>();
         map.put("players", playersPositions);
@@ -75,28 +73,36 @@ public class GameAPIController {
         return map;
     }
 
-    private int[][] initVerticalWalls(ReadOnlyPhysicalBoard board) {
-        int[][] verticalWalls = new int[9][9];
-
-        board.getWalls().stream()
-                .filter(wall -> WallDirection.DOWN.equals(wall.getWallDirection()))
-                .map(Wall::getPosition)
-                .forEach(pos -> verticalWalls[pos.getY()][pos.getX()] = 1);
-
-
-        return verticalWalls;
+    private int[][] initVerticalWalls(PhysicalBoard board) {
+        return initWalls(board, WallDirection.DOWN);
     }
 
-    private int[][] initHorizontalWalls(ReadOnlyPhysicalBoard board) {
-        int[][] horizontalWalls = new int[9][9];
+    private int[][] initHorizontalWalls(PhysicalBoard board) {
+        return initWalls(board, WallDirection.RIGHT);
+    }
+
+    private int[][] initWalls(PhysicalBoard board, WallDirection dir) {
+        AtomicReferenceArray<AtomicReferenceArray<Integer>> mat = new AtomicReferenceArray<>(board.getSize());
+        for (int i = 0; i < mat.length(); i++) {
+            mat.set(i, new AtomicReferenceArray<>(board.getSize()));
+            for (int j = 0; j < mat.length(); j++) {
+                mat.get(i).set(j, 0);
+            }
+        }
 
         board.getWalls().stream()
-                .filter(wall -> WallDirection.RIGHT.equals(wall.getWallDirection()))
+                .filter(wall -> dir.equals(wall.getWallDirection()))
                 .map(Wall::getPosition)
-                .forEach(pos -> horizontalWalls[pos.getY()][pos.getX()] = 1);
+                .forEach(pos -> mat.get(pos.getY()).set(pos.getX(), 1));
 
+        int[][] ret = new int[board.getSize()][board.getSize()];
+        for (int i = 0; i < ret.length; i++) {
+            for (int j = 0; j < ret.length; j++) {
+                ret[i][j] = mat.get(i).get(j);
+            }
+        }
 
-        return horizontalWalls;
+        return ret;
     }
 
     @CrossOrigin

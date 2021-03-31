@@ -29,25 +29,11 @@
   flex: 1;
 }
 
-.details-game {
-  display: flex;
-  flex-direction: column;
-  flex: 2;
-  margin: 30px;
-  justify-content: space-around;
-}
-
 .list-of-games {
   display: flex;
   flex: 1;
   justify-content: space-around;
-}
-
-.details {
-  display: flex;
-  flex: 1;
-  background-color: #4b4b4b;
-  justify-content: space-around;
+  height: 10px;
 }
 
 .watch-game {
@@ -55,4 +41,21 @@
   flex: 1;
   align-items: center;
   justify-content: space-around;
+}
+
+#board {
+  grid-area: board;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#scroll {
+  height: 100%
+}
+
+.game {
+  height: 10px;
 }

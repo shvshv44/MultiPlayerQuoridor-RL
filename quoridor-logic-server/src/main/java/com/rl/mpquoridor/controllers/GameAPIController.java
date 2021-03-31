@@ -124,9 +124,6 @@ public class GameAPIController {
     @GetMapping("/CreateGameAgainstAgent/{playerName}")
     @ResponseBody
     public ResponseEntity<String> createGameAgainstAgent(@PathVariable String playerName) {
-        if(playerName == null || playerName.equals(""))
-            return createBasicBadRequestResponse("Name must contain at least one character!");
-
         String gameId = gameRoomManager.createGame();
         logger.info(playerName + " has been created game room with id: " + gameId);
 

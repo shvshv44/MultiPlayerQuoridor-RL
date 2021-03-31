@@ -41,7 +41,7 @@ public class GameAPIController {
     private GameWebSocket gameWebSocket;
     private RestTemplate restTemplate;
     private ServerSocket server;
-    private String pythonServerURL = "http://localhost:8000/";
+    private String pythonServerURL = System.getenv("PYTHON_SERVER_URL"); // "http://localhost:8000/"
     private String addAgentToGameEndpoint = "addAgentToGame/";
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 

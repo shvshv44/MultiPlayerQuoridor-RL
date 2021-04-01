@@ -22,7 +22,7 @@ def action_shape():
 
 
 def observation_shape():
-    return (1,) + (9, 9, 4) # window length + board shape
+    return (1,) + (9, 9, 4)  # window length + board shape
 
 
 class QuoridorEnv(gym.Env):
@@ -42,6 +42,7 @@ class QuoridorEnv(gym.Env):
         self.is_my_turn = False
         self.winner_status = GameWinnerStatus.NoWinner
         self.last_turn_illegal = False
+        self.action_options = []
 
         # join_game(self.game_id, self.player_name)
 
@@ -120,12 +121,13 @@ class QuoridorEnv(gym.Env):
     def on_recieved(self, json_message):
 
         if json_message["type"] == "IllegalMove":
-            #self.is_my_turn = True
+            # self.is_my_turn = True
             self.last_turn_illegal = True
         elif json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True
+                self.update_action_options(json_message)
         elif json_message["type"] == "GameOverEvent":
             self.is_my_turn = True
             if json_message["winnerName"] == self.player_name:
@@ -138,3 +140,22 @@ class QuoridorEnv(gym.Env):
 
     def observation_shape(self):
         return observation_shape()
+
+    def update_action_options(self, moves_json):
+        self.action_options = []
+
+        # TODO: implement move actions
+        self.action_options.append(0)
+        self.action_options.append(1)
+        self.action_options.append(2)
+        self.action_options.append(3)
+
+        for wall in moves_json["availableWalls"]:
+            wall_action = 4 + wall["position"]["x"] + (8 * wall["position"]["y"])
+            if wall["wallDirection"] == "Down":
+                wall_action += 64
+            self.action_options.append(wall_action)
+
+
+    def get_action_options(self):
+        return self.action_options

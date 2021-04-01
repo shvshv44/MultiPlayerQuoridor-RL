@@ -9,6 +9,7 @@ from tcp import TCP
 from globals import Global
 from trainer import Trainer
 import costum_agent
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -43,3 +44,7 @@ if __name__ == '__main__':
     agent = costum_agent.Agent(model.model)
     trainer = Trainer(agent)
     trainer.start_training_session(50)
+
+    time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
+    saved_file_name = "quoridor-{time}.h5".format(time=time)
+    agent.save_model(saved_file_name)

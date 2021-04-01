@@ -53,7 +53,10 @@ class Agent:
             print("random action")
             return env.action_space.sample()
         print("predicted action")
-        return np.argmax(self.model.predict(self.prepare_state_to_predication(state, env))[0])
+
+        all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
+        legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
+        return np.argmax(legal_predictions)
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -93,3 +96,7 @@ class Agent:
 
     def prepare_state_to_predication(self, state, env):
         return state.reshape((1,) + env.observation_shape())
+
+    def minimize_to_legal_predictions(self, all_predictions, env):
+        return all_predictions[env.get_action_options()]
+

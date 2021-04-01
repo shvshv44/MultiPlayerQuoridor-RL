@@ -3,13 +3,12 @@ from enum import Enum
 import gym
 import numpy as np
 from gym import spaces
-from numpy import zeros
-from rest_api import join_game, get_board
+from rest_api import get_board
 import json
 from tcp import TCP
 import utils
 from globals import Global
-
+import os
 
 class GameWinnerStatus(Enum):
     NoWinner = 0
@@ -67,13 +66,14 @@ class QuoridorEnv(gym.Env):
         assert self.action_space.contains(action)
 
         action = int(action)
-
         self.update_board(action)
         self.wait_for_my_turn()
-
         reward, done = self.calculate_reward()
         self.is_my_turn = False
+
+        # self.print_board()
         return self.board, reward, done, {}
+
 
     def wait_for_my_turn(self):
         while not self.is_my_turn:
@@ -104,6 +104,36 @@ class QuoridorEnv(gym.Env):
         operation = utils.convert_action_to_server(action)
         self.send_to_server(operation)  # WAITING
 
+    def print_board(self):
+        os.system('cls')
+        print('------- TEAM 600 --------')
+        arrays = np.dsplit(self.board, 4)
+        for y in range(9):
+            for x in range(9):
+                print('|', end='')
+                if arrays[0][y][x] != 0:
+                    print(1, end='')
+                elif arrays[1][y][x] != 0:
+                    print(2, end='')
+                else:
+                    print(' ', end='')
+                if arrays[3][y][x] != 0:
+                    print('|', end='')
+                elif y != 0 & arrays[3][y - 1][x] != 0:
+                    print('|', end='')
+                else:
+                    print(' ', end='')
+
+            print('')
+            for x_wall in range(9):
+                if arrays[2][y][x_wall] != 0:
+                    print(' ==', end='')
+                elif x_wall != 0 & arrays[2][y][x_wall - 1] != 0:
+                    print(' ==', end='')
+                else:
+                    print(' __', end='')
+            print('')
+
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
         dim1 = np.zeros((9, 9), dtype=int)
@@ -113,7 +143,6 @@ class QuoridorEnv(gym.Env):
 
         all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"]))
         return all_dims
-        # return np.asarray(all_dims)
 
     def send_to_server(self, operation):
         self.tcp.write(operation)

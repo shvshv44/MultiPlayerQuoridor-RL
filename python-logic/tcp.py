@@ -1,7 +1,6 @@
 import json
 import socket
 import threading
-from api import MovementDirection
 import random
 import traceback
 from globals import Global
@@ -31,10 +30,6 @@ class TCP:
             try:
                 # Receive Message From Server
                 message = self.client.recv(1024 * 100).decode('ascii')
-                # print(message)
-                # json_message = json.loads(message)
-                # receiveFunc(json_message)
-
                 pos = 0
                 while not pos == len(str(message)):
                     j, json_len = self.json_dec.raw_decode(str(message)[pos:])

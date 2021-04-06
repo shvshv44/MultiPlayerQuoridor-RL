@@ -34,19 +34,9 @@ export class GameHistoryComponent implements OnInit {
     this.isMyTurn$ = of(false);
     this.currentPawnMoves$ = of([]);
     this.pawnName$ = of('sharon');
-    const mockGames = [
-      {
-        gameId: 'fb854e01-75f4-47df-89dd-fc4c2dae9ca7'
-      },
-      {
-        gameId: 'f805e54f-964d-4c78-a57d-0719aab55a74'
-      }
-    ];
-    this.gamesIds = mockGames.map(gameId => gameId.gameId);
-
-    /* this.http.get(this.config.getConfig().serverUrl + '/HistoryIds').subscribe((gamesIds: { gameId: string }[]) => {
-       this.gamesIds = gamesIds.map(gameId => gameId.gameId);
-     });*/
+    this.http.get(this.config.getConfig().serverUrl + '/HistoryIds').subscribe((gamesIds: { gameId: string }[]) => {
+      this.gamesIds = gamesIds.map(gameId => gameId.gameId);
+    });
   }
 
   ngOnInit(): void {
@@ -55,258 +45,22 @@ export class GameHistoryComponent implements OnInit {
   async getGameAction(gameId: string): Promise<void> {
     this.currGameId = gameId;
 
-    /* this.http.get(this.config.getConfig().serverUrl + '/History' + gameId).subscribe((gamesIds: { gameId: string }[]) => {
-       // NEED TO TAKE FROM DOWN
-     });*/
+    this.http.get(this.config.getConfig().serverUrl + '/History' + gameId).subscribe((gameActions: any) => {
+      const pawns: Pawn[] = gameActions.pawns.map(player => {
+        return {
+          position: player.position, name: player.name, numOfWalls: gameActions.startingWallCount
+        };
+      });
 
-    const gameActions: any = {
-      gameId: 'f805e54f-964d-4c78-a57d-0719aab55a74',
-      winner: {
-        uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-      },
-      history: [
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 1,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 7,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 2,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 6,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            wall: {
-              position: {
-                y: 4,
-                x: 4
-              },
-              wallDirection: 'Right'
-            },
-            actionType: 'PLACE_WALL'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 5,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 3,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 4,
-              x: 4
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 3,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 4,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 5,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 3,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 6,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 2,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 7,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-          },
-          action: {
-            position: {
-              y: 1,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        },
-        {
-          pawn: {
-            uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-          },
-          action: {
-            position: {
-              y: 8,
-              x: 3
-            },
-            actionType: 'MOVE_PAWN'
-          }
-        }
-      ],
-      playOrder: [
-        {
-          uuid: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb'
-        },
-        {
-          uuid: '74cec3d0-13c2-44fd-85be-e3fda7b00e08'
-        }
-      ],
-      pawns: [
-        {
-          name: '7de12ba3-6bd6-4d43-b456-bf97d29b72bb',
-          position: {x: 4, y: 0}
-        },
-        {
-          name: '74cec3d0-13c2-44fd-85be-e3fda7b00e08',
-          position: {x: 4, y: 8}
-        }],
-      startingWallCount: 8
-    };
+      this.store.dispatch(addPawns({pawns}));
 
-    const pawns: Pawn[] = gameActions.pawns.map(player => {
-      return {
-        position: player.position, name: player.name, numOfWalls: gameActions.startingWallCount
-      };
+      let i = 0;
+      for (const turn of gameActions.history) {
+        // SLEEP
+        setTimeout(() => this.doAction(turn), i * 100);
+        i += 10;
+      }
     });
-
-    this.store.dispatch(addPawns({pawns}));
-
-    let i = 0;
-    for (const turn of gameActions.history) {
-      // SLEEP
-      setTimeout(() => this.doAction(turn), i * 100);
-      i += 10;
-    }
   }
 
   doAction(turn: any): void {
@@ -314,7 +68,7 @@ export class GameHistoryComponent implements OnInit {
       this.store.dispatch(updatePawn({
         update: {
           id: turn.pawn.uuid,
-          changes: {position: turn.action.position}
+          changes: {position: turn.details.position}
         }
       }));
     } else {

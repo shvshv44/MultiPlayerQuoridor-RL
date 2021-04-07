@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TCPPlayer extends SocketPlayer {
 
@@ -40,7 +42,13 @@ public class TCPPlayer extends SocketPlayer {
 
     @Override
     public void illegalMovePlayed(IllegalMovementException.Reason reason) {
-        // TODO
+        Map<String, String> illegalMove = new HashMap<>();
+        illegalMove.put("type", "IllegalMove");
+        try {
+            gameTCPSocket.send(gson.toJson(illegalMove));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -7,7 +7,7 @@ public class MongoDBConfig {
     public static final String PASSWORD = System.getenv("MONGODB_PASSWORD");
     public static final String AUTHENTICATION_DATABASE = "admin";
     public static final String DB = "games";
-    public static final String COLLECTION="games";
+    public static final String COLLECTION="history";
     public static final boolean SSL=true;
 
     private MongoDBConfig() {}

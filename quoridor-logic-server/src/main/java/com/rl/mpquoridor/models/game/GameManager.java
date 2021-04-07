@@ -3,6 +3,7 @@ package com.rl.mpquoridor.models.game;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.GameBoard;
 import com.rl.mpquoridor.models.board.Pawn;
@@ -23,14 +24,16 @@ public class GameManager {
     private final GameBoard gameBoard;
     private final Queue<Player> players = new LinkedList<>();
     private BiMap<Player, Pawn> playerPawn;
-    private int numberOfWallsPerPlayer;
+    private final int numberOfWallsPerPlayer;
+    private final String gameId;
 
     public BiMap<Player, Pawn> getPlayerPawn() {
         return playerPawn;
     }
 
-    public GameManager(Collection<Player> players, int numberOfWallsPerPlayer) {
+    public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
+        this.gameId = gameId;
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
@@ -68,6 +71,7 @@ public class GameManager {
     public GameResult run() {
         List<HistoryRecord> history = new LinkedList<>();
         GameResult gameResult = new GameResult();
+        gameResult.setGameId(this.gameId);
         gameResult.setStartingWallCount(numberOfWallsPerPlayer);
         gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
@@ -89,7 +93,11 @@ public class GameManager {
             isGameEnded = (this.gameBoard.getWinner() != null);
             List<Position> nextPlayerMoves = this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer));
 
-            history.add(new HistoryRecord(currentPawn, action));
+            HistoryRecord record = new HistoryRecord(currentPawn, action);
+            if(action instanceof MovePawnAction) {
+                record.addDetail("position", this.gameBoard.getReadOnlyPhysicalBoard().getPawnPosition(currentPawn));
+            }
+            history.add(record);
             this.players.add(this.players.poll()); // Move the current player to the end of the queue
             trigger(new EndTurnEvent(currentPawn, action));
         }

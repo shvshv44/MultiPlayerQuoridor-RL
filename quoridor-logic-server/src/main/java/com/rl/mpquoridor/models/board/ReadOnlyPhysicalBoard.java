@@ -57,4 +57,9 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     public Position getPawnPosition(Pawn pawn) {
         return source.getPawnPosition(pawn);
     }
+
+    @Override
+    public Map<Pawn, Position> getAllPawnPosition() {
+        return source.getAllPawnPosition();
+    }
 }

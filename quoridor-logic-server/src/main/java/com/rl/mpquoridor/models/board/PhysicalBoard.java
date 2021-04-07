@@ -79,4 +79,8 @@ public class PhysicalBoard {
     public Position getPawnPosition(Pawn pawn) {
         return this.pawns.get(pawn);
     }
+
+    public Map<Pawn, Position> getAllPawnPosition() {
+        return Collections.unmodifiableMap(this.pawns);
+    }
 }

@@ -74,6 +74,7 @@ public class GameManager {
         gameResult.setGameId(this.gameId);
         gameResult.setStartingWallCount(numberOfWallsPerPlayer);
         gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
+        gameResult.setStartingPosition(this.gameBoard.getReadOnlyPhysicalBoard().getAllPawnPosition());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));

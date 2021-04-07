@@ -51,7 +51,7 @@ export class MenuComponent implements OnInit {
   async onPlayButtonClick(): Promise<void> {
     const dialogRef = this.dialog.open(PlayDialogComponent, {
       height: '300px',
-      width: '450px',
+      width: '650px',
       data: this.dialog
     });
 

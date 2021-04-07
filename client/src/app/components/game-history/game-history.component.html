@@ -4,28 +4,18 @@
   </div>
   <div class="body-games">
     <div class="list-of-games">
-      <mat-selection-list #games [multiple]="false">
+      <mat-selection-list [multiple]="false">
         <mat-list-option class="game-option" *ngFor="let gameId of gamesIds" [value]="gameId">
-          Game {{gameId}}
+          <div (click)="getGameAction(gameId)">Game {{gameId}}</div>
         </mat-list-option>
       </mat-selection-list>
     </div>
-    <div class="details-game">
-      <p>
-        Game: {{games.selectedOptions.selected[0]?.value}}
-      </p>
-      <div class="details">
-        <mat-card>details details details details details details
-          details details details details details details details details
-          details details details details details
-          details
-          details details details details details details details details
-
-          details details details details details details details
-        </mat-card>
-      </div>
-      <div class="watch-game">
-        <button mat-raised-button color="basic" class="button">Watch Game</button>
+    <div class="watch-game" *ngIf="currGameId">
+      <div id="board">
+        <app-board-game [walls]="walls$ | async" [pawns]="pawns$ | async" [currentPawnMoves]="currentPawnMoves$ | async"
+                        [pawnName]="pawnName$ | async" [isMyTurn]="isMyTurn$ | async"
+        ></app-board-game>
+        <app-walls [pawns]="pawns$ | async"></app-walls>
       </div>
     </div>
   </div>

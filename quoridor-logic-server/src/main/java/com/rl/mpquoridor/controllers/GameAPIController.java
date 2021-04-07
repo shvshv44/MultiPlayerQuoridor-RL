@@ -21,9 +21,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,18 +39,24 @@ public class GameAPIController {
     private HistoryResolverService historyResolver;
     private SimpMessagingTemplate messageSender;
     private GameWebSocket gameWebSocket;
+    private RestTemplate restTemplate;
     private ServerSocket server;
+    private String pythonServerURL = System.getenv("PYTHON_SERVER_URL"); // "http://localhost:8000/"
+    private String addAgentToGameEndpoint = "addAgentToGame/";
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Document NOT_FOUND_DOCUMENT = new Document("not_found", 1);
 
     @Autowired
     public GameAPIController(GameRoomsManagerService gameRoomManager,
                              HistoryResolverService historyResolver,
                              SimpMessagingTemplate messageSender,
-                             GameWebSocket gameWebSocket) {
+                             GameWebSocket gameWebSocket,
+                             RestTemplate restTemplate) {
         this.gameRoomManager = gameRoomManager;
         this.historyResolver = historyResolver;
         this.messageSender = messageSender;
         this.gameWebSocket = gameWebSocket;
+        this.restTemplate = restTemplate;
     }
 
     @CrossOrigin
@@ -109,6 +119,25 @@ public class GameAPIController {
         String gameId = gameRoomManager.createGame();
         logger.info(playerName + " has been created game room with id: " + gameId);
         return this.joinGame(gameId, playerName);
+    }
+
+    @CrossOrigin
+    @GetMapping("/CreateGameAgainstAgent/{playerName}")
+    @ResponseBody
+    public ResponseEntity<String> createGameAgainstAgent(@PathVariable String playerName) {
+        String gameId = gameRoomManager.createGame();
+        logger.info(playerName + " has been created game room with id: " + gameId);
+
+        ResponseEntity<String> joinGameResponse= this.joinGame(gameId, playerName);
+        executor.submit(() -> joinAgentToTheGame(gameId));
+
+        return joinGameResponse;
+    }
+
+    private void joinAgentToTheGame(String gameId) {
+        ResponseEntity<String> response = restTemplate.getForEntity(pythonServerURL + addAgentToGameEndpoint + gameId, String.class);
+        logger.info("Send joining agent to the python server with game id " + gameId);
+        logger.info("Python server response " + response.getBody());
     }
 
     @CrossOrigin

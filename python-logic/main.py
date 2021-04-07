@@ -9,6 +9,8 @@ from agent import Agent
 from globals import Global
 from model import Model
 from trainer import Trainer
+import costum_agent
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -51,12 +53,16 @@ if __name__ == '__main__':
 
     is_trainer_create_game = False
 
-    model = Model(quoridor_env.observation_shape(), Global.num_of_actions)
-    agent = Agent(model)
-    trainer = Trainer(agent)
 
     if is_trainer_create_game:
-        trainer.start_training_session()
+        model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+        agent = costum_agent.Agent(model.model)
+        trainer = Trainer(agent)
+        trainer.start_training_session(50)
+
+        time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
+        saved_file_name = "quoridor-{time}.h5".format(time=time)
+        agent.save_model(saved_file_name)
 
     app.run(host="127.0.0.1", port=8000)
 

@@ -18,7 +18,8 @@ class Agent:
         return dqn
 
     def train_agent(self, env):
-        self.dqn.fit(env, nb_steps=5000, visualize=False, verbose=1)
+        # self.dqn.fit(env, nb_steps=2500, visualize=False, verbose=1)
+         self.dqn.fit(env, nb_steps=5000, visualize=False, verbose=1)
 
     def test(self, env):
         self.dqn.test(env, nb_episodes=5, visualize=False)

@@ -3,6 +3,7 @@ package com.rl.mpquoridor.models.game;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.GameBoard;
 import com.rl.mpquoridor.models.board.Pawn;
@@ -92,7 +93,11 @@ public class GameManager {
             isGameEnded = (this.gameBoard.getWinner() != null);
             List<Position> nextPlayerMoves = this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer));
 
-            history.add(new HistoryRecord(currentPawn, action));
+            HistoryRecord record = new HistoryRecord(currentPawn, action);
+            if(action instanceof MovePawnAction) {
+                record.addDetail("position", this.gameBoard.getReadOnlyPhysicalBoard().getPawnPosition(currentPawn));
+            }
+            history.add(record);
             this.players.add(this.players.poll()); // Move the current player to the end of the queue
             trigger(new EndTurnEvent(currentPawn, action));
         }

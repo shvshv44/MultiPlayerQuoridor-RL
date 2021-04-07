@@ -45,10 +45,10 @@ export class GameHistoryComponent implements OnInit {
   async getGameAction(gameId: string): Promise<void> {
     this.currGameId = gameId;
 
-    this.http.get(this.config.getConfig().serverUrl + '/History' + gameId).subscribe((gameActions: any) => {
-      const pawns: Pawn[] = gameActions.pawns.map(player => {
+    this.http.get(this.config.getConfig().serverUrl + '/History/' + gameId).subscribe((gameActions: any) => {
+      const pawns: Pawn[] = gameActions.playOrder.map(player => {
         return {
-          position: player.position, name: player.name, numOfWalls: gameActions.startingWallCount
+          position: gameActions.startingPosition[player.uuid], name: player.uuid, numOfWalls: gameActions.startingWallCount
         };
       });
 

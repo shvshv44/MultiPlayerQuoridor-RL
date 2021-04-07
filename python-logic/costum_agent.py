@@ -100,3 +100,9 @@ class Agent:
     def minimize_to_legal_predictions(self, all_predictions, env):
         return all_predictions[env.get_action_options()]
 
+    def test(self, env):
+        self.model.test(env, nb_episodes=5, visualize=False)
+
+    def load_weights(self):
+        self.model.load_weights('dqn_weights.h5f')
+

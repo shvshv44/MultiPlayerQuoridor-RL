@@ -20,12 +20,13 @@ app = Flask(__name__)
 
 @app.route('/addAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
-    model = Model(quoridor_env.observation_shape(), Global.num_of_actions)
-    agent = Agent(model)
+    model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+    agent = costum_agent.Agent(model.model)
     auto_agent = AutoAgent(agent)
 
     auto_agent.join_game(game_id_to_join)
     return "Add agent to game id " + game_id_to_join
+
 
 def join_game_random_player(game_id):
     join_game_url = serverUrl + "/JoinGame/" + game_id + "/randomPlayer"
@@ -53,7 +54,6 @@ if __name__ == '__main__':
 
     is_trainer_create_game = False
 
-
     if is_trainer_create_game:
         model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
         agent = costum_agent.Agent(model.model)
@@ -65,5 +65,3 @@ if __name__ == '__main__':
         agent.save_model(saved_file_name)
 
     app.run(host="127.0.0.1", port=8000)
-
-

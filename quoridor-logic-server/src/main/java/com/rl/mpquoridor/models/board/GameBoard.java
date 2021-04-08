@@ -75,7 +75,7 @@ public class GameBoard {
         ret.put(p4, new Position(this.getPhysicalBoard().getSize() / 2, this.getPhysicalBoard().getSize() -1));
         this.pawnEndLine.put(p4, new HashSet<>());
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
-            this.pawnEndLine.get(p4).add(new Position(0, i));
+            this.pawnEndLine.get(p4).add(new Position(i, 0));
         }
         return  ret;
     }

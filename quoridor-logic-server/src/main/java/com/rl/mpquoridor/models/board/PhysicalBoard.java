@@ -2,8 +2,12 @@ package com.rl.mpquoridor.models.board;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -14,15 +18,15 @@ import java.util.*;
  * -------------------------------------------
  */
 public class PhysicalBoard {
-    private HashSet<Wall> walls;
+    private Set<Wall> walls;
     private BiMap<Pawn, Position> pawns;
-    private HashMap<Pawn, Integer> pawnWalls;
+    private Map<Pawn, Integer> pawnWalls;
     private int startNumberOfWallsPerPlayer;
 
     public PhysicalBoard(int numberOfWallsPerPlayer) {
         this.pawnWalls = new HashMap<>();
         this.startNumberOfWallsPerPlayer = numberOfWallsPerPlayer;
-        this.walls = new HashSet<>();
+        this.walls = Sets.newConcurrentHashSet();
 
     }
 

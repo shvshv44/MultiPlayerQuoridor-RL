@@ -2,14 +2,11 @@ package com.rl.mpquoridor.models.game;
 
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @NoArgsConstructor
-@Data
 public class GameResult {
     private String gameId;
     private Pawn winner;
@@ -17,4 +14,52 @@ public class GameResult {
     private List<Pawn> playOrder;
     private int startingWallCount;
     private Map<Pawn, Position> startingPosition;
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
+    public void setWinner(Pawn winner) {
+        this.winner = winner;
+    }
+
+    public void setHistory(List<HistoryRecord> history) {
+        this.history = new LinkedList<>(history);
+    }
+
+    public void setPlayOrder(List<Pawn> playOrder) {
+        this.playOrder = new LinkedList<>(playOrder);
+    }
+
+    public void setStartingWallCount(int startingWallCount) {
+        this.startingWallCount = startingWallCount;
+    }
+
+    public void setStartingPosition(Map<Pawn, Position> startingPosition) {
+        this.startingPosition = new HashMap<>(startingPosition);
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public Pawn getWinner() {
+        return winner;
+    }
+
+    public List<HistoryRecord> getHistory() {
+        return Collections.unmodifiableList(history);
+    }
+
+    public List<Pawn> getPlayOrder() {
+        return Collections.unmodifiableList(playOrder);
+    }
+
+    public int getStartingWallCount() {
+        return startingWallCount;
+    }
+
+    public Map<Pawn, Position> getStartingPosition() {
+        return Collections.unmodifiableMap(startingPosition);
+    }
 }

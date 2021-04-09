@@ -1,12 +1,13 @@
-import requests
 import logging
-import gym
+
+import requests
+from flask import Flask
+
 import quoridor_env
-from quoridor_env import QuoridorEnv
-from model import Model
+from auto_agent import AutoAgent
 from agent import Agent
-from tcp import TCP
 from globals import Global
+from model import Model
 from trainer import Trainer
 import costum_agent
 from datetime import datetime
@@ -14,6 +15,17 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 
 serverUrl = Global.server
+app = Flask(__name__)
+
+
+@app.route('/addAgentToGame/<game_id_to_join>', methods=['GET'])
+def add_agent_to_game(game_id_to_join):
+    model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+    agent = costum_agent.Agent(model.model)
+    auto_agent = AutoAgent(agent)
+
+    auto_agent.join_game(game_id_to_join)
+    return "Add agent to game id " + game_id_to_join
 
 
 def join_game_random_player(game_id):
@@ -40,11 +52,16 @@ if __name__ == '__main__':
     #     print(board)
     #     print("*************************")
 
-    model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
-    agent = costum_agent.Agent(model.model)
-    trainer = Trainer(agent)
-    trainer.start_training_session(50)
+    is_trainer_create_game = False
 
-    time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
-    saved_file_name = "quoridor-{time}.h5".format(time=time)
-    agent.save_model(saved_file_name)
+    if is_trainer_create_game:
+        model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+        agent = costum_agent.Agent(model.model)
+        trainer = Trainer(agent)
+        trainer.start_training_session(50)
+
+        time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
+        saved_file_name = "quoridor-{time}.h5".format(time=time)
+        agent.save_model(saved_file_name)
+
+    app.run(host="127.0.0.1", port=8000)

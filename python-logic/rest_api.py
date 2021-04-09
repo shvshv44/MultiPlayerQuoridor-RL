@@ -1,4 +1,5 @@
 import requests as http
+
 from globals import Global
 
 server = Global.server

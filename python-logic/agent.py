@@ -21,6 +21,12 @@ class Agent:
         # self.dqn.fit(env, nb_steps=2500, visualize=False, verbose=1)
          self.dqn.fit(env, nb_steps=5000, visualize=False, verbose=1)
 
+    def test(self, env):
+        self.dqn.test(env, nb_episodes=5, visualize=False)
+
+    def load_weights(self):
+        self.dqn.load_weights('dqn_weights.h5f')
+
 
 
 

@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras.optimizers import Adam
 import random
 from tensorflow.keras.models import clone_model
+from datetime import datetime
 
 loss = "mean_squared_error"
 optimizer = Adam(learning_rate=1e-3)
@@ -84,8 +85,13 @@ class Agent:
             target_weights[i] = weights[i] * self.tau + target_weights[i] * (1 - self.tau)
         self.target_model.set_weights(target_weights)
 
-    def save_model(self, fn):
-        self.model.save(fn)
+    def save_model(self):
+        time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
+        saved_file_name = "quoridor-{time}.h5".format(time=time)
+        self.save_model_to_path(saved_file_name)
+
+    def save_model_to_path(self, fn):
+        self.model.save_weights(fn)
 
     def create_model_clone(self, model):
         model_copy = clone_model(model)

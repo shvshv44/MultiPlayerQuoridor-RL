@@ -4,3 +4,5 @@ tensorflow==2.4.1
 numpy==1.19.5
 Keras==2.4.3
 keras-rl2==1.0.4
+
+Flask==1.1.2

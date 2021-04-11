@@ -88,7 +88,6 @@ class Agent:
 
     def save_model(self):
         time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
-        #saved_file_name = "C:\\Users\\shvsh\\OneDrive\\Desktop\\MultiPlayerQuoridor-RL\\python-logic\\models\\quoridor-{time}.h5".format(time=time)
         saved_file_name = "./models/shaq_{}.h5".format(time)
         self.save_model_to_path(saved_file_name)
 

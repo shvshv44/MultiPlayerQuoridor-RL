@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras.optimizers import Adam
 import random
 from tensorflow.keras.models import clone_model
+from datetime import datetime
 
 loss = "mean_squared_error"
 optimizer = Adam(learning_rate=1e-3)
@@ -56,7 +57,8 @@ class Agent:
 
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        return np.argmax(legal_predictions)
+        action_index = np.argmax(legal_predictions)
+        return env.get_action_options()[action_index]
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -84,7 +86,12 @@ class Agent:
             target_weights[i] = weights[i] * self.tau + target_weights[i] * (1 - self.tau)
         self.target_model.set_weights(target_weights)
 
-    def save_model(self, fn):
+    def save_model(self):
+        time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+        saved_file_name = "./models/shaq_{}.h5".format(time)
+        self.save_model_to_path(saved_file_name)
+
+    def save_model_to_path(self, fn):
         self.model.save(fn)
 
     def create_model_clone(self, model):

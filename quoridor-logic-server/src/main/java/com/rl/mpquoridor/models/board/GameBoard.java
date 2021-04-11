@@ -126,8 +126,8 @@ public class GameBoard {
         }
 
         // Checking the wall is in the bounds of the board
-        if(wall.getPosition().getY() < 0 || wall.getPosition().getY() >= this.getPhysicalBoard().getSize() ||
-                wall.getPosition().getX() < 0 || wall.getPosition().getX() >= this.getPhysicalBoard().getSize() )  {
+        if(wall.getPosition().getY() < 0 || wall.getPosition().getY() >= this.getPhysicalBoard().getSize() - 1 ||
+                wall.getPosition().getX() < 0 || wall.getPosition().getX() >= this.getPhysicalBoard().getSize() - 1 )  {
             throw new IllegalMovementException(WALL_IS_OUTSIDE_THE_BOARD_BOUNDS);
         }
 
@@ -142,8 +142,8 @@ public class GameBoard {
 
     public Set<Wall> getAvailableWalls(Pawn pawn) {
         Set<Wall> ret = new HashSet<>();
-        for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
-            for (int j = 0; j < this.getPhysicalBoard().getSize(); j++) {
+        for (int i = 0; i < this.getPhysicalBoard().getSize() - 1; i++) {
+            for (int j = 0; j < this.getPhysicalBoard().getSize() - 1; j++) {
                 for(WallDirection direction : WallDirection.values()) {
                     Wall w = new Wall(new Position(i, j), direction);
                     try {

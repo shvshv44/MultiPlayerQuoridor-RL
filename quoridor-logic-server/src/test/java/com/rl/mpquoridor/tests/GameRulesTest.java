@@ -40,7 +40,7 @@ public class GameRulesTest {
 
     @Test
     private void WallPlacementAtEdge() {
-        Wall w = new Wall(new Position(8,2), WallDirection.RIGHT);
+        Wall w = new Wall(new Position(7,2), WallDirection.RIGHT);
         this.board.executeAction(p, new PlaceWallAction(w));
         assertTrue(this.board.getReadOnlyPhysicalBoard().getWalls().contains(w));
     }
@@ -178,7 +178,7 @@ public class GameRulesTest {
             this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN));
         }
         Pawn other = this.board.getReadOnlyPhysicalBoard().getPawns().stream().filter(x -> !p.equals(x)).findFirst().get(); // Location should be (8,4)
-        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(8,4), WallDirection.RIGHT)));
+        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(7,4), WallDirection.RIGHT)));
         try {
             this.board.executeAction(other, new MovePawnAction(MovementDirection.UP));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);

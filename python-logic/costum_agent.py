@@ -57,7 +57,8 @@ class Agent:
 
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        return np.argmax(legal_predictions)
+        action_index = np.argmax(legal_predictions)
+        return env.get_action_options()[action_index]
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -86,12 +87,13 @@ class Agent:
         self.target_model.set_weights(target_weights)
 
     def save_model(self):
-        time = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
-        saved_file_name = "quoridor-{time}.h5".format(time=time)
+        time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+        #saved_file_name = "C:\\Users\\shvsh\\OneDrive\\Desktop\\MultiPlayerQuoridor-RL\\python-logic\\models\\quoridor-{time}.h5".format(time=time)
+        saved_file_name = "./models/shaq_{}.h5".format(time)
         self.save_model_to_path(saved_file_name)
 
     def save_model_to_path(self, fn):
-        self.model.save_weights(fn)
+        self.model.save(fn)
 
     def create_model_clone(self, model):
         model_copy = clone_model(model)

@@ -81,6 +81,7 @@ public abstract class SocketPlayer implements Player{
             NewTurnEvent newTurnEvent = ((NewTurnEvent) event);
             NewTurnMessage message = new NewTurnMessage();
             message.setNextPlayerToPlay(pawnPerPlayerName.get(newTurnEvent.getPawn()));
+            message.setCurrentPosition(board.getPawnPosition(myPawn));
             message.setAvialiableMoves(this.myPawn == newTurnEvent.getPawn() ? newTurnEvent.getCurrentPawnMoves() : Collections.emptyList());
             message.setAvailableWalls(this.myPawn == newTurnEvent.getPawn() ? newTurnEvent.getCurrentPawnWalls() : Collections.emptyList());
 

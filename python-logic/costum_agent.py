@@ -50,8 +50,7 @@ class Agent:
     def act(self, state, env):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
-        #if np.random.random() < self.epsilon:
-        if True:
+        if np.random.random() < self.epsilon:
             print("random action")
             action = self.random_act(env)
         else:

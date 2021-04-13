@@ -59,6 +59,7 @@ class Trainer:
                 act_json = utils.convert_action_to_server(actions[random_i])
                 self.tcp.write(act_json)
 
+
         elif json_message["type"] == "GameOverEvent":
             pass
         elif json_message["type"] == "RoomStateResponse":

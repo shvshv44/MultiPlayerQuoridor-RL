@@ -9,7 +9,6 @@ from tensorflow.keras.optimizers import Adam
 import random
 from tensorflow.keras.models import clone_model
 from datetime import datetime
-from random import choice
 
 loss = "mean_squared_error"
 optimizer = Adam(learning_rate=1e-3)
@@ -51,11 +50,16 @@ class Agent:
     def act(self, state, env):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
-        if np.random.random() < self.epsilon:
+        #if np.random.random() < self.epsilon:
+        if True:
             print("random action")
-            return self.random_act(env)
-        print("predicted action")
-        return self.predicated_act(state, env)
+            action = self.random_act(env)
+        else:
+            print("predicted action")
+            action = self.predicated_act(state, env)
+
+        print(action)
+        return action
 
     def predicated_act(self, state, env):
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
@@ -64,7 +68,11 @@ class Agent:
         return env.get_action_options()[action_index]
 
     def random_act(self, env):
-        return choice(env.get_action_options())
+        choices = env.get_action_options()
+        choices_len = len(choices)
+        random_i = np.random.randint(0, choices_len)
+        print(choices)
+        return choices[random_i]
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])

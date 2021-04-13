@@ -24,9 +24,4 @@ export class PlayDialogComponent implements OnInit {
     this.data.action = 'join';
     this.dialogRef.close(this.data);
   }
-
-  onCreateGameAgainstAgent(): void {
-    this.data.action = 'createAgainstAgent';
-    this.dialogRef.close(this.data);
-  }
 }

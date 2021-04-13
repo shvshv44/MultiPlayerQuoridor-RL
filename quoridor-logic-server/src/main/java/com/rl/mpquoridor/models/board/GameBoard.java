@@ -142,14 +142,17 @@ public class GameBoard {
 
     public Set<Wall> getAvailableWalls(Pawn pawn) {
         Set<Wall> ret = new HashSet<>();
-        for (int i = 0; i < this.getPhysicalBoard().getSize() - 1; i++) {
-            for (int j = 0; j < this.getPhysicalBoard().getSize() - 1; j++) {
-                for(WallDirection direction : WallDirection.values()) {
-                    Wall w = new Wall(new Position(i, j), direction);
-                    try {
-                        this.simulatePlaceWall(pawn, w);
-                        ret.add(w);
-                    } catch (IllegalMovementException ignored) {}
+
+        if(getPhysicalBoard().getPawnWalls().get(pawn) == 0) {
+            for (int i = 0; i < this.getPhysicalBoard().getSize() - 1; i++) {
+                for (int j = 0; j < this.getPhysicalBoard().getSize() - 1; j++) {
+                    for(WallDirection direction : WallDirection.values()) {
+                        Wall w = new Wall(new Position(i, j), direction);
+                        try {
+                            this.simulatePlaceWall(pawn, w);
+                            ret.add(w);
+                        } catch (IllegalMovementException ignored) {}
+                    }
                 }
             }
         }

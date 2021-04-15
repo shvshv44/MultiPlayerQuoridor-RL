@@ -15,17 +15,15 @@ class AutoAgent:
     def start_game_with_agent(self, game_id):
         env = QuoridorEnv(game_id, self.name)
 
-        # self.agent.load_weights() #todo: remove remark after saveing the weights
-        self.agent.test(env)
-
         done = False
         steps_num = 0
+        cur_state = env.reset()
 
         while not done:
             steps_num += 1
-            action = self.agent.test(env)
+            action = self.agent.predicated_act(cur_state, env)
             new_state, reward, done, _ = env.step(action)
-            env.wait_for_my_turn()
+            cur_state = new_state
 
         print("\n\nGAME FINISHED IN {} STEPS!\n\n".format(steps_num))
 

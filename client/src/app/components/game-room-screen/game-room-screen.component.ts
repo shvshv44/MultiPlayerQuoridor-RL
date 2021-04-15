@@ -19,6 +19,7 @@ import {addPawns, addPawnsWithoutPosition} from '../../reducers/pawns/pawns.acti
 })
 export class GameRoomScreenComponent implements OnInit {
   private readonly serverURL;
+  private readonly agentServerUrl;
   gameId: string;
   pawnName: string;
   pawns: Pawn[] = [];
@@ -31,6 +32,7 @@ export class GameRoomScreenComponent implements OnInit {
               private store: Store,
               private config: ConfigService) {
     this.serverURL = this.config.getConfig().serverUrl;
+    this.agentServerUrl = this.config.getConfig().agentServerUrl;
     this.store.select(selectGameId).subscribe(gameId => this.gameId = gameId);
     this.store.select(selectPawnName).subscribe(pawnName => this.pawnName = pawnName);
     this.store.select(selectPawnArray).subscribe(pawns => this.pawns = pawns);
@@ -68,6 +70,13 @@ export class GameRoomScreenComponent implements OnInit {
   async startGame(): Promise<void> {
     const startGameURL = this.serverURL + '/StartGame/' + this.gameId;
     await this.http.get(startGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+      this.snackBar.open(err.error, 'close', {duration: 10000});
+    });
+  }
+
+  async addAgent(): Promise<void> {
+    const createGameURL = this.agentServerUrl + '/AddAgentToGame' + '/' + this.gameId;
+    await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
       this.snackBar.open(err.error, 'close', {duration: 10000});
     });
   }

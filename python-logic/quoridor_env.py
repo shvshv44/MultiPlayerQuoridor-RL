@@ -22,7 +22,7 @@ def action_shape():
 
 
 def observation_shape():
-    return (1,) + (9, 9, 4)  # window length + board shape
+    return Global.observation_shape
 
 
 class QuoridorEnv(gym.Env):

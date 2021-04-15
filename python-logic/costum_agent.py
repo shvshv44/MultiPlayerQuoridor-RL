@@ -16,9 +16,9 @@ optimizer = Adam(learning_rate=1e-3)
 
 class Model:
 
-    def __init__(self, observation_input_shape, action_input_shape):
-        self.states = observation_input_shape
-        self.actions = action_input_shape
+    def __init__(self):
+        self.states = Global.observation_shape
+        self.actions = Global.num_of_actions
         self.model = self.build_model(self.states, self.actions)
         self.model.summary()
 

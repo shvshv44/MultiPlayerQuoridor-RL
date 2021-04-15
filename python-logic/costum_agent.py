@@ -109,12 +109,3 @@ class Agent:
 
     def minimize_to_legal_predictions(self, all_predictions, env):
         return all_predictions[env.get_action_options()]
-
-    def test(self, env):
-        board = env.board
-        all_predictions = self.model.predict(board.reshape((1,) + env.observation_shape()))[0]
-        legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        return np.argmax(legal_predictions)
-
-    def load_weights(self):
-        self.model.load_weights('dqn_weights.h5f')

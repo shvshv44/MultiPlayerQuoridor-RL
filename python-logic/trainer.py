@@ -4,6 +4,7 @@ from tcp import TCP
 from quoridor_env import QuoridorEnv
 import random
 import utils
+import numpy as np
 
 
 class Trainer:
@@ -42,8 +43,21 @@ class Trainer:
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
-                rand_action = random.randint(0,4)
-                act_json = utils.convert_action_to_server(rand_action)
+                myLoc = json_message["currentPosition"]
+                actions = []
+                for move in json_message["avialiableMoves"]:
+                    if int(move["x"]) > int(myLoc["x"]):
+                        actions.append(3)  # Move Right
+                    elif int(move["x"]) < int(myLoc["x"]):
+                        actions.append(2)  # Move Left
+                    elif int(move["y"]) > int(myLoc["y"]):
+                        actions.append(1)  # Move Down
+                    elif int(move["y"]) < int(myLoc["y"]):
+                        actions.append(0)  # Move Up
+
+                actions_len = len(actions)
+                random_i = np.random.randint(0, actions_len)
+                act_json = utils.convert_action_to_server(actions[random_i])
                 self.tcp.write(act_json)
 
         elif json_message["type"] == "GameOverEvent":

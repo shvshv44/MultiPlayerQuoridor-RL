@@ -16,9 +16,9 @@ optimizer = Adam(learning_rate=1e-3)
 
 class Model:
 
-    def __init__(self, observation_input_shape, action_input_shape):
-        self.states = observation_input_shape
-        self.actions = action_input_shape
+    def __init__(self):
+        self.states = Global.observation_shape
+        self.actions = Global.num_of_actions
         self.model = self.build_model(self.states, self.actions)
         self.model.summary()
 
@@ -52,13 +52,24 @@ class Agent:
         self.epsilon = max(self.epsilon_min, self.epsilon)
         if np.random.random() < self.epsilon:
             print("random action")
-            return env.action_space.sample()
-        print("predicted action")
+            action = self.random_act(env)
+        else:
+            print("predicted action")
+            action = self.predicated_act(state, env)
 
+        return action
+
+    def predicated_act(self, state, env):
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
         action_index = np.argmax(legal_predictions)
         return env.get_action_options()[action_index]
+
+    def random_act(self, env):
+        choices = env.get_action_options()
+        choices_len = len(choices)
+        random_i = np.random.randint(0, choices_len)
+        return choices[random_i]
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -86,14 +97,6 @@ class Agent:
             target_weights[i] = weights[i] * self.tau + target_weights[i] * (1 - self.tau)
         self.target_model.set_weights(target_weights)
 
-    def save_model(self):
-        time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
-        saved_file_name = "./models/shaq_{}.h5".format(time)
-        self.save_model_to_path(saved_file_name)
-
-    def save_model_to_path(self, fn):
-        self.model.save(fn)
-
     def create_model_clone(self, model):
         model_copy = clone_model(model)
         model_copy.build(model.layers[0].input_shape)  # replace 10 with number of variables in input layer
@@ -106,13 +109,3 @@ class Agent:
 
     def minimize_to_legal_predictions(self, all_predictions, env):
         return all_predictions[env.get_action_options()]
-
-    def test(self, env):
-        board = env.board
-        all_predictions = self.model.predict(board.reshape((1,) + env.observation_shape()))[0]
-        legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        return np.argmax(legal_predictions)
-
-    def load_weights(self):
-        self.model.load_weights('dqn_weights.h5f')
-

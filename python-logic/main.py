@@ -1,16 +1,20 @@
 import logging
+from datetime import datetime
 
 import requests
 from flask import Flask
+from flask_injector import FlaskInjector
+
+# do not delete imports at any cost!
+from agent import Agent
+from model import Model
 
 import quoridor_env
 from auto_agent import AutoAgent
-from agent import Agent
+from dependencies import configure
 from globals import Global
-from model import Model
 from trainer import Trainer
 import costum_agent
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,9 +22,8 @@ serverUrl = Global.server
 app = Flask(__name__)
 
 
-@app.route('/addAgentToGame/<game_id_to_join>', methods=['GET'])
-def add_agent_to_game(game_id_to_join):
-    model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
+@app.route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
+def add_agent_to_game(model: costum_agent.Model, game_id_to_join):
     agent = costum_agent.Agent(model.model)
     auto_agent = AutoAgent(agent)
 
@@ -28,24 +31,30 @@ def add_agent_to_game(game_id_to_join):
     return "Add agent to game id " + game_id_to_join
 
 
-def join_game_random_player(game_id):
-    join_game_url = serverUrl + "/JoinGame/" + game_id + "/randomPlayer"
-    response = requests.get(join_game_url)
+@app.route('/TrainAgent/<episodes>', methods=['GET'])
+def train_agent(model: costum_agent.Model, episodes):
+    agent = costum_agent.Agent(model.model)
+    trainer = Trainer(agent)
+    trainer.start_training_session(int(episodes))
+    return "Trained Successfully!"
 
-    return response
 
+@app.route('/SaveModel', methods=['GET'])
+def save_model(model: costum_agent.Model):
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.model.save(saved_file_name)
+    return "Model Saved In {}".format(saved_file_name)
+
+
+@app.route('/SaveModel/<file_name>', methods=['GET'])
+def save_model_to_path(model: costum_agent.Model, file_name):
+    model.model.save(file_name)
+    return "Model Saved In {}".format(file_name)
+
+
+# Setup Flask Injector, this has to happen AFTER routes are added
+FlaskInjector(app=app, modules=[configure])
 
 if __name__ == '__main__':
-
-    is_trainer_create_game = True
-
-    if is_trainer_create_game:
-        model = costum_agent.Model(quoridor_env.observation_shape(), Global.num_of_actions)
-        agent = costum_agent.Agent(model.model)
-        trainer = Trainer(agent)
-        trainer.start_training_session(50)
-        agent.save_model()
-
     app.run(host="127.0.0.1", port=8000)
-
-

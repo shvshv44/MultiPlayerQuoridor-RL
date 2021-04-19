@@ -80,4 +80,11 @@ export class GameRoomScreenComponent implements OnInit {
       this.snackBar.open(err.error, 'close', {duration: 10000});
     });
   }
+
+  async trainAgent(): Promise<void> {
+    const createGameURL = this.agentServerUrl + '/TrainAgentByHuman' + '/' + this.gameId;
+    await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+      this.snackBar.open(err.error, 'close', {duration: 10000});
+    });
+  }
 }

@@ -5,5 +5,5 @@ numpy==1.19.5
 Keras==2.4.3
 keras-rl2==1.0.4
 
-Flask==1.1.2
-flask_injector==0.12.3
+bottle==0.12.19
+injector==0.18.4

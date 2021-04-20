@@ -54,7 +54,12 @@ export class GameScreenComponent implements OnInit {
           }
         }));
       } else {
-        this.store.dispatch(AddWall({wall: message.currentTurnMove.wall}));
+        const wall: Wall = message.currentTurnMove.wall;
+        const newWall: Wall = wall.wallDirection === Direction.Down ? {
+          position: {x: wall.position.x + 1, y: wall.position.y},
+          wallDirection: Direction.Down
+        } : {position: {x: wall.position.x, y: wall.position.y + 1}, wallDirection: Direction.Right};
+        this.store.dispatch(AddWall({wall: newWall}));
         this.store.dispatch(updatePawn({
           update: {
             id: message.playerPlayed,

@@ -76,9 +76,10 @@ export class WebSocketApiService {
   // tslint:disable-next-line:typedef
   _sendPutWall(wall: Wall) {
     console.log('calling send put wall');
-    const newWall = {
-      position: {x: wall.position.x - 1, y: wall.position.y - 1},
-      wallDirection: wall.wallDirection};
+    const newWall = wall.wallDirection === Direction.Down ? {
+      position: {x: wall.position.x - 1, y: wall.position.y},
+      wallDirection: Direction.Down
+    } : {position: {x: wall.position.x, y: wall.position.y - 1}, wallDirection: Direction.Right};
     this.stompClient.send('/app/' + this.gameId + '/' + this.playerName + '/putWall', {}, JSON.stringify({wall: newWall}));
   }
 

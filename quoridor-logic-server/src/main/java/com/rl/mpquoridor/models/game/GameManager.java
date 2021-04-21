@@ -33,6 +33,7 @@ public class GameManager {
 
     public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
+        Collections.shuffle((List<?>) players);
         this.gameId = gameId;
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);

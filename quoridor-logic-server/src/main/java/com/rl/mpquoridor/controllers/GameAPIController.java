@@ -1,5 +1,7 @@
 package com.rl.mpquoridor.controllers;
 
+import com.mongodb.client.result.DeleteResult;
+import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
@@ -27,7 +29,6 @@ import java.net.ServerSocket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 @RestController
@@ -213,6 +214,20 @@ public class GameAPIController {
             return createBasicResponse(d, HttpStatus.OK);
 
         }
+    }
+
+    @CrossOrigin
+    @DeleteMapping("/History/{gameId}")
+    @ResponseBody
+    public ResponseEntity<DeleteResult> deleteGameFromHistory(@PathVariable String gameId) {
+        DeleteResult deleteResult = MongoDB.getInstance().deleteGame(gameId);
+        HttpStatus status;
+        if(deleteResult.getDeletedCount() == 0){
+            status = HttpStatus.NOT_FOUND;
+        } else {
+            status = HttpStatus.ACCEPTED;
+        }
+        return createBasicResponse(deleteResult, status);
     }
 
     private ResponseEntity<String> createBasicBadRequestResponse(String message) {

@@ -15,15 +15,14 @@ import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
 public class GameBoard {
     private final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
-    private final Map<Pawn, HashSet<Position>> pawnEndLine;
     @Getter
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
-        this.pawnEndLine = new HashMap<>();
         this.board = new PhysicalBoard(numberOfWallsPerPlayer);
+        this.board.setPawnEndLine(new HashMap<>());
 
         switch (numberOfPlayers) {
             case 2:
@@ -53,12 +52,12 @@ public class GameBoard {
 
         ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
         ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
-        this.pawnEndLine.put(p1, new HashSet<>());
-        this.pawnEndLine.put(p2, new HashSet<>());
+        this.board.getPawnEndLine().put(p1, new HashSet<>());
+        this.board.getPawnEndLine().put(p2, new HashSet<>());
 
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
-            this.pawnEndLine.get(p1).add(new Position(this.getPhysicalBoard().getSize() - 1, i));
-            this.pawnEndLine.get(p2).add(new Position(0, i));
+            this.board.getPawnEndLine().get(p1).add(new Position(this.getPhysicalBoard().getSize() - 1, i));
+            this.board.getPawnEndLine().get(p2).add(new Position(0, i));
         }
         return ret;
     }
@@ -68,9 +67,9 @@ public class GameBoard {
         Pawn p3 = new Pawn();
         playOrder.add(p3);
         ret.put(p3, new Position(this.getPhysicalBoard().getSize() / 2, 0));
-        this.pawnEndLine.put(p3, new HashSet<>());
+        this.board.getPawnEndLine().put(p3, new HashSet<>());
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
-            this.pawnEndLine.get(p3).add(new Position(i, this.getPhysicalBoard().getSize() - 1));
+            this.board.getPawnEndLine().get(p3).add(new Position(i, this.getPhysicalBoard().getSize() - 1));
         }
         return ret;
     }
@@ -80,9 +79,9 @@ public class GameBoard {
         Pawn p4 = new Pawn();
         playOrder.add(p4);
         ret.put(p4, new Position(this.getPhysicalBoard().getSize() / 2, this.getPhysicalBoard().getSize() - 1));
-        this.pawnEndLine.put(p4, new HashSet<>());
+        this.board.getPawnEndLine().put(p4, new HashSet<>());
         for (int i = 0; i < this.getPhysicalBoard().getSize(); i++) {
-            this.pawnEndLine.get(p4).add(new Position(i, 0));
+            this.board.getPawnEndLine().get(p4).add(new Position(i, 0));
         }
         return ret;
     }
@@ -112,7 +111,7 @@ public class GameBoard {
      * @param pawn - the pawn this method checks.
      */
     private void checkWinner(Pawn pawn) {
-        if (winner == null && this.pawnEndLine.get(pawn).contains(this.getPhysicalBoard().getPawnPosition(pawn))) {
+        if (winner == null && this.board.getPawnEndLine().get(pawn).contains(this.getPhysicalBoard().getPawnPosition(pawn))) {
             this.winner = pawn;
         }
     }
@@ -187,7 +186,7 @@ public class GameBoard {
         return this.readOnlyPhysicalBoard;
     }
 
-    private boolean isPathExists(Position s, HashSet<Position> dest) {
+    private boolean isPathExists(Position s, Set<Position> dest) {
         Queue<Position> q = new LinkedList<>();
         Set<Position> visited = new HashSet<>();
         q.add(s);
@@ -257,7 +256,7 @@ public class GameBoard {
 
     private boolean isAllPawnsHavePath() {
         for (Pawn p : this.getPhysicalBoard().getPawns()) {
-            if (!isPathExists(this.getPhysicalBoard().getPawnPosition(p), this.pawnEndLine.get(p))) {
+            if (!isPathExists(this.getPhysicalBoard().getPawnPosition(p), this.board.getPawnEndLine().get(p))) {
                 return false;
             }
         }

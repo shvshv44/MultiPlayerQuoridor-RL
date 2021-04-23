@@ -3,6 +3,7 @@ from datetime import datetime
 
 # do not delete imports at any cost!
 from agent import Agent
+from agent_trainer import AgentTrainer
 from model import Model
 
 from auto_agent import AutoAgent
@@ -43,6 +44,17 @@ def train_agent(episodes):
     global model
     agent = costum_agent.Agent(model)
     trainer = Trainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+@route('/TrainAgentByAgent/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    # load trainer model
+    agent_trainer = costum_agent.Agent(model)
+    trainer = AgentTrainer(agent, agent_trainer)
     trainer.start_training_session(int(episodes))
 
     return "Trained Successfully!"

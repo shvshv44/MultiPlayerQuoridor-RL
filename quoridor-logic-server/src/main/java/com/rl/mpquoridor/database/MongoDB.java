@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.result.DeleteResult;
 import com.rl.mpquoridor.models.game.GameResult;
 import org.bson.Document;
 
@@ -57,5 +58,9 @@ public class MongoDB implements AutoCloseable{
         }
 
         return doc;
+    }
+
+    public DeleteResult deleteGame(String gameId) {
+        return this.mongo.getDatabase(DB).getCollection(COLLECTION).deleteOne(new Document("gameId", gameId));
     }
 }

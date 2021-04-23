@@ -6,11 +6,13 @@ if [ -z $changed ];
 then
 	echo "repository is already updated, nothing to do."
 else 
-	echo "repository updated, repackaging and restarting services"
-	mvn clean package --file ./quoridor-logic-server/pom.xml
-	npm install ./client 
-	systemctl restart quoridor-server.service
-	systemctl restart quoridor-client.service
+        mvn clean package --file ./quoridor-logic-server/pom.xml
+        npm install ./client
+        /usr/bin/pip3 install -r ./python-logic/requirements.txt
+        chown -R cs600:users .
+        systemctl restart quoridor-server.service
+        systemctl restart quoridor-client.service
+        systemctl restart quoridor-agent.service
 fi
 
 

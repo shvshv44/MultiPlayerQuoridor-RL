@@ -11,6 +11,7 @@ import {Observable, of} from 'rxjs';
 import {Store} from '@ngrx/store';
 import {addPawns, updatePawn} from '../../reducers/pawns/pawns.actions';
 import {AddWall} from '../../reducers/walls/walls.actions';
+import {Direction} from '../../enums/direction';
 
 @Component({
   selector: 'app-game-history',
@@ -72,7 +73,12 @@ export class GameHistoryComponent implements OnInit {
         }
       }));
     } else {
-      this.store.dispatch(AddWall({wall: turn.action.wall}));
+      const wall = turn.action.wall;
+      const newWall: Wall = wall.wallDirection === Direction.Down ? {
+        position: {x: wall.position.x + 1, y: wall.position.y},
+        wallDirection: Direction.Down
+      } : {position: {x: wall.position.x, y: wall.position.y + 1}, wallDirection: Direction.Right};
+      this.store.dispatch(AddWall({wall: newWall}));
     }
   }
 }

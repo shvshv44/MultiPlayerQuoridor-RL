@@ -1,4 +1,4 @@
 {
-  "serverUrl": "http://localhost:8080",
-  "agentServerUrl": "http://localhost:8000"
+  "serverUrl": "http://193.106.55.110:8080",
+  "agentServerUrl": "http://193.106.55.110:8000"
 }

@@ -1,6 +1,7 @@
 package com.rl.mpquoridor.models.board;
 
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,5 +62,10 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     @Override
     public Map<Pawn, Position> getAllPawnPosition() {
         return source.getAllPawnPosition();
+    }
+
+    @Override
+    public Map<Pawn, Set<Position>> getPawnEndLine() {
+        return Collections.unmodifiableMap(source.getPawnEndLine());
     }
 }

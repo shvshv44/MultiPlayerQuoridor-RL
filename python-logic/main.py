@@ -9,8 +9,10 @@ from auto_agent import AutoAgent
 from globals import Global
 from trainer import Trainer
 from human_trainer import HumanTrainer
+from history_trainer import HistoryTrainer
 import costum_agent
 import keras
+import rest_api
 
 from bottle import route, run
 
@@ -54,6 +56,15 @@ def train_agent_human(game_id):
     agent = costum_agent.Agent(model)
     trainer = HumanTrainer(agent)
     trainer.start_game_with_agent(game_id)
+    return "Trained By Human Successfully!"
+
+
+@route('/TrainAgentByHistory', methods=['GET'])
+def train_agent_history():
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = HistoryTrainer(agent)
+    trainer.start()
     return "Trained By Human Successfully!"
 
 

@@ -74,8 +74,15 @@ export class GameRoomScreenComponent implements OnInit {
     });
   }
 
-  async addAgent(): Promise<void> {
-    const createGameURL = this.agentServerUrl + '/AddAgentToGame' + '/' + this.gameId;
+  async addWalkingAgent(): Promise<void> {
+    const createGameURL = this.agentServerUrl + '/AddAgentToGame/Walking' + '/' + this.gameId;
+    await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
+      this.snackBar.open(err.error, 'close', {duration: 10000});
+    });
+  }
+
+  async addRandomAgent(): Promise<void> {
+    const createGameURL = this.agentServerUrl + '/AddAgentToGame/Random' + '/' + this.gameId;
     await this.http.get(createGameURL, {responseType: 'text'}).toPromise().catch((err: HttpErrorResponse) => {
       this.snackBar.open(err.error, 'close', {duration: 10000});
     });

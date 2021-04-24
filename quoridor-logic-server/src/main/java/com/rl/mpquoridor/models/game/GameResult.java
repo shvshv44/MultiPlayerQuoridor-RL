@@ -14,6 +14,18 @@ public class GameResult {
     private List<Pawn> playOrder;
     private int startingWallCount;
     private Map<Pawn, Position> startingPosition;
+    private Map<Pawn, Set<Position>> pawnEndLine;
+
+    public Map<Pawn, Set<Position>> getPawnEndLine() {
+        return Collections.unmodifiableMap(pawnEndLine);
+    }
+
+    public void setPawnEndLine(final Map<Pawn, Set<Position>> pawnEndLine) {
+        this.pawnEndLine = new HashMap<>();
+        pawnEndLine.forEach((p, e) -> {
+            this.pawnEndLine.put(p, new HashSet<>(e));
+        });
+    }
 
     public void setGameId(String gameId) {
         this.gameId = gameId;

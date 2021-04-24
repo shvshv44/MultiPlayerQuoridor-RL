@@ -6,9 +6,7 @@ import random
 import utils
 import numpy as np
 
-
 class Trainer:
-
     def __init__(self, agent):
         self.agent = agent
         self.name = "Trainer"
@@ -40,6 +38,17 @@ class Trainer:
 
         print("\n\nGAME FINISHED IN {} STEPS!\n\n".format(steps_num))
 
+    def headline_print(self, text):
+        print("====================================================")
+        print(text)
+        print("====================================================")
+
+    def on_recieved(self, json_message):
+        raise NotImplementedError("This is abstract class you must implement the method!")
+
+
+class WalkingTrainer(Trainer):
+
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
@@ -66,7 +75,18 @@ class Trainer:
             if len(json_message["players"]) == 2:
                 rest_api.start_game(self.game_id)
 
-    def headline_print(self, text):
-        print("====================================================")
-        print(text)
-        print("====================================================")
+
+class RandomTrainer(Trainer):
+
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.name:
+                actions = utils.convert_moves_to_action_options(json_message)
+                choices_len = len(actions)
+                random_i = np.random.randint(0, choices_len)
+                act_json = utils.convert_action_to_server(actions[random_i])
+                self.tcp.write(act_json)
+
+        elif json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)

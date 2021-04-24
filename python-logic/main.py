@@ -7,7 +7,7 @@ from model import Model
 
 from auto_agent import AutoAgent
 from globals import Global
-from trainer import Trainer
+from trainer import WalkingTrainer, RandomTrainer
 from human_trainer import HumanTrainer
 import costum_agent
 import keras
@@ -38,11 +38,21 @@ def add_agent_to_game(game_id_to_join):
     return "Add agent to game id " + game_id_to_join
 
 
-@route('/TrainAgent/<episodes>', methods=['GET'])
+@route('/TrainAgent/Walking/<episodes>', methods=['GET'])
 def train_agent(episodes):
     global model
     agent = costum_agent.Agent(model)
-    trainer = Trainer(agent)
+    trainer = WalkingTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+
+@route('/TrainAgent/Random/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = RandomTrainer(agent)
     trainer.start_training_session(int(episodes))
 
     return "Trained Successfully!"

@@ -52,7 +52,7 @@ class HistoryTrainer:
                         self.verticalWalls[position["y"]][position["x"]] = 1
                         self.verticalWalls[position["y"] + 1][position["x"]] = 1
 
-        self.start_game_with_agent()
+            self.start_game_with_agent()
 
     def start_game_with_agent(self):
         env = QuoridorEnv('history', "Agent", True)

@@ -175,24 +175,7 @@ class QuoridorEnv(gym.Env):
         return observation_shape()
 
     def update_action_options(self, moves_json):
-        self.action_options = []
-
-        myLoc = moves_json["currentPosition"]
-        for move in moves_json["avialiableMoves"]:
-            if int(move["x"]) > int(myLoc["x"]):
-                self.action_options.append(3)  # Move Right
-            elif int(move["x"]) < int(myLoc["x"]):
-                self.action_options.append(2)  # Move Left
-            elif int(move["y"]) > int(myLoc["y"]):
-                self.action_options.append(1)  # Move Down
-            elif int(move["y"]) < int(myLoc["y"]):
-                self.action_options.append(0)  # Move Up
-
-        for wall in moves_json["availableWalls"]:
-            wall_action = 4 + wall["position"]["x"] + (8 * wall["position"]["y"])
-            if wall["wallDirection"] == "Down":
-                wall_action += 64
-            self.action_options.append(wall_action)
+        self.action_options = utils.convert_moves_to_action_options(moves_json)
 
     def get_action_options(self):
         return self.action_options

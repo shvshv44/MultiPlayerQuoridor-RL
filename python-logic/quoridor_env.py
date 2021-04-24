@@ -187,4 +187,3 @@ class QuoridorEnv(gym.Env):
                     x = int(loc["x"])
                     y = int(loc["y"])
                     self.winning_points_dim[y, x] = 1
-        print(self.winning_points_dim)

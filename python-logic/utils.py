@@ -30,7 +30,7 @@ def convert_action_to_server(action):
     return output
 
 
-def convert_moves_to_action_options(self, moves_json):
+def convert_moves_to_action_options(moves_json):
     action_options = []
 
     myLoc = moves_json["currentPosition"]

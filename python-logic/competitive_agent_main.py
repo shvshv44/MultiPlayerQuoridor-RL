@@ -1,13 +1,10 @@
 import logging
 from datetime import datetime
 
-# do not delete imports at any cost!
-from competitive_agent_trainer import CompetitiveAgentTrainer
+import rest_api
 
 from auto_agent import AutoAgent
 from globals import Global
-from trainer import Trainer
-from human_trainer import HumanTrainer
 import costum_agent
 import keras
 
@@ -27,42 +24,15 @@ def load_model(file):
 model = load_model("")
 
 
-@route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
+@route('/AddCompetitiveAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
     global model
+    #model = load_model("./models/quoridor.h5")
     print("adding agent to game id {}".format(game_id_to_join))
     agent = costum_agent.Agent(model)
     auto_agent = AutoAgent(agent)
-    auto_agent.join_game(game_id_to_join)
+    auto_agent.join_game_and_start(game_id_to_join)
     return "Add agent to game id " + game_id_to_join
-
-
-@route('/TrainAgent/<episodes>', methods=['GET'])
-def train_agent(episodes):
-    global model
-    agent = costum_agent.Agent(model)
-    trainer = Trainer(agent)
-    trainer.start_training_session(int(episodes))
-
-    return "Trained Successfully!"
-
-@route('/TrainAgentByAgent/<episodes>', methods=['GET'])
-def train_agent(episodes):
-    global model
-    agent = costum_agent.Agent(model)
-    trainer = CompetitiveAgentTrainer(agent)
-    trainer.start_training_session(int(episodes))
-
-    return "Trained Successfully!"
-
-
-@route('/TrainAgentByHuman/<game_id>', methods=['GET'])
-def train_agent_human(game_id):
-    global model
-    agent = costum_agent.Agent(model)
-    trainer = HumanTrainer(agent)
-    trainer.start_game_with_agent(game_id)
-    return "Trained By Human Successfully!"
 
 
 @route('/SaveModel', methods=['GET'])
@@ -89,4 +59,4 @@ def load_model_to_path(file_name):
 
 
 if __name__ == '__main__':
-    run(host='localhost', port=8000, debug=True)
+    run(host='localhost', port=8001, debug=True)

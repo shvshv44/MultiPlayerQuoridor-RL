@@ -75,9 +75,9 @@ public class GameRulesTest {
         Wall w1 = new Wall(new Position(1, 2), WallDirection.DOWN);
         this.board.executeAction(p, new PlaceWallAction(w1));
         Wall[] blockers = new Wall[] {
+                new Wall(new Position(0,2), WallDirection.DOWN),
                 new Wall(new Position(2,2), WallDirection.DOWN),
-                new Wall(new Position(1,2), WallDirection.DOWN),
-                new Wall(new Position(2,1), WallDirection.RIGHT)
+                new Wall(new Position(1,2), WallDirection.RIGHT)
         };
         for (Wall w : blockers) {
             try {
@@ -94,7 +94,7 @@ public class GameRulesTest {
     private void WallPlacementBlockPath() {
         Wall[] blockers = new Wall[] {
                 new Wall(new Position(0,3), WallDirection.DOWN),
-                new Wall(new Position(2,3), WallDirection.RIGHT),
+                new Wall(new Position(1,4), WallDirection.RIGHT),
                 new Wall(new Position(0,5), WallDirection.DOWN)
         };
         this.board.executeAction(p, new PlaceWallAction(blockers[0]));
@@ -125,14 +125,14 @@ public class GameRulesTest {
         // Expecting the pawn to be on (1,4)
         @SuppressWarnings("all")
         Pair<Wall,MovementDirection>[] blockers = new Pair[] {
-                Pair.of(new Wall(new Position(1,5), WallDirection.DOWN), MovementDirection.RIGHT),
-                Pair.of(new Wall(new Position(0,5), WallDirection.DOWN), MovementDirection.RIGHT),
-                Pair.of(new Wall(new Position(1,4), WallDirection.DOWN), MovementDirection.LEFT),
-                Pair.of(new Wall(new Position(0,4), WallDirection.DOWN), MovementDirection.LEFT),
-                Pair.of(new Wall(new Position(2,4), WallDirection.RIGHT), MovementDirection.DOWN),
-                Pair.of(new Wall(new Position(2,3), WallDirection.RIGHT), MovementDirection.DOWN),
-                Pair.of(new Wall(new Position(1,4), WallDirection.RIGHT), MovementDirection.UP),
-                Pair.of(new Wall(new Position(1,3), WallDirection.RIGHT), MovementDirection.UP),
+                Pair.of(new Wall(new Position(1,4), WallDirection.DOWN), MovementDirection.RIGHT),
+                Pair.of(new Wall(new Position(0,4), WallDirection.DOWN), MovementDirection.RIGHT),
+                Pair.of(new Wall(new Position(1,3), WallDirection.DOWN), MovementDirection.LEFT),
+                Pair.of(new Wall(new Position(0,3), WallDirection.DOWN), MovementDirection.LEFT),
+                Pair.of(new Wall(new Position(1,4), WallDirection.RIGHT), MovementDirection.DOWN),
+                Pair.of(new Wall(new Position(1,3), WallDirection.RIGHT), MovementDirection.DOWN),
+                Pair.of(new Wall(new Position(0,3), WallDirection.RIGHT), MovementDirection.UP),
+                Pair.of(new Wall(new Position(0,4), WallDirection.RIGHT), MovementDirection.UP),
         };
 
         for (Pair<Wall, MovementDirection> block : blockers) {

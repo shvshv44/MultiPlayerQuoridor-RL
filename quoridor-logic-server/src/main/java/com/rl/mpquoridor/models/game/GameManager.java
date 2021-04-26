@@ -33,6 +33,7 @@ public class GameManager {
 
     public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
+        Collections.shuffle((List<?>) this.players);
         this.gameId = gameId;
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
@@ -73,6 +74,7 @@ public class GameManager {
         GameResult gameResult = new GameResult();
         gameResult.setGameId(this.gameId);
         gameResult.setStartingWallCount(numberOfWallsPerPlayer);
+        gameResult.setPawnEndLine(this.gameBoard.getReadOnlyPhysicalBoard().getPawnEndLine());
         gameResult.setPlayOrder(this.gameBoard.getPlayOrder());
         gameResult.setStartingPosition(this.gameBoard.getReadOnlyPhysicalBoard().getAllPawnPosition());
         boolean isGameEnded = (this.gameBoard.getWinner() != null);

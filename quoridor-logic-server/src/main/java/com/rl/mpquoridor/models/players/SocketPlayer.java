@@ -19,10 +19,7 @@ import com.rl.mpquoridor.models.websocket.NewTurnMessage;
 import com.rl.mpquoridor.models.websocket.StartGameMessage;
 import com.rl.mpquoridor.models.websocket.actions.WebSocketAction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class SocketPlayer implements Player{
 
@@ -71,7 +68,7 @@ public abstract class SocketPlayer implements Player{
                 PlayerPosition playerPosition = new PlayerPosition();
                 playerPosition.setName(startGameEvent.getPawnPerPlayerName().get(currPawn));
                 playerPosition.setPosition(this.board.getPawnPosition(currPawn));
-
+                playerPosition.setEndLine(new HashSet<>(this.board.getPawnEndLine().get(currPawn)));
                 message.getPlayers().add(playerPosition);
             }
             this.sendEvent(message);

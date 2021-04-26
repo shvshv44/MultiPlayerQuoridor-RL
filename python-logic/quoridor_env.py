@@ -43,6 +43,7 @@ class QuoridorEnv(gym.Env):
         self.winner_status = GameWinnerStatus.NoWinner
         self.last_turn_illegal = False
         self.action_options = []
+        self.winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
 
         # join_game(self.game_id, self.player_name)
 
@@ -52,6 +53,7 @@ class QuoridorEnv(gym.Env):
         self.action_space = spaces.Discrete(Global.num_of_actions)
 
         self.observation_space = spaces.Tuple((
+            spaces.MultiBinary([9, 9]),
             spaces.MultiBinary([9, 9]),
             spaces.MultiBinary([9, 9]),
             spaces.MultiBinary([9, 9]),
@@ -84,19 +86,19 @@ class QuoridorEnv(gym.Env):
         return self.board
 
     def calculate_reward(self):
-        reward = 0
+        reward = -1
         done = False
 
         if self.last_turn_illegal:
-            reward = -1
+            reward = -10
             self.last_turn_illegal = False
 
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 10
+                reward = 200
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -10
+                reward = -200
 
         return reward, done
 
@@ -141,7 +143,7 @@ class QuoridorEnv(gym.Env):
         dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
         dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
 
-        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"]))
+        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], self.winning_points_dim))
         return all_dims
 
     def send_to_server(self, operation):
@@ -163,6 +165,8 @@ class QuoridorEnv(gym.Env):
                 self.winner_status = GameWinnerStatus.EnvWinner
             else:
                 self.winner_status = GameWinnerStatus.EnvLoser
+        elif json_message["type"] == "StartGameMessage":
+            self.update_winning_locations(json_message["players"])
 
     def action_shape(self):
         return action_shape()
@@ -192,3 +196,12 @@ class QuoridorEnv(gym.Env):
 
     def get_action_options(self):
         return self.action_options
+
+    def update_winning_locations(self, players):
+        for player in players:
+            if player["name"] == self.player_name:
+                for loc in player["endLine"]:
+                    x = int(loc["x"])
+                    y = int(loc["y"])
+                    self.winning_points_dim[y, x] = 1
+        print(self.winning_points_dim)

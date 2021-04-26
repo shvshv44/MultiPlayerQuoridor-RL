@@ -22,6 +22,8 @@ public class PhysicalBoard {
     private BiMap<Pawn, Position> pawns;
     private Map<Pawn, Integer> pawnWalls;
     private int startNumberOfWallsPerPlayer;
+    private Map<Pawn, Set<Position>> pawnEndLine;
+
 
     public PhysicalBoard(int numberOfWallsPerPlayer) {
         this.pawnWalls = new HashMap<>();
@@ -87,4 +89,13 @@ public class PhysicalBoard {
     public Map<Pawn, Position> getAllPawnPosition() {
         return Collections.unmodifiableMap(this.pawns);
     }
+
+    public Map<Pawn, Set<Position>> getPawnEndLine() {
+        return pawnEndLine;
+    }
+
+    public void setPawnEndLine(final Map<Pawn, Set<Position>> pawnEndLine) {
+        this.pawnEndLine = pawnEndLine;
+    }
+
 }

@@ -3,7 +3,8 @@ from quoridor_env import QuoridorEnv
 import threading
 import time
 
-
+# Do not use - this is deprecated
+# Didn't work with multithreading
 class AgentTrainer:
 
     def __init__(self, agent, agent_trainer):

@@ -1,7 +1,7 @@
 from api import MovementDirection
 
 class Global:
-    server = "http://localhost:8080"
+    server = "http://193.106.55.110:8080"
     competitive_agent = "http://localhost:8001"
     movements = list(map(lambda c: c, MovementDirection))
 

@@ -1,5 +1,6 @@
 import json
 from globals import Global
+import numpy as np
 
 
 def convert_action_to_server(action):
@@ -28,3 +29,12 @@ def convert_action_to_server(action):
         )
 
     return output
+
+def convert_board(board, winning_points_dim):
+    dim1 = np.zeros((9, 9), dtype=int)
+    dim2 = np.zeros((9, 9), dtype=int)
+    dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
+    dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
+
+    all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], winning_points_dim))
+    return all_dims

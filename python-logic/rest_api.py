@@ -29,6 +29,17 @@ def start_game(game_id):
     response = http.get(start_url)
     return response
 
+def history_game(game_id):
+    start_url = server + "/History/" + game_id
+    response = http.get(start_url)
+    return response.content.decode("utf-8")
+
+def get_history_game_ids():
+    start_url = server + "/HistoryIds"
+    response = http.get(start_url)
+    return response.content.decode("utf-8")
+
+
 
 def join_competitive_agent(game_id):
     start_url = competitive_agent + "/AddCompetitiveAgentToGame/" + game_id

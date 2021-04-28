@@ -35,11 +35,13 @@ public class MongoDB implements AutoCloseable{
     }
 
     public void save(GameResult result) {
+
         this.mongo.getDatabase(DB).getCollection(COLLECTION).insertOne(convert(result));
     }
 
     public FindIterable<Document> selectHistory() {
-        return this.mongo.getDatabase(DB).getCollection(COLLECTION).find();
+
+        return this.mongo.getDatabase(DB).getCollection(COLLECTION).find(QUERIES.FILTER_TWO_PLAYERS);
     }
 
     private Document convert(GameResult obj) {
@@ -62,5 +64,10 @@ public class MongoDB implements AutoCloseable{
 
     public DeleteResult deleteGame(String gameId) {
         return this.mongo.getDatabase(DB).getCollection(COLLECTION).deleteOne(new Document("gameId", gameId));
+    }
+
+
+    private static class QUERIES {
+        public static Document FILTER_TWO_PLAYERS = new Document("playOrder", new Document("$size", 2));
     }
 }

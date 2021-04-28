@@ -24,10 +24,10 @@ class Model:
 
     def build_model(self, states, actions):
         model = Sequential()
-        model.add(Conv2D(8, (3, 3), padding='same', input_shape=states))
-        model.add(Conv2D(16, (3, 3), padding='same', input_shape=states))
+        model.add(Conv2D(12, (3, 3), padding='same', input_shape=states))
+        model.add(Conv2D(24, (3, 3), padding='same', input_shape=states))
         model.add(Flatten())
-        model.add(Dense(324, activation='relu'))
+        model.add(Dense(300 , activation='relu'))
         model.add(Dense(actions, activation='linear'))
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
         return model
@@ -39,8 +39,8 @@ class Agent:
         self.memory = deque(maxlen=2000)
 
         self.gamma = 0.85
-        self.epsilon = 1.0
-        self.epsilon_min = 0.01
+        self.epsilon = 0.9
+        self.epsilon_min = 0.1
         self.epsilon_decay = 0.995
         self.tau = .125
 
@@ -75,7 +75,11 @@ class Agent:
         self.memory.append([state, action, reward, new_state, done])
 
     def replay(self, env):
-        batch_size = 32
+        batch_size = 16
+
+        if len(self.memory) < batch_size:
+            batch_size = 8
+
         if len(self.memory) < batch_size:
             return
 

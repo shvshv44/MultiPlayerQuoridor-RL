@@ -43,7 +43,8 @@ class QuoridorEnv(gym.Env):
         self.winner_status = GameWinnerStatus.NoWinner
         self.last_turn_illegal = False
         self.action_options = []
-        self.winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.player_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.opponent_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
 
         # join_game(self.game_id, self.player_name)
 
@@ -143,7 +144,7 @@ class QuoridorEnv(gym.Env):
         dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
         dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
 
-        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], self.winning_points_dim))
+        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], self.player_winning_points_dim, self.opponent_winning_points_dim))
         return all_dims
 
     def send_to_server(self, operation):
@@ -186,4 +187,12 @@ class QuoridorEnv(gym.Env):
                 for loc in player["endLine"]:
                     x = int(loc["x"])
                     y = int(loc["y"])
-                    self.winning_points_dim[y, x] = 1
+                    self.player_winning_points_dim[y, x] = 1
+
+    def update_winning_locations_for_opponent(self, players):
+        for player in players:
+            if player["name"] != self.player_name:
+                for loc in player["endLine"]:
+                    x = int(loc["x"])
+                    y = int(loc["y"])
+                    self.opponent_winning_points_dim[y, x] = 1

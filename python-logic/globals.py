@@ -13,4 +13,5 @@ class Global:
     #   3. horizontal walls location on board
     #   4. vertical walls location on board
     #   5. main player goal locations on board
-    observation_shape = (1,) + (9, 9, 5)  # window length + board shape
+    #   6. opponent player goal locations on board
+    observation_shape = (1,) + (9, 9, 6)  # window length + board shape

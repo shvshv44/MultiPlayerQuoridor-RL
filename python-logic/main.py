@@ -2,8 +2,7 @@ import logging
 from datetime import datetime
 
 # do not delete imports at any cost!
-from agent import Agent
-from model import Model
+from competitive_agent_trainer import CompetitiveAgentTrainer
 
 from auto_agent import AutoAgent
 from globals import Global
@@ -45,6 +44,15 @@ def train_agent(episodes):
     global model
     agent = costum_agent.Agent(model)
     trainer = Trainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+@route('/TrainAgentByAgent/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = CompetitiveAgentTrainer(agent)
     trainer.start_training_session(int(episodes))
 
     return "Trained Successfully!"

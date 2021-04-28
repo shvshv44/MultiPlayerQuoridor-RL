@@ -75,7 +75,7 @@ class Agent:
         self.memory.append([state, action, reward, new_state, done])
 
     def replay(self, env):
-        batch_size = 32
+        batch_size = 16
         if len(self.memory) < batch_size:
             return
 

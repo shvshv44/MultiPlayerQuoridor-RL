@@ -3,6 +3,7 @@ package com.rl.mpquoridor.controllers;
 import com.mongodb.client.result.DeleteResult;
 import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.board.Wall;
@@ -10,6 +11,7 @@ import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.enums.WallDirection;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
+import com.rl.mpquoridor.models.gameroom.PlayerPosition;
 import com.rl.mpquoridor.models.players.Player;
 import com.rl.mpquoridor.models.players.WebSocketPlayer;
 import com.rl.mpquoridor.services.GameRoomsManagerService;
@@ -69,8 +71,7 @@ public class GameAPIController {
 
         Queue<Player> copiedPlayers = new LinkedList<>(gameManager.getPlayers());
 
-        List<Position> playersPositions = copiedPlayers.stream().map(gameManager.getPlayerPawn()::get)
-                .map(gameManager.getGameBoard().getReadOnlyPhysicalBoard()::getPawnPosition).collect(Collectors.toList());
+        List<PlayerPosition> playersPositions = getAllPlayerPositions(gameManager, copiedPlayers);
 
         int[][] horizontalWalls = new int[9][9];
         int[][] verticalWalls = new int[9][9];
@@ -84,6 +85,20 @@ public class GameAPIController {
         map.put("verticalWalls", verticalWalls);
 
         return map;
+    }
+
+    private List<PlayerPosition> getAllPlayerPositions(GameManager gameManager, Queue<Player> copiedPlayers) {
+        List<PlayerPosition> playerPositions = new ArrayList<>();
+        while (! copiedPlayers.isEmpty()) {
+            Player player = copiedPlayers.poll();
+            Pawn pawn = gameManager.getPlayerPawn().get(player);
+            PlayerPosition playerPosition = new PlayerPosition();
+            playerPosition.setName(player.getPlayerName());
+            playerPosition.setPosition(gameManager.getGameBoard().getReadOnlyPhysicalBoard().getPawnPosition(pawn));
+            playerPositions.add(playerPosition);
+        }
+
+        return playerPositions;
     }
 
     private int[][] initVerticalWalls(ReadOnlyPhysicalBoard board) {

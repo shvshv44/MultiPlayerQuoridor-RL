@@ -41,10 +41,16 @@ class QuoridorEnv(gym.Env):
         self.player_name = player_name
         self.is_my_turn = False
         self.winner_status = GameWinnerStatus.NoWinner
-        self.last_turn_illegal = False
         self.action_options = []
         self.player_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
         self.opponent_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.player_winning_points = []
+        self.opponent_winning_points = []
+        self.player_location = (-1, -1)
+        self.opponent_location = (-1, -1)
+        self.player_start_location = (-1, -1)
+        self.opponent_start_location = (-1, -1)
+        self.winner_name = ""
 
         # join_game(self.game_id, self.player_name)
 
@@ -87,19 +93,15 @@ class QuoridorEnv(gym.Env):
         return self.board
 
     def calculate_reward(self):
-        reward = -1
+        reward = -10 * self.calculate_closest_goal_distance(self.player_winning_points, self.player_location) + 10 * self.calculate_closest_goal_distance(self.opponent_winning_points, self.opponent_location)
         done = False
-
-        if self.last_turn_illegal:
-            reward = -10
-            self.last_turn_illegal = False
 
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 200
+                reward = 1000000
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -200
+                reward = -1000000
 
         return reward, done
 
@@ -141,10 +143,16 @@ class QuoridorEnv(gym.Env):
         board = json.loads(get_board(self.game_id).content)
         dim1 = np.zeros((9, 9), dtype=int)
         dim2 = np.zeros((9, 9), dtype=int)
-        dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
-        dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
+        print(board)
+        pi = self.find_player_index(board["players"])
+        oi = self.find_opponent_index(board["players"])
+        dim1[board["players"][pi]["position"]["y"]][board["players"][pi]["position"]["x"]] = 1
+        dim2[board["players"][oi]["position"]["y"]][board["players"][oi]["position"]["x"]] = 1
+        self.player_location = (int(board["players"][pi]["position"]["y"]), int(board["players"][pi]["position"]["x"]))
+        self.opponent_location = (int(board["players"][oi]["position"]["y"]), int(board["players"][oi]["position"]["x"]))
 
-        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], self.player_winning_points_dim, self.opponent_winning_points_dim))
+        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"],
+                              self.player_winning_points_dim, self.opponent_winning_points_dim))
         return all_dims
 
     def send_to_server(self, operation):
@@ -152,22 +160,24 @@ class QuoridorEnv(gym.Env):
 
     def on_recieved(self, json_message):
 
-        if json_message["type"] == "IllegalMove":
-            # self.is_my_turn = True
-            self.last_turn_illegal = True
-        elif json_message["type"] == "NewTurnEvent":
+        if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True
                 self.update_action_options(json_message)
         elif json_message["type"] == "GameOverEvent":
             self.is_my_turn = True
+            self.winner_name = json_message["winnerName"]
             if json_message["winnerName"] == self.player_name:
                 self.winner_status = GameWinnerStatus.EnvWinner
             else:
                 self.winner_status = GameWinnerStatus.EnvLoser
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])
+            self.update_winning_locations_for_opponent(json_message["players"])
+            self.player_start_location = self.get_start_player_location(json_message["players"])
+            self.opponent_start_location = self.get_start_opponent_location(json_message["players"])
+
 
     def action_shape(self):
         return action_shape()
@@ -184,6 +194,7 @@ class QuoridorEnv(gym.Env):
     def update_winning_locations(self, players):
         for player in players:
             if player["name"] == self.player_name:
+                self.player_winning_points = player["endLine"]
                 for loc in player["endLine"]:
                     x = int(loc["x"])
                     y = int(loc["y"])
@@ -192,7 +203,58 @@ class QuoridorEnv(gym.Env):
     def update_winning_locations_for_opponent(self, players):
         for player in players:
             if player["name"] != self.player_name:
+                self.opponent_winning_points = player["endLine"]
                 for loc in player["endLine"]:
                     x = int(loc["x"])
                     y = int(loc["y"])
                     self.opponent_winning_points_dim[y, x] = 1
+
+    def get_start_player_location(self, players):
+        loc = (-1, -1)
+        for player in players:
+            if player["name"] == self.player_name:
+                x = int(player["position"]["x"])
+                y = int(player["position"]["y"])
+                loc = (y, x)
+
+        return loc
+
+    def get_start_opponent_location(self, players):
+        loc = (-1, -1)
+        for player in players:
+            if player["name"] != self.player_name:
+                x = int(player["position"]["x"])
+                y = int(player["position"]["y"])
+                loc = (y, x)
+
+        return loc
+
+
+    def calculate_closest_goal_distance(self, winning_points, location):
+        closest = 1000000
+        for point in winning_points:
+            distance = pow(int(point["x"]) - location[0], 2) + pow(int(point["y"]) - location[1], 2)
+            if distance < closest:
+                closest = distance
+
+        return closest
+
+    def find_player_index(self, players):
+        index = 0
+        found = 0
+        for player in players:
+            if player["name"] == self.player_name:
+                found = index
+            index += 1
+
+        return found
+
+    def find_opponent_index(self, players):
+        index = 0
+        found = 0
+        for player in players:
+            if player["name"] != self.player_name:
+                found = index
+            index += 1
+
+        return found

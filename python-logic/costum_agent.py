@@ -27,7 +27,8 @@ class Model:
         model.add(Conv2D(12, (3, 3), padding='same', input_shape=states))
         model.add(Conv2D(24, (3, 3), padding='same', input_shape=states))
         model.add(Flatten())
-        model.add(Dense(300 , activation='relu'))
+        model.add(Dense(actions * 3, activation='relu'))
+        model.add(Dense(actions * 2 , activation='relu'))
         model.add(Dense(actions, activation='linear'))
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
         return model

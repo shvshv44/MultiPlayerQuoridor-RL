@@ -11,8 +11,8 @@ class Trainer:
     def __init__(self, agent):
         self.agent = agent
         self.name = "Trainer"
-        self.overfitting_limitation_winning_games = 3 # how many winning games will be overfitting
-        self.overfitting_limitation_winning_steps = 70 # how many steps will be considered good game
+        self.overfitting_limitation_winning_games = 7 # how many winning games will be overfitting
+        self.overfitting_limitation_winning_steps = 60 # how many steps will be considered good game
 
     def start_training_session(self, num_of_episodes):
         num_of_agent_good_winning = 0

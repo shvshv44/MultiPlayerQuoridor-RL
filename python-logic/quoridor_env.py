@@ -17,6 +17,11 @@ class GameWinnerStatus(Enum):
     EnvLoser = 2
 
 
+class MoveType(Enum):
+    MOVE = 0
+    WALL = 1
+
+
 def action_shape():
     return 1
 
@@ -51,6 +56,7 @@ class QuoridorEnv(gym.Env):
         self.player_start_location = (-1, -1)
         self.opponent_start_location = (-1, -1)
         self.winner_name = ""
+        self.last_move_type = MoveType.MOVE
 
         # join_game(self.game_id, self.player_name)
 
@@ -93,9 +99,16 @@ class QuoridorEnv(gym.Env):
         return self.board
 
     def calculate_reward(self):
-        reward = -10 * self.calculate_closest_goal_distance(self.player_winning_points, self.player_location) + 10 * self.calculate_closest_goal_distance(self.opponent_winning_points, self.opponent_location)
         done = False
 
+        # To prefer be close to goal and keep opponent far from goal
+        reward = -10 * self.calculate_closest_goal_distance(self.player_winning_points, self.player_location) + 10 * self.calculate_closest_goal_distance(self.opponent_winning_points, self.opponent_location)
+
+        # To prefer saving the walls for good moments
+        if self.last_move_type == MoveType.WALL:
+            reward -= 50
+
+        # To prefer to win
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
@@ -106,6 +119,11 @@ class QuoridorEnv(gym.Env):
         return reward, done
 
     def update_board(self, action):
+        if 0 <= action <= 3:
+            self.last_move_type = MoveType.MOVE
+        else:
+            self.last_move_type = MoveType.WALL
+
         operation = utils.convert_action_to_server(action)
         self.send_to_server(operation)  # WAITING
 

@@ -98,4 +98,7 @@ public class PhysicalBoard {
         this.pawnEndLine = pawnEndLine;
     }
 
+    public void setPawnWalls(Map<Pawn, Integer> pawnWalls) {
+        this.pawnWalls = new HashMap<>(pawnWalls);
+    }
 }

@@ -8,6 +8,7 @@ import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.GameBoard;
 import com.rl.mpquoridor.models.board.Pawn;
 import com.rl.mpquoridor.models.board.Position;
+import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.events.EndTurnEvent;
 import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class GameManager {
@@ -38,6 +40,36 @@ public class GameManager {
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
+    }
+
+    public GameManager(String gameId,
+                       List<Player> playOrder,
+                       Player currentPlayer,
+                       Map<Player, Integer> playerWalls,
+                       Map<Player, Position> playerPosition,
+                       Set<Wall> walls,
+                       Map<Player, Set<Position>> playerEndline
+                       )
+    {
+        this.numberOfWallsPerPlayer = -1; // Unknown starting walls (Should not matter)
+        this.players.addAll(playOrder);
+        this.gameId = gameId;
+        this.playerPawn = HashBiMap.create(playOrder.size());
+        playOrder.forEach(p -> playerPawn.put(p, new Pawn()));
+        Map<Pawn,Position> pawnPosition = new HashMap<>();
+        playerPosition.forEach((pl, po) -> pawnPosition.put(playerPawn.get(pl), po));
+        Map<Pawn, Integer> pawnWalls = new HashMap<>();
+        playerWalls.forEach((p,n) -> pawnWalls.put(playerPawn.get(p), n));
+        List<Pawn> pawnPlayOrder = playOrder.stream().map(playerPawn::get).collect(Collectors.toList());
+        Map<Pawn,Set<Position>> pawnEndLine = new HashMap<>();
+        playerEndline.forEach((p,e) -> pawnEndLine.put(playerPawn.get(p),e));
+        this.gameBoard = new GameBoard(pawnPosition,
+                pawnWalls,
+                pawnPlayOrder,
+                playerPawn.get(currentPlayer),
+                walls,
+                pawnEndLine
+                );
     }
 
     public Queue<Player> getPlayers() {

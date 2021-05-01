@@ -19,6 +19,24 @@ public class GameBoard {
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
 
+
+    public GameBoard(Map<Pawn, Position> pawns,
+                     Map<Pawn, Integer> pawnWalls,
+                     List<Pawn> playOrder,
+                     Pawn currentTurn,
+                     Set<Wall> walls,
+                     Map<Pawn, Set<Position>> pawnEndLine
+                     ) {
+        this.board = new PhysicalBoard();
+        this.board.setPawnPosition(pawns);
+        this.board.setPawnEndLine(pawnEndLine);
+        walls.forEach(this.board::putWall);
+        this.board.setPawnWalls(pawnWalls);
+        while(playOrder.get(0) != currentTurn) {
+            playOrder.add(playOrder.remove(0));
+        }
+    }
+
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
         this.board = new PhysicalBoard(numberOfWallsPerPlayer);

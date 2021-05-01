@@ -27,9 +27,9 @@ model = load_model("")
 @route('/AddCompetitiveAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
     global model
-    #model = load_model("./models/quoridor.h5")
     print("adding agent to game id {}".format(game_id_to_join))
     agent = costum_agent.Agent(model)
+    agent.model.load_weights('./models/quoridor.h5')
     auto_agent = AutoAgent(agent)
     auto_agent.join_game_and_start(game_id_to_join)
     return "Add agent to game id " + game_id_to_join

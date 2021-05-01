@@ -31,7 +31,7 @@ class AgentTrainer:
             self.headline_print("end of episode number {}".format(episode_num + 1))
 
     def start_game_with_agent(self, game_id):
-        env = QuoridorEnv(game_id, "Agent")
+        env = QuoridorEnv(game_id, "Agent", False)
 
         cur_state = env.reset()
         done = False
@@ -52,7 +52,7 @@ class AgentTrainer:
     def start_game_with_trainer(self, game_id):
         start_game_thr = threading.Thread(target=self.start_game, args=[self.game_id])
         start_game_thr.start()
-        env_trainer = QuoridorEnv(game_id, self.name)
+        env_trainer = QuoridorEnv(game_id, self.name, False)
 
         cur_state_trainer = env_trainer.reset()
 

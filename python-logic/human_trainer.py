@@ -9,7 +9,7 @@ class HumanTrainer:
         self.agent = agent
 
     def start_game_with_agent(self, game_id):
-        env = QuoridorEnv(game_id, "Agent")
+        env = QuoridorEnv(game_id, "Agent", False)
 
         cur_state = env.reset()
         done = False

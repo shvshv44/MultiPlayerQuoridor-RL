@@ -24,7 +24,7 @@ class AutoAgent:
         self.start_game_with_agent(self.game_id)
 
     def start_game_with_agent(self, game_id):
-        env = QuoridorEnv(game_id, self.name)
+        env = QuoridorEnv(game_id, self.name, False)
 
         done = False
         steps_num = 0

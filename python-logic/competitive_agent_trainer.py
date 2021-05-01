@@ -28,7 +28,7 @@ class CompetitiveAgentTrainer:
             self.headline_print("end of episode number {}".format(episode_num + 1))
 
     def start_game_with_agent(self, game_id):
-        env = QuoridorEnv(game_id, self.name)
+        env = QuoridorEnv(game_id, self.name, False)
 
         cur_state = env.reset()
         done = False

@@ -3,10 +3,9 @@ package com.rl.mpquoridor.controllers;
 import com.mongodb.client.result.DeleteResult;
 import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
-import com.rl.mpquoridor.models.board.Position;
-import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
-import com.rl.mpquoridor.models.board.Wall;
+import com.rl.mpquoridor.models.board.*;
 import com.rl.mpquoridor.models.common.Constants;
+import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
 import com.rl.mpquoridor.models.game.GameManager;
 import com.rl.mpquoridor.models.gameroom.GameRoomState;
@@ -228,6 +227,46 @@ public class GameAPIController {
             status = HttpStatus.ACCEPTED;
         }
         return createBasicResponse(deleteResult, status);
+    }
+
+
+    /**
+     * Generates all the boards that can be achieved by doing one move
+     * in the given board
+     *
+     * @param board - given board state.
+     * @return - A List of the next layer in the tree.
+     */
+    @CrossOrigin
+    @PostMapping("/Generate/NextBoards")
+    @ResponseBody
+    public ResponseEntity<List<PhysicalBoard>> generateNextLayer(@RequestBody InputBoard board) {
+        GameBoard root = new GameBoard(board);
+        List<PhysicalBoard> allBoards = new LinkedList<>();
+        Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
+
+        // Handling walls
+        if(root.getReadOnlyPhysicalBoard().getPawnWalls().get(playing) > 0) {
+            for (Wall w: root.getAvailableWalls(playing)) {
+                PhysicalBoard tmp = new PhysicalBoard(root.board);
+                tmp.putWall(w);
+                tmp.reduceWallToPawn(playing);
+                allBoards.add(tmp);
+            }
+        }
+
+        // Handling movements
+        for(MovementDirection direction : MovementDirection.values()) {
+            Position destination = root.simulateMove(playing, direction);
+            if(destination != null) {
+                PhysicalBoard tmp = new PhysicalBoard((root.board));
+                tmp.movePawn(playing, destination);
+                allBoards.add(tmp);
+            }
+
+        }
+
+        return createBasicResponse(allBoards, HttpStatus.OK);
     }
 
     private ResponseEntity<String> createBasicBadRequestResponse(String message) {

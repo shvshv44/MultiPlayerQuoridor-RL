@@ -13,11 +13,30 @@ import java.util.*;
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
 
 public class GameBoard {
-    private final PhysicalBoard board;
+    public final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     @Getter
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
+
+    public GameBoard(InputBoard source) {
+        this.board = new PhysicalBoard();
+        this.readOnlyPhysicalBoard = new ReadOnlyPhysicalBoard(this.board);
+        Pawn p1 = new Pawn();
+        Pawn p2 = new Pawn();
+        Map<Pawn, Position> pawnPosition = new HashMap<>();
+        pawnPosition.put(p1, source.getP1Pos());
+        pawnPosition.put(p2, source.getP2Pos());
+        Map<Pawn, Set<Position>> pawnEndLine = new HashMap<>();
+        pawnEndLine.put(p1, source.getP1EndLine());
+        pawnEndLine.put(p2, source.getP2EndLine());
+        Map<Pawn, Integer> pawnWallCount = new HashMap<>();
+        pawnWallCount.put(p1, source.getP1Walls());
+        pawnWallCount.put(p2, source.getP2Walls());
+        this.board.setPawnPosition(pawnPosition);
+        this.board.setPawnEndLine(pawnEndLine);
+        this.board.setPawnWalls(pawnWallCount);
+    }
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
@@ -150,8 +169,8 @@ public class GameBoard {
 
     public Set<Wall> getAvailableWalls(Pawn pawn) {
         Set<Wall> ret = new HashSet<>();
-        for (int i = 0; i < this.getPhysicalBoard().getSize() - 1; i++) {
-            for (int j = 0; j < this.getPhysicalBoard().getSize() - 1; j++) {
+        for (int i = 0; i < this.getPhysicalBoard().getSize() - 2; i++) {
+            for (int j = 0; j < this.getPhysicalBoard().getSize() - 2; j++) {
                 for (WallDirection direction : WallDirection.values()) {
                     Wall w = new Wall(new Position(i, j), direction);
                     try {
@@ -286,6 +305,10 @@ public class GameBoard {
         }
 
         return position;
+    }
+
+    public Position simulateMove(Pawn p, MovementDirection direction) {
+        return simulateMove(this.getReadOnlyPhysicalBoard().getPawnPosition(p), direction);
     }
 
     private Position simulateUpMove(Position s) {

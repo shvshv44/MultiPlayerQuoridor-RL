@@ -8,6 +8,7 @@ import json
 from tcp import TCP
 import utils
 from globals import Global
+from utils import convert_board
 import os
 
 
@@ -36,7 +37,7 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def __init__(self, game_id, player_name):
+    def __init__(self, game_id, player_name, is_not_tcp):
         self.game_id = game_id
         self.player_name = player_name
         self.is_my_turn = False
@@ -47,8 +48,9 @@ class QuoridorEnv(gym.Env):
 
         # join_game(self.game_id, self.player_name)
 
-        self.tcp = TCP(game_id, player_name, self.on_recieved)
-        self.wait_for_my_turn()
+        if not is_not_tcp:
+            self.tcp = TCP(game_id, player_name, self.on_recieved)
+            self.wait_for_my_turn()
 
         self.action_space = spaces.Discrete(Global.num_of_actions)
 
@@ -63,7 +65,7 @@ class QuoridorEnv(gym.Env):
         self.seed()
 
         # Start the first game
-        self.reset()
+        #self.reset()
 
     def step(self, action):
         assert self.action_space.contains(action)
@@ -138,19 +140,12 @@ class QuoridorEnv(gym.Env):
 
     def get_and_convert_board(self):
         board = json.loads(get_board(self.game_id).content)
-        dim1 = np.zeros((9, 9), dtype=int)
-        dim2 = np.zeros((9, 9), dtype=int)
-        dim1[board["players"][0]["y"]][board["players"][0]["x"]] = 1
-        dim2[board["players"][1]["y"]][board["players"][1]["x"]] = 1
-
-        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"], self.winning_points_dim))
-        return all_dims
+        return convert_board(board, self.winning_points_dim)
 
     def send_to_server(self, operation):
         self.tcp.write(operation)
 
     def on_recieved(self, json_message):
-
         if json_message["type"] == "IllegalMove":
             # self.is_my_turn = True
             self.last_turn_illegal = True

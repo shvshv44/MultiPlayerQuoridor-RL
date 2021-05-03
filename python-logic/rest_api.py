@@ -3,6 +3,7 @@ import requests as http
 from globals import Global
 
 server = Global.server
+competitive_agent = Global.competitive_agent
 
 
 def create_game(name):
@@ -25,5 +26,22 @@ def join_game(game_id, name):
 
 def start_game(game_id):
     start_url = server + "/StartGame/" + game_id
+    response = http.get(start_url)
+    return response
+
+def history_game(game_id):
+    start_url = server + "/History/" + game_id
+    response = http.get(start_url)
+    return response.content.decode("utf-8")
+
+def get_history_game_ids():
+    start_url = server + "/HistoryIds"
+    response = http.get(start_url)
+    return response.content.decode("utf-8")
+
+
+
+def join_competitive_agent(game_id):
+    start_url = competitive_agent + "/AddCompetitiveAgentToGame/" + game_id
     response = http.get(start_url)
     return response

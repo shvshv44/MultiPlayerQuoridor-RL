@@ -2,15 +2,16 @@ import logging
 from datetime import datetime
 
 # do not delete imports at any cost!
-from agent import Agent
-from model import Model
+from competitive_agent_trainer import CompetitiveAgentTrainer
 
 from auto_agent import AutoAgent
 from globals import Global
 from trainer import Trainer
 from human_trainer import HumanTrainer
+from history_trainer import HistoryTrainer
 import costum_agent
 import keras
+import rest_api
 
 from bottle import route, run
 
@@ -47,6 +48,15 @@ def train_agent(episodes):
 
     return "Trained Successfully!"
 
+@route('/TrainAgentByAgent/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = CompetitiveAgentTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
 
 @route('/TrainAgentByHuman/<game_id>', methods=['GET'])
 def train_agent_human(game_id):
@@ -54,6 +64,15 @@ def train_agent_human(game_id):
     agent = costum_agent.Agent(model)
     trainer = HumanTrainer(agent)
     trainer.start_game_with_agent(game_id)
+    return "Trained By Human Successfully!"
+
+
+@route('/TrainAgentByHistory', methods=['GET'])
+def train_agent_history():
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = HistoryTrainer(agent)
+    trainer.start()
     return "Trained By Human Successfully!"
 
 

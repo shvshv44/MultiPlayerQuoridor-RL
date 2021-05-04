@@ -1,8 +1,12 @@
 package com.rl.mpquoridor.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.result.DeleteResult;
 import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
+import com.rl.mpquoridor.models.actions.MovePawnAction;
+import com.rl.mpquoridor.models.actions.PlaceWallAction;
+import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.board.*;
 import com.rl.mpquoridor.models.common.Constants;
 import com.rl.mpquoridor.models.enums.MovementDirection;
@@ -113,7 +117,7 @@ public class GameAPIController {
     @GetMapping("/CreateGame/{playerName}")
     @ResponseBody
     public ResponseEntity<String> createGame(@PathVariable String playerName) {
-        if(playerName == null || playerName.equals(""))
+        if (playerName == null || playerName.equals(""))
             return createBasicBadRequestResponse("Name must contain at least one character!");
 
         String gameId = gameRoomManager.createGame();
@@ -128,7 +132,7 @@ public class GameAPIController {
         String gameId = gameRoomManager.createGame();
         logger.info(playerName + " has been created game room with id: " + gameId);
 
-        ResponseEntity<String> joinGameResponse= this.joinGame(gameId, playerName);
+        ResponseEntity<String> joinGameResponse = this.joinGame(gameId, playerName);
         executor.submit(() -> joinAgentToTheGame(gameId));
 
         return joinGameResponse;
@@ -145,10 +149,10 @@ public class GameAPIController {
     @ResponseBody
     public ResponseEntity<String> joinGame(@PathVariable String gameId, @PathVariable String playerName) {
 
-        if(playerName == null || playerName.equals(""))
+        if (playerName == null || playerName.equals(""))
             return createBasicBadRequestResponse("Name must contain at least one character!");
 
-        if(gameRoomManager.getRoomState(gameId).getPlayers().containsKey(playerName))
+        if (gameRoomManager.getRoomState(gameId).getPlayers().containsKey(playerName))
             return createBasicBadRequestResponse("This name was already taken by another room member... replace it please.");
 
         if (gameRoomManager.getRoomState(gameId).isGameStarted())
@@ -207,7 +211,7 @@ public class GameAPIController {
     @ResponseBody
     public ResponseEntity<Document> historyByGameId(@PathVariable String id) {
         Document d = historyResolver.getById(id);
-        if( d == null) {
+        if (d == null) {
             return createBasicResponse(NOT_FOUND_DOCUMENT, HttpStatus.NOT_FOUND);
         } else {
             return createBasicResponse(d, HttpStatus.OK);
@@ -221,7 +225,7 @@ public class GameAPIController {
     public ResponseEntity<DeleteResult> deleteGameFromHistory(@PathVariable String gameId) {
         DeleteResult deleteResult = MongoDB.getInstance().deleteGame(gameId);
         HttpStatus status;
-        if(deleteResult.getDeletedCount() == 0){
+        if (deleteResult.getDeletedCount() == 0) {
             status = HttpStatus.NOT_FOUND;
         } else {
             status = HttpStatus.ACCEPTED;
@@ -246,8 +250,8 @@ public class GameAPIController {
         Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
 
         // Handling walls
-        if(root.getReadOnlyPhysicalBoard().getPawnWalls().get(playing) > 0) {
-            for (Wall w: root.getAvailableWalls(playing)) {
+        if (root.getReadOnlyPhysicalBoard().getPawnWalls().get(playing) > 0) {
+            for (Wall w : root.getAvailableWalls(playing)) {
                 PhysicalBoard tmp = new PhysicalBoard(root.board);
                 tmp.putWall(w);
                 tmp.reduceWallToPawn(playing);
@@ -256,9 +260,9 @@ public class GameAPIController {
         }
 
         // Handling movements
-        for(MovementDirection direction : MovementDirection.values()) {
+        for (MovementDirection direction : MovementDirection.values()) {
             Position destination = root.simulateMove(playing, direction);
-            if(destination != null) {
+            if (destination != null) {
                 PhysicalBoard tmp = new PhysicalBoard((root.board));
                 tmp.movePawn(playing, destination);
                 allBoards.add(tmp);
@@ -267,6 +271,61 @@ public class GameAPIController {
         }
 
         return createBasicResponse(allBoards, HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @PostMapping("/Generate/AvailableMoves")
+    @ResponseBody
+    public ResponseEntity<List<TurnAction>> generateAvailableMoves(@RequestBody InputBoard board) {
+        GameBoard root = new GameBoard(board);
+        List<TurnAction> allActions = new LinkedList<>();
+        Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
+        if (root.getReadOnlyPhysicalBoard().getPawnWalls().get(playing) > 0) {
+            for (Wall w : root.getAvailableWalls(playing)) {
+                allActions.add(new PlaceWallAction(w));
+            }
+        }
+        for (MovementDirection d : MovementDirection.values()) {
+            if(root.simulateMove(playing, d) != null){
+                allActions.add(new MovePawnAction(d));
+            }
+        }
+
+        return createBasicResponse(allActions, HttpStatus.OK);
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    @CrossOrigin
+    @PostMapping("/Generate/NextAction")
+    @ResponseBody
+    public ResponseEntity<PhysicalBoard> calculateNextAction(@RequestBody Map<String, Object> object) {
+        InputBoard board = mapper.convertValue(object.get("board"), InputBoard.class);
+        TurnAction action;
+        if(((Map)object.get("action")).remove("name").equals("MOVE_PAWN")) {
+            action = mapper.convertValue(object.get("action"), MovePawnAction.class);
+        } else {
+            action = mapper.convertValue(object.get("action"), PlaceWallAction.class);
+        }
+
+        GameBoard root = new GameBoard(board);
+        Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
+        root.executeAction(playing,action);
+        return createBasicResponse(root.board, HttpStatus.OK);
+    }
+
+
+    @CrossOrigin
+    @PostMapping("/Generate/CheckWinner")
+    @ResponseBody
+    public ResponseEntity<Position> fetchWinner(@RequestBody InputBoard board) {
+        GameBoard root = new GameBoard(board);
+        Pawn winner = null;
+        for (Map.Entry<Pawn, Set<Position>> entry: root.board.getPawnEndLine().entrySet()) {
+            if(entry.getValue().contains(root.board.getPawnPosition(entry.getKey()))) {
+                return createBasicResponse(root.board.getPawnPosition(entry.getKey()), HttpStatus.OK);
+            }
+        }
+        return createBasicResponse(null, HttpStatus.NOT_FOUND);
     }
 
     private ResponseEntity<String> createBasicBadRequestResponse(String message) {
@@ -280,6 +339,4 @@ public class GameAPIController {
     private <T> ResponseEntity<T> createBasicResponse(T message, HttpStatus status) {
         return new ResponseEntity<>(message, new HttpHeaders(), status);
     }
-
-
 }

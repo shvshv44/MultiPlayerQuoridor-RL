@@ -29,10 +29,12 @@ def start_game(game_id):
     response = http.get(start_url)
     return response
 
+
 def history_game(game_id):
     start_url = server + "/History/" + game_id
     response = http.get(start_url)
     return response.content.decode("utf-8")
+
 
 def get_history_game_ids():
     start_url = server + "/HistoryIds"
@@ -40,8 +42,25 @@ def get_history_game_ids():
     return response.content.decode("utf-8")
 
 
-
 def join_competitive_agent(game_id):
     start_url = competitive_agent + "/AddCompetitiveAgentToGame/" + game_id
     response = http.get(start_url)
+    return response
+
+
+def fetch_next_available_moves(board):
+    start_url = competitive_agent + "/Generate/AvailableMoves"
+    response = http.post(start_url, board)
+    return response
+
+
+def take_action(board, action):
+    start_url = competitive_agent + "/Generate/NextAction"
+    response = http.post(start_url, {"board": board, "action": action})
+    return response
+
+
+def fetch_winner(board):
+    start_url = competitive_agent + "/Generate/CheckWinner"
+    response = http.post(start_url, board)
     return response

@@ -45,22 +45,22 @@ def get_history_game_ids():
 def join_competitive_agent(game_id):
     start_url = competitive_agent + "/AddCompetitiveAgentToGame/" + game_id
     response = http.get(start_url)
-    return response
+    return response.content.decode("utf-8")
 
 
 def fetch_next_available_moves(board):
-    start_url = competitive_agent + "/Generate/AvailableMoves"
-    response = http.post(start_url, board)
+    start_url = server + "/Generate/AvailableMoves"
+    response = http.post(start_url, json=board["board"])
     return response
 
 
 def take_action(board, action):
-    start_url = competitive_agent + "/Generate/NextAction"
-    response = http.post(start_url, {"board": board, "action": action})
+    start_url = server + "/Generate/NextAction"
+    response = http.post(start_url, json={"board": board["board"], "action": action})
     return response
 
 
 def fetch_winner(board):
-    start_url = competitive_agent + "/Generate/CheckWinner"
-    response = http.post(start_url, board)
+    start_url = server + "/Generate/CheckWinner"
+    response = http.post(start_url, json=board["board"])
     return response

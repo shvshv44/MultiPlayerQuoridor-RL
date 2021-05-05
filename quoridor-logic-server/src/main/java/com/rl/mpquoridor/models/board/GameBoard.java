@@ -22,8 +22,8 @@ public class GameBoard {
     public GameBoard(InputBoard source) {
         this.board = new PhysicalBoard();
         this.readOnlyPhysicalBoard = new ReadOnlyPhysicalBoard(this.board);
-        Pawn p1 = new Pawn();
-        Pawn p2 = new Pawn();
+        Pawn p1 = new Pawn(source.getP1UUID());
+        Pawn p2 = new Pawn(source.getP2UUID());
         Map<Pawn, Position> pawnPosition = new HashMap<>();
         pawnPosition.put(p1, source.getP1Pos());
         pawnPosition.put(p2, source.getP2Pos());

@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * A model that allows clients to send board state to Java server. (2 players only)
  */
 public class InputBoard {
+    private final UUID p1UUID;
+    private final UUID p2UUID;
     private final Position p1Pos;
     private final Position p2Pos;
     private final Set<Wall> walls;
@@ -19,7 +22,9 @@ public class InputBoard {
     private final Set<Position> p2EndLine;
 
     @JsonCreator()
-    public InputBoard(@JsonProperty("p1Pos") Position p1Pos,
+    public InputBoard(@JsonProperty("p1UUID") UUID p1UUID,
+                      @JsonProperty("p2UUID") UUID p2UUID,
+                      @JsonProperty("p1Pos") Position p1Pos,
                       @JsonProperty("p2Pos") Position p2Pos,
                       @JsonProperty("walls") Set<Wall> walls,
                       @JsonProperty("p1Walls") int p1Walls,
@@ -27,6 +32,8 @@ public class InputBoard {
                       @JsonProperty("p1Turn") boolean p1Turn,
                       @JsonProperty("p1EndLine") Set<Position> p1EndLine,
                       @JsonProperty("p2EndLine") Set<Position> p2EndLine) {
+        this.p1UUID = p1UUID;
+        this.p2UUID = p2UUID;
         this.p1Pos = p1Pos;
         this.p2Pos = p2Pos;
         this.walls = walls;
@@ -36,6 +43,15 @@ public class InputBoard {
         this.p1EndLine = p1EndLine;
         this.p2EndLine = p2EndLine;
     }
+
+    public UUID getP1UUID() {
+        return p1UUID;
+    }
+
+    public UUID getP2UUID() {
+        return p2UUID;
+    }
+
 
     public Position getP1Pos() {
         return p1Pos;

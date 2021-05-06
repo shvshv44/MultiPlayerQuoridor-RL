@@ -19,6 +19,16 @@ def transform_physical_board_to_input_board(physical_board, p1_turn):
     return input_board
 
 
+class Action:
+    def __init__(self, data):
+        self.data = data
+
+    def __hash__(self):
+        if "wall" in self.data:
+            return hash(self.data["wall"]["position"]["x"]) ^ hash(self.data["wall"]["position"]["y"]) ^ hash(self.data["wall"]["wallDirection"])
+        return 0
+
+
 class MCTSState:
 
     def __init__(self, board):
@@ -26,14 +36,17 @@ class MCTSState:
 
     def getPossibleActions(self):
         next_moves = rest_api.fetch_next_available_moves(self.board)
-        next_moves["content"] = next_moves.content.decode("utf8")
-        next_moves["content"] = json.loads(next_moves["content"])
-        return next_moves
+        content = next_moves.content.decode("utf8")
+        content = json.loads(content)
+        actions = []
+        for action in content:
+            actions.append(Action(action))
+        return actions
 
     def takeAction(self, action):
-        response = rest_api.take_action(self.board, action).content.decode("utf8")
+        response = rest_api.take_action(self.board, action.data).content.decode("utf8")
         response = json.loads(response)
-        return MCTSState(transform_physical_board_to_input_board(response, self.board["p1Turn"]))
+        return MCTSState(transform_physical_board_to_input_board(response, self.board["board"]["p1Turn"]))
 
     def isTerminal(self):
         response = rest_api.fetch_winner(self.board)

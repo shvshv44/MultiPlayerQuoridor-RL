@@ -16,6 +16,10 @@ class GameWinnerStatus(Enum):
     EnvWinner = 1
     EnvLoser = 2
 
+class MoveType(Enum):
+    MOVE = 0
+    WALL = 1
+
 
 def action_shape():
     return 1
@@ -44,6 +48,8 @@ class QuoridorEnv(gym.Env):
         self.last_turn_illegal = False
         self.action_options = []
         self.winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.last_move_type = MoveType.MOVE
+        self.last_move_direction = 1
 
         # join_game(self.game_id, self.player_name)
 
@@ -86,23 +92,42 @@ class QuoridorEnv(gym.Env):
         return self.board
 
     def calculate_reward(self):
-        reward = -1
+        reward = -5
         done = False
 
-        if self.last_turn_illegal:
-            reward = -10
-            self.last_turn_illegal = False
+        if self.last_move_type == MoveType.WALL:
+            reward -= 30
+        elif self.last_move_direction == 1:
+            reward += 20
+        elif self.last_move_direction == 0:
+            reward -= 20
+        else:
+            reward -= 10
 
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 200
+                reward = 100
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -200
+                reward = -100
 
         return reward, done
 
+    #def calculate_closest_goal_distance(self, winning_points, location):
+    #    closest = 1000000
+    #    for point in winning_points:
+    #        distance = pow(int(point["x"]) - location[0], 2) + pow(int(point["y"]) - location[1], 2)
+    #        if distance < closest:
+    #            closest = distance
+
+    #    return closest
+
     def update_board(self, action):
+        if 0 <= action <= 3:
+            self.last_move_type = MoveType.MOVE
+            self.last_move_direction = action
+        else:
+            self.last_move_type = MoveType.WALL
         operation = utils.convert_action_to_server(action)
         self.send_to_server(operation)  # WAITING
 
@@ -163,8 +188,10 @@ class QuoridorEnv(gym.Env):
             self.is_my_turn = True
             if json_message["winnerName"] == self.player_name:
                 self.winner_status = GameWinnerStatus.EnvWinner
+                print("Agent win")
             else:
                 self.winner_status = GameWinnerStatus.EnvLoser
+                print("Trainer win")
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])
 

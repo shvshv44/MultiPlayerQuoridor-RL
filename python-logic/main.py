@@ -7,7 +7,7 @@ from model import Model
 
 from auto_agent import AutoAgent
 from globals import Global
-from trainer import WalkingTrainer, RandomTrainer
+from trainer import WalkingTrainer, RandomTrainer, SmartTrainer
 from human_trainer import HumanTrainer
 import costum_agent
 import keras
@@ -58,6 +58,17 @@ def train_agent(episodes):
     return "Trained Successfully!"
 
 
+@route('/TrainAgent/Smart/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = SmartTrainer(agent)
+    trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.save(saved_file_name)
+
+    return "Trained Successfully!"
 @route('/TrainAgentByHuman/<game_id>', methods=['GET'])
 def train_agent_human(game_id):
     global model

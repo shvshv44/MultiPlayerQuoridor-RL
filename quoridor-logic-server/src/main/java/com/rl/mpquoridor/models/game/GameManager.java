@@ -33,7 +33,8 @@ public class GameManager {
 
     public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
         this.players.addAll(players);
-        Collections.shuffle((List<?>) this.players);
+        //Collections.shuffle((List<?>) this.players);
+        Collections.sort((List<? extends Comparable>) this.players);
         this.gameId = gameId;
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
@@ -82,7 +83,11 @@ public class GameManager {
         while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
-            trigger(new NewTurnEvent(currentPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn)));
+            this.players.add(this.players.poll());
+            Player secondPlayer = this.players.peek();
+            Pawn secondPawn = playerPawn.get(secondPlayer);
+            this.players.add(this.players.poll());
+            trigger(new NewTurnEvent(currentPawn, secondPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn)));
 
             TurnAction action = currentPlayer.play();
             try {
@@ -96,7 +101,7 @@ public class GameManager {
             List<Position> nextPlayerMoves = this.gameBoard.getCurrentPlayerMoves(this.playerPawn.get(currentPlayer));
 
             HistoryRecord record = new HistoryRecord(currentPawn, action);
-            if(action instanceof MovePawnAction) {
+            if (action instanceof MovePawnAction) {
                 record.addDetail("position", this.gameBoard.getReadOnlyPhysicalBoard().getPawnPosition(currentPawn));
             }
             history.add(record);

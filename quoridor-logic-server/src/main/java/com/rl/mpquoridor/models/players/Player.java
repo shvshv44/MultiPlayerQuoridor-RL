@@ -9,12 +9,24 @@ import java.util.List;
 
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason;
 
-public interface Player {
+public interface Player extends Comparable{
     void setPlayOrder(List<Pawn> playOrder);
+
     void setMyPawn(Pawn myPawn);
+
     void illegalMovePlayed(Reason reason);
+
     void trigger(GameEvent event);
+
     void setBoard(ReadOnlyPhysicalBoard board);
+
     String getPlayerName();
+
     TurnAction play();
+
+    @Override
+    default int compareTo(Object o) {
+        return getPlayerName().compareTo(((Player) o).getPlayerName()) * -1;
+    }
+
 }

@@ -51,3 +51,4 @@ def convert_moves_to_action_options(moves_json):
         action_options.append(wall_action)
 
     return action_options
+

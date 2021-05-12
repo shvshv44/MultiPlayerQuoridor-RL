@@ -4,7 +4,7 @@ from tensorflow.keras.optimizers import Adam
 from globals import Global
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, LeakyReLU, BatchNormalization
 from tensorflow.keras.optimizers import Adam
 import random
 from tensorflow.keras.models import clone_model
@@ -25,9 +25,15 @@ class Model:
     def build_model(self, states, actions):
         model = Sequential()
         model.add(Conv2D(8, (3, 3), padding='same', input_shape=states))
-        model.add(Conv2D(16, (3, 3), padding='same', input_shape=states))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        model.add(Conv2D(16, (3, 3), padding='same'))
+        model.add(BatchNormalization())
         model.add(Flatten())
-        model.add(Dense(324, activation='relu'))
+        model.add(Dense(512))
+        model.add(LeakyReLU())
+        model.add(Dense(256))
+        model.add(LeakyReLU())
         model.add(Dense(actions, activation='linear'))
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
         return model
@@ -41,7 +47,7 @@ class Agent:
         self.gamma = 0.85
         self.epsilon = 1.0
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.998
         self.tau = .125
 
         self.target_model = model
@@ -51,10 +57,10 @@ class Agent:
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
         if np.random.random() < self.epsilon:
-            print("random action")
+            #print("random action")
             action = self.random_act(env)
         else:
-            print("predicted action")
+            #print("predicted action")
             action = self.predicated_act(state, env)
 
         return action
@@ -62,14 +68,42 @@ class Agent:
     def predicated_act(self, state, env):
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
+        if len(legal_predictions) > 1 and np.random.random() < 0.3:
+            print("Second choice act")
+            action_index = np.argmax(legal_predictions)
+            legal_predictions = np.delete(legal_predictions, action_index)
+        if len(legal_predictions) > 1 and np.random.random() < 0.1:
+            print("Second choice act")
+            action_index = np.argmax(legal_predictions)
+            legal_predictions = np.delete(legal_predictions, action_index)
         action_index = np.argmax(legal_predictions)
         return env.get_action_options()[action_index]
 
     def random_act(self, env):
         choices = env.get_action_options()
-        choices_len = len(choices)
-        random_i = np.random.randint(0, choices_len)
-        return choices[random_i]
+        if np.random.random() > 0.1:
+            return_value = Agent.smart_move(self, choices)
+        else:
+            choices_len = len(choices)
+            random_i = np.random.randint(0, choices_len)
+            return_value = choices[random_i]
+        return return_value
+
+    def smart_move(self, actions):
+        random_choice = np.random.random()
+        if random_choice < 0.9 and actions.count(1) > 0:
+            return 1
+        elif np.random.random() < 0.5 and actions.count(2) > 0:
+            return 2
+        elif actions[0] == 3 or actions.count(3) > 0:
+            return 3
+        elif actions.count(0) > 0:
+            return 0
+        else:
+            choices_len = len(actions)
+            random_i = np.random.randint(0, choices_len)
+            return_value = actions[random_i]
+            return return_value
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -86,6 +120,7 @@ class Agent:
             if done:
                 target[0][action] = reward
             else:
+                g = self.target_model.predict(self.prepare_state_to_predication(new_state, env))
                 Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env))[0])
                 target[0][action] = reward + Q_future * self.gamma
             self.model.fit(self.prepare_state_to_predication(state, env), target, epochs=1, verbose=0)

@@ -101,22 +101,21 @@ class QuoridorEnv(gym.Env):
     def calculate_reward(self):
         done = False
 
-        reward = 0
+        # reward = 0
         # To prefer be close to goal and keep opponent far from goal
-        # reward = -0.01 * (self.calculate_closest_goal_distance(self.player_winning_points, self.player_location) / 128)\
-        #          + 0.01 * (self.calculate_closest_goal_distance(self.opponent_winning_points, self.opponent_location) / 128)
+        reward = 0.025 * (9 - self.calculate_closest_goal_distance(self.player_winning_points, self.player_location))
 
         # To prefer saving the walls for good moments
         if self.last_move_type == MoveType.WALL:
-            reward -= 0.3
+            reward -= 0.2
 
         # To prefer to win
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 1
+                reward = 0.7
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -1
+                reward = -0.7
 
         return reward, done
 
@@ -252,7 +251,7 @@ class QuoridorEnv(gym.Env):
     def calculate_closest_goal_distance(self, winning_points, location):
         closest = 1000000
         for point in winning_points:
-            distance = pow(int(point["x"]) - location[0], 2) + pow(int(point["y"]) - location[1], 2)
+            distance = abs(int(point["x"]) - location[0]) + abs(int(point["y"]) - location[1])
             if distance < closest:
                 closest = distance
 

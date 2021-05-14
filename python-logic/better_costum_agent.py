@@ -1,10 +1,12 @@
 from collections import deque
 
 from tensorflow.keras.optimizers import Adam
+
 from globals import Global
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, BatchNormalization, LeakyReLU
+import tensorflow as ts
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, BatchNormalization, Dropout
+from tensorflow.keras.layers import LeakyReLU, Input, Embedding, Reshape, Concatenate
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.initializers import RandomNormal
 import random
@@ -25,43 +27,45 @@ class Model:
 
     def build_model(self, states, actions):
         # return self.new_model(states, actions)
-        return self.old_model(states, actions)
+        return self.best_model(states, actions)
 
-    def old_model(self, states, actions):
-        model = Sequential()
-        model.add(Conv2D(12, (3, 3), padding='same', input_shape=states))
-        model.add(Conv2D(24, (3, 3), padding='same'))
-        model.add(Flatten())
-        # model.add(Dense(actions * 3, activation='relu'))
-        model.add(Dense(actions * 2))
-        model.add(LeakyReLU(0.5))
-        model.add(Dense(actions, activation='linear'))
-        model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
-        return model
+    def best_model(self, states, actions):
+        board_shape = (states[1], states[2])
+        n_nodes = board_shape[0] * board_shape[1]
 
-    def new_model(self, states, actions):
-        init = RandomNormal(stddev=0.02)
+        in_start_loc = Input(shape=(1,))
+        # Turn positive numbers to numbers between 0 and 1 -> need to change if 4 players playing
+        li = Embedding(2, 9)(in_start_loc)
+        li = LeakyReLU(alpha=0.2)(li)
+        li = Dense(n_nodes)(li)
+        li = Reshape((board_shape[0], board_shape[1], 1))(li)
 
-        model = Sequential()
+        in_state = Input(shape=(board_shape[0], board_shape[1], 6))
+        merge = Concatenate()([in_state, li])
 
-        model.add(Conv2D(24, (4, 4), strides=(2, 2), padding='same', kernel_initializer=init, input_shape=states))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
+        f3 = Conv2D(128, (3, 3), strides=(2, 2), padding='same')(merge)
+        f3 = LeakyReLU(alpha=0.2)(f3)
+        f3 = Conv2D(128, (3, 3), strides=(2, 2), padding='same')(f3)
+        f3 = LeakyReLU(alpha=0.2)(f3)
+        f3 = Flatten()(f3)
 
-        model.add(Conv2D(48, (4, 4), strides=(2, 2), padding='same', kernel_initializer=init))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
+        f5 = Conv2D(128, (5, 5), strides=(2, 2), padding='same')(merge)
+        f5 = LeakyReLU(alpha=0.2)(f5)
+        f5 = Conv2D(128, (5, 5), strides=(2, 2), padding='same')(f5)
+        f5 = LeakyReLU(alpha=0.2)(f5)
+        f5 = Flatten()(f5)
 
-        model.add(Conv2D(96, (4, 4), strides=(2, 2), padding='same', kernel_initializer=init))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
+        f7 = Conv2D(128, (7, 7), strides=(2, 2), padding='same')(merge)
+        f7 = LeakyReLU(alpha=0.2)(f7)
+        f7 = Conv2D(128, (7, 7), strides=(2, 2), padding='same')(f7)
+        f7 = LeakyReLU(alpha=0.2)(f7)
+        f7 = Flatten()(f7)
 
-        model.add(Flatten())
-        model.add(Dense(actions * 3))
-        model.add(LeakyReLU(alpha=0.5))
-        model.add(Dense(actions * 2))
-        model.add(LeakyReLU(alpha=0.5))
-        model.add(Dense(actions, activation='linear'))
+        merge2 = Concatenate()([f3, f5, f7])
+        d = Dropout(0.4)(merge2)
+        out_layer = Dense(actions, activation='softmax')(d)
+
+        model = ts.keras.models.Model([in_start_loc, in_state], out_layer)
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
         return model
 
@@ -81,7 +85,7 @@ class Agent:
         self.target_model = model
         self.model = self.create_model_clone(model)
 
-    def act(self, state, env):
+    def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
         if np.random.random() < self.epsilon:
@@ -89,12 +93,12 @@ class Agent:
             action = self.random_act(env)
         else:
             print("predicted action")
-            action = self.predicated_act(state, env)
+            action = self.predicated_act(state, env, location_label)
 
         return action
 
-    def predicated_act(self, state, env):
-        all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
+    def predicated_act(self, state, env, location_label):
+        all_predictions = self.model.predict(self.prepare_state_to_predication(state, env, location_label))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
         action_index = np.argmax(legal_predictions)
         return env.get_action_options()[action_index]
@@ -108,11 +112,11 @@ class Agent:
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
 
-    def replay(self, env):
-        batch_size = 16
+    def replay(self, env, location_label):
+        batch_size = 32
 
         if len(self.memory) < batch_size:
-            batch_size = 8
+            batch_size = 16
 
         if len(self.memory) < batch_size:
             return
@@ -120,13 +124,13 @@ class Agent:
         samples = random.sample(self.memory, batch_size)
         for sample in samples:
             state, action, reward, new_state, done = sample
-            target = self.target_model.predict(self.prepare_state_to_predication(state, env))
+            target = self.target_model.predict(self.prepare_state_to_predication(state, env, location_label))
             if done:
                 target[0][action] = reward
             else:
-                Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env))[0])
+                Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
                 target[0][action] = reward + Q_future * self.gamma
-            self.model.fit(self.prepare_state_to_predication(state, env), target, epochs=1, verbose=0)
+            self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
 
     def target_train(self):
         weights = self.model.get_weights()
@@ -142,8 +146,12 @@ class Agent:
         model_copy.set_weights(model.get_weights())
         return model_copy
 
-    def prepare_state_to_predication(self, state, env):
-        return state.reshape((1,) + env.observation_shape())
+    def prepare_state_to_predication(self, state, env, location_label):
+        location_dim = (location_label,)
+        state_dim = state.reshape(env.observation_shape())
+        # location_dim = (1,) + (location_label,)
+        # state_dim = state.reshape((1,) + env.observation_shape())
+        return [location_dim, state_dim]
 
     def minimize_to_legal_predictions(self, all_predictions, env):
         return all_predictions[env.get_action_options()]

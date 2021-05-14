@@ -10,6 +10,9 @@ from globals import Global
 from trainer import WalkingTrainer, RandomTrainer
 from human_trainer import HumanTrainer
 import costum_agent
+import better_costum_agent
+import better_trainer
+import better_auto_agent
 import keras
 
 from bottle import route, run
@@ -24,16 +27,24 @@ def load_model(file):
     else:
         return keras.models.load_model("./models/{}".format(file))
 
+def load_better_model(file):
+    if file == "":
+        return better_costum_agent.Model().model
+    else:
+        return keras.models.load_model("./models/{}".format(file))
 
-model = load_model("")
+
+model = load_better_model("")
 
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
     global model
     print("adding agent to game id {}".format(game_id_to_join))
-    agent = costum_agent.Agent(model)
-    auto_agent = AutoAgent(agent)
+    agent = better_costum_agent.Agent(model)
+    auto_agent = better_auto_agent.AutoAgent(agent)
+    # agent = costum_agent.Agent(model)
+    # auto_agent = AutoAgent(agent)
     auto_agent.join_game(game_id_to_join)
     return "Add agent to game id " + game_id_to_join
 
@@ -65,6 +76,16 @@ def train_agent_human(game_id):
     trainer = HumanTrainer(agent)
     trainer.start_game_with_agent(game_id)
     return "Trained By Human Successfully!"
+
+
+@route('/TrainBetterAgent/Random/<episodes>', methods=['GET'])
+def train_better_agent(episodes):
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = better_trainer.RandomTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
 
 
 @route('/SaveModel', methods=['GET'])

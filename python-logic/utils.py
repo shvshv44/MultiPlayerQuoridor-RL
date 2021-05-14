@@ -51,3 +51,11 @@ def convert_moves_to_action_options(moves_json):
         action_options.append(wall_action)
 
     return action_options
+
+
+# Change if has 4 players
+def define_location_label(start_loc):
+    if start_loc[0] == 0:
+        return 0 # Start UP
+    else:
+        return 1 # Start DOWN

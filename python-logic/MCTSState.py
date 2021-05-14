@@ -84,3 +84,6 @@ class MCTSState:
             return 100
         else:
             return -100
+
+    def __hash__(self):
+        return self.board.__hash__()

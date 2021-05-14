@@ -301,7 +301,7 @@ public class GameAPIController {
     public ResponseEntity<PhysicalBoard> calculateNextAction(@RequestBody Map<String, Object> object) {
         InputBoard board = mapper.convertValue(object.get("board"), InputBoard.class);
         TurnAction action;
-        if(((Map)object.get("action")).remove("name").equals("MOVE_PAWN")) {
+        if(((Map)object.get("action")).remove("actionType").equals("MOVE_PAWN")) {
             action = mapper.convertValue(object.get("action"), MovePawnAction.class);
         } else {
             action = mapper.convertValue(object.get("action"), PlaceWallAction.class);

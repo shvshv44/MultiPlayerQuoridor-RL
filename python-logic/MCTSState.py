@@ -3,20 +3,45 @@ import json
 import rest_api
 
 
+def hash_dict(dictionary: dict):
+    h = 0
+    for key in dictionary.keys():
+        if dictionary[key] is dict:
+            cur = hash_dict(dictionary[key])
+        else:
+            cur = hash(dictionary[key])
+        h = h ^ cur
+    return h
+
+
+class Board:
+    def __init__(self, board_dictionary: dict):
+        self.board_dictionary = board_dictionary
+
+    def __hash__(self):
+        return hash_dict(self.board_dictionary)
+
+    def __getitem__(self, item):
+        if item == "board":
+            return self.board_dictionary
+
+        self.board_dictionary.__getitem__(item)
+
+
 # noinspection PyDictCreation
 def transform_physical_board_to_input_board(physical_board, p1_turn):
     input_board = {}
     input_board["p1UUID"] = physical_board["pawns"][0]
     input_board["p2UUID"] = physical_board["pawns"][1]
-    input_board["p1Pos"] = physical_board["allPawnPosition"][input_board["p1UUID"]]
-    input_board["p2Pos"] = physical_board["allPawnPosition"][input_board["p2UUID"]]
+    input_board["p1Pos"] = physical_board["allPawnPosition"][input_board["p1UUID"]["uuid"]]
+    input_board["p2Pos"] = physical_board["allPawnPosition"][input_board["p2UUID"]["uuid"]]
     input_board["walls"] = physical_board["walls"]
-    input_board["p1Walls"] = physical_board["pawnWalls"][input_board["p1UUID"]]
-    input_board["p2Walls"] = physical_board["pawnWalls"][input_board["p2UUID"]]
+    input_board["p1Walls"] = physical_board["pawnWalls"][input_board["p1UUID"]["uuid"]]
+    input_board["p2Walls"] = physical_board["pawnWalls"][input_board["p2UUID"]["uuid"]]
     input_board["p1Turn"] = not p1_turn
-    input_board["p1EndLine"] = physical_board["pawnEndLine"][input_board["p1UUID"]]
-    input_board["p2EndLine"] = physical_board["pawnEndLine"][input_board["p2UUID"]]
-    return input_board
+    input_board["p1EndLine"] = physical_board["pawnEndLine"][input_board["p1UUID"]["uuid"]]
+    input_board["p2EndLine"] = physical_board["pawnEndLine"][input_board["p2UUID"]["uuid"]]
+    return Board(input_board)
 
 
 class Action:
@@ -25,7 +50,8 @@ class Action:
 
     def __hash__(self):
         if "wall" in self.data:
-            return hash(self.data["wall"]["position"]["x"]) ^ hash(self.data["wall"]["position"]["y"]) ^ hash(self.data["wall"]["wallDirection"])
+            return hash(self.data["wall"]["position"]["x"]) ^ hash(self.data["wall"]["position"]["y"]) ^ hash(
+                self.data["wall"]["wallDirection"])
         return 0
 
 

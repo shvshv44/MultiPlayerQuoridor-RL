@@ -18,6 +18,7 @@ public class NewTurnMessage extends EventMessage {
 
     private String nextPlayerToPlay;
     private Position currentPosition;
+    private Position secondPlayerPosition;
     private List<Position> avialiableMoves;
     private Collection<Wall> availableWalls;
 

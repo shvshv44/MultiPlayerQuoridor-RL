@@ -76,14 +76,15 @@ class Agent:
         self.memory = deque(maxlen=2000)
 
         self.gamma = 0.85
-        self.epsilon_max = 0.9
-        self.epsilon_min = 0.1
+        self.epsilon_max = 0.85
+        self.epsilon_min = 0.15
         self.epsilon = self.epsilon_max
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.98
         self.tau = .125
 
         self.target_model = model
         self.model = self.create_model_clone(model)
+        self.advance_chance_value = 0.2
 
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
@@ -99,8 +100,10 @@ class Agent:
 
     def predicated_act(self, state, env, location_label):
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env, location_label))[0]
+        self.add_advance_more_value(location_label, all_predictions)
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        action_index = np.argmax(legal_predictions)
+        action_index = self.probability_predication(legal_predictions)
+        # action_index = self.greedy_predication(legal_predictions)
         return env.get_action_options()[action_index]
 
     def random_act(self, env):
@@ -158,3 +161,41 @@ class Agent:
 
     def reset_epsilon(self):
         self.epsilon = self.epsilon_max
+
+    def add_advance_more_value(self, location_label, all_predictions):
+        advance_index = 0
+
+        # Start up so  prefer move down
+        if location_label == 0:
+            advance_index = 1
+
+        # Start down so prefer to move up
+        if location_label == 1:
+            advance_index = 0
+
+        all_predictions[advance_index] += self.advance_chance_value
+        if all_predictions[advance_index] > 1:
+            all_predictions[advance_index] = 1
+
+    def greedy_predication(self, legal_predictions):
+        return np.argmax(legal_predictions)
+
+    def probability_predication(self, legal_predictions):
+        max_indices = legal_predictions.argsort()[-3:][::-1]
+        max_sum = 0
+        for i in max_indices:
+            max_sum += legal_predictions[i]
+
+        action_probs = [0]
+        temporary_sum = 0
+        for i in max_indices:
+            temporary_sum += (legal_predictions[i] / max_sum)
+            action_probs.append(temporary_sum)
+
+        action_index = 0
+        actual_prob = np.random.random()
+        for prob_index in range(0,len(max_indices)):
+            if action_probs[prob_index] <= actual_prob <= action_probs[prob_index + 1]:
+                action_index = prob_index
+
+        return max_indices[action_index]

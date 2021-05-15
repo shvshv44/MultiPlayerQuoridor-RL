@@ -6,6 +6,7 @@ from agent import Agent
 from model import Model
 
 from auto_agent import AutoAgent
+import numpy as np
 from globals import Global
 from trainer import WalkingTrainer, RandomTrainer
 from human_trainer import HumanTrainer
@@ -83,6 +84,16 @@ def train_better_agent(episodes):
     global model
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.RandomTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+
+@route('/TrainBetterAgent/Smart/<episodes>', methods=['GET'])
+def train_better_agent_smart(episodes):
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = better_trainer.SmartTrainer(agent)
     trainer.start_training_session(int(episodes))
 
     return "Trained Successfully!"

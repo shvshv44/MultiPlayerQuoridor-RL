@@ -13,6 +13,7 @@ import java.util.Set;
 @Getter
 public class NewTurnEvent implements GameEvent{
     Pawn pawn;
+    Pawn secondPawn;
     List<Position> currentPawnMoves;
     Set<Wall> currentPawnWalls;
 

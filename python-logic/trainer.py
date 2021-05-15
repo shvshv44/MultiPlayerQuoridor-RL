@@ -118,10 +118,13 @@ class SmartTrainer(Trainer):
             return 4 + second_player_position_x + (8 * second_player_position_y)
         elif putWall and np.random.random() < 0.2 and \
                 actions.count(4 - 1 + second_player_position_x + (8 * second_player_position_y)) > 0:
-            return 4 + 64 + second_player_position_x + (8 * second_player_position_y)
+            return 4 - 1 + second_player_position_x + (8 * second_player_position_y)
         elif putWall and np.random.random() < 0.2 and \
                 actions.count(4 + 64 + second_player_position_x + (8 * second_player_position_y)) > 0:
             return 4 + 64 + second_player_position_x + (8 * second_player_position_y)
+        elif putWall and np.random.random() < 0.2 and \
+                actions.count(4 + 64 - 1 + second_player_position_x + (8 * second_player_position_y)) > 0:
+            return 4 + 64 - 1 + second_player_position_x + (8 * second_player_position_y)
         elif np.random.random() < 0.3:
             choices_len = len(actions)
             random_i = np.random.randint(0, choices_len)

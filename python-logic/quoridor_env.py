@@ -92,24 +92,24 @@ class QuoridorEnv(gym.Env):
         return self.board
 
     def calculate_reward(self):
-        reward = -5
+        reward = -0.005
         done = False
 
         if self.last_move_type == MoveType.WALL:
-            reward -= 30
+            reward -= 0.003
         elif self.last_move_direction == 1:
-            reward += 20
+            reward += 0.002
         elif self.last_move_direction == 0:
-            reward -= 20
+            reward -= 0.002
         else:
-            reward -= 10
+            reward -= 0.001
 
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 100
+                reward = 1
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -100
+                reward = -1
 
         return reward, done
 

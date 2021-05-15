@@ -4,7 +4,7 @@ from tensorflow.keras.optimizers import Adam
 from globals import Global
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, LeakyReLU, BatchNormalization
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, LeakyReLU, BatchNormalization, Dropout
 from tensorflow.keras.optimizers import Adam
 import random
 from tensorflow.keras.models import clone_model
@@ -32,7 +32,9 @@ class Model:
         model.add(Flatten())
         model.add(Dense(512))
         model.add(LeakyReLU())
+        model.add(Dropout(0.4))
         model.add(Dense(256))
+        model.add(Dropout(0.6))
         model.add(LeakyReLU())
         model.add(Dense(actions, activation='linear'))
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
@@ -68,15 +70,18 @@ class Agent:
     def predicated_act(self, state, env):
         all_predictions = self.model.predict(self.prepare_state_to_predication(state, env))[0]
         legal_predictions = self.minimize_to_legal_predictions(all_predictions, env)
-        if len(legal_predictions) > 1 and np.random.random() < 0.3:
+        if len(legal_predictions) > 3 and np.random.random() < 0.3:
             print("Second choice act")
             action_index = np.argmax(legal_predictions)
-            legal_predictions = np.delete(legal_predictions, action_index)
-        if len(legal_predictions) > 1 and np.random.random() < 0.1:
-            print("Second choice act")
+            legal_predictions2 = np.delete(legal_predictions, action_index)
+            action_index = np.where(legal_predictions == legal_predictions2[np.argmax(legal_predictions2)])[0][0]
+            if len(legal_predictions) > 3 and np.random.random() < 0.1:
+                print("Third choice act")
+                action_index = np.argmax(legal_predictions2)
+                legal_predictions3 = np.delete(legal_predictions2, action_index)
+                action_index = np.where(legal_predictions == legal_predictions3[np.argmax(legal_predictions3)])[0][0]
+        else:
             action_index = np.argmax(legal_predictions)
-            legal_predictions = np.delete(legal_predictions, action_index)
-        action_index = np.argmax(legal_predictions)
         return env.get_action_options()[action_index]
 
     def random_act(self, env):

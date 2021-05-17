@@ -177,7 +177,6 @@ class QuoridorEnv(gym.Env):
         self.tcp.write(operation)
 
     def on_recieved(self, json_message):
-
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
@@ -187,8 +186,10 @@ class QuoridorEnv(gym.Env):
             self.is_my_turn = True
             self.winner_name = json_message["winnerName"]
             if json_message["winnerName"] == self.player_name:
+                print("Agent win")
                 self.winner_status = GameWinnerStatus.EnvWinner
             else:
+                print("Trainer win")
                 self.winner_status = GameWinnerStatus.EnvLoser
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])

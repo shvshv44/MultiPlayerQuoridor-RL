@@ -88,7 +88,7 @@ class Agent:
             print("random action")
             action = self.random_act(env)
         else:
-            print("predicted action")
+            #print("predicted action")
             action = self.predicated_act(state, env)
 
         return action

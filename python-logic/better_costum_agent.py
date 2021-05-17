@@ -1,7 +1,7 @@
 from collections import deque
 
 from tensorflow.keras.optimizers import Adam
-
+import tensorflow as tf
 from globals import Global
 import numpy as np
 import tensorflow as ts
@@ -63,11 +63,30 @@ class Model:
 
         merge2 = Concatenate()([f3, f5, f7])
         d = Dropout(0.4)(merge2)
+        out = tf.nn.relu(self.noisy_dense(256, d))
+        out = tf.nn.relu(self.noisy_dense(256, out))
+        out = self.noisy_dense(132, out)
         out_layer = Dense(actions, activation='softmax')(d)
 
         model = ts.keras.models.Model([in_start_loc, in_state], out_layer)
         model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
         return model
+
+    def noisy_dense(self, units, input):
+        w_shape = [units, input.shape[1]]
+        mu_w = tf.Variable(initial_value=tf.random.truncated_normal(shape=w_shape))
+        sigma_w = tf.Variable(initial_value=tf.constant(0.017, shape=w_shape))
+        epsilon_w = tf.random.uniform(shape=w_shape)
+
+        b_shape = [units]
+        mu_b = tf.Variable(initial_value=tf.random.truncated_normal(shape=b_shape))
+        sigma_b = tf.Variable(initial_value=tf.constant(0.017, shape=b_shape))
+        epsilon_b = tf.random.uniform(shape=b_shape)
+
+        w = tf.add(mu_w, tf.multiply(sigma_w, epsilon_w))
+        b = tf.add(mu_b, tf.multiply(sigma_b, epsilon_b))
+
+        return tf.matmul(input, tf.transpose(w)) + b
 
 
 class Agent:
@@ -84,6 +103,7 @@ class Agent:
 
         self.target_model = model
         self.model = self.create_model_clone(model)
+        self.alternate_model = self.model
         self.advance_chance_value = 0.2
 
     def act(self, state, env, location_label):
@@ -93,7 +113,7 @@ class Agent:
             print("random action")
             action = self.random_act(env)
         else:
-            print("predicted action")
+            #print("predicted action")
             action = self.predicated_act(state, env, location_label)
 
         return action
@@ -109,8 +129,27 @@ class Agent:
     def random_act(self, env):
         choices = env.get_action_options()
         choices_len = len(choices)
-        random_i = np.random.randint(0, choices_len)
-        return choices[random_i]
+        if np.random.random() > 0.5:
+            return_value = Agent.smart_move(self, choices)
+        else:
+            return_value = choices[np.random.randint(0, choices_len)]
+        return return_value
+
+    def smart_move(self, actions):
+        random_choice = np.random.random()
+        if random_choice < 0.9 and actions.count(1) > 0:
+            return 1
+        elif np.random.random() < 0.5 and actions.count(2) > 0:
+            return 2
+        elif actions[0] == 3 or actions.count(3) > 0:
+            return 3
+        elif actions.count(0) > 0:
+            return 0
+        else:
+            choices_len = len(actions)
+            random_i = np.random.randint(0, choices_len)
+            return_value = actions[random_i]
+            return return_value
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done])
@@ -127,11 +166,14 @@ class Agent:
         samples = random.sample(self.memory, batch_size)
         for sample in samples:
             state, action, reward, new_state, done = sample
-            target = self.target_model.predict(self.prepare_state_to_predication(state, env, location_label))
+            target = self.model.predict(self.prepare_state_to_predication(state, env, location_label))
             if done:
                 target[0][action] = reward
             else:
-                Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
+                # Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
+                # target = reward + self.discount_factor * np.max(self.model.predict(next_state)[0])
+                Q_future = self.alternate_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0][
+                    np.argmax(self.model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])]
                 target[0][action] = reward + Q_future * self.gamma
             self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
 

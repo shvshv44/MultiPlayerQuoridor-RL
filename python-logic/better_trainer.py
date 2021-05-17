@@ -45,6 +45,7 @@ class Trainer:
         steps_num = 0
         num_of_agent_good_winning = 0
         location_label = utils.define_location_label(start_location)
+        self.agent.alternate_model = self.agent.model
 
         while not done:
             steps_num += 1
@@ -85,6 +86,7 @@ class RandomTrainer(Trainer):
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
+                print("Agent position", json_message["secondPlayerPosition"])
                 actions = utils.convert_moves_to_action_options(json_message)
                 choices_len = len(actions)
                 if choices_len == 0:
@@ -109,6 +111,7 @@ class SmartTrainer(Trainer):
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
+                print("Agent position", json_message["secondPlayerPosition"])
                 actions = utils.convert_moves_to_action_options(json_message)
                 action = self.trainer_move(actions, json_message["secondPlayerPosition"]["y"], json_message["secondPlayerPosition"]["x"])
                 act_json = utils.convert_action_to_server(action)

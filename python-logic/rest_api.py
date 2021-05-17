@@ -18,6 +18,12 @@ def get_board(game_id):
     return response
 
 
+def get_mcts_board(game_id):
+    get_board_url = server + "/BoardStatusMCTS/" + game_id
+    response = http.get(get_board_url)
+    return response
+
+
 def join_game(game_id, name):
     join_url = server + "/JoinGame/" + game_id + "/" + name
     response = http.get(join_url)

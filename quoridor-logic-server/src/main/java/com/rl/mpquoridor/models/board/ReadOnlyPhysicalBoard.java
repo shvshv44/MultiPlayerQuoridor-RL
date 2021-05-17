@@ -73,4 +73,10 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     public void setPawnWalls(Map<Pawn, Integer> pawnWalls) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void setWalls(Set<Wall> walls) {
+        throw new UnsupportedOperationException();
+    }
 }
+

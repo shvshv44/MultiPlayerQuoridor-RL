@@ -64,6 +64,28 @@ public class GameAPIController {
     }
 
     @CrossOrigin
+    @GetMapping("/BoardStatusMCTS/{gameId}")
+    @ResponseBody
+    public InputBoard mctsBoardStatus(@PathVariable String gameId) {
+        GameRoomState gameRoomState = gameRoomManager.getRoomState(gameId);
+        GameManager gameManager = gameRoomState.getManager();
+        GameBoard board = gameManager.getGameBoard();
+        PhysicalBoard physical = gameManager.getGameBoard().getReadOnlyPhysicalBoard();
+        return new InputBoard(
+                board.getPlayOrder().get(0).getUuid(),
+                board.getPlayOrder().get(1).getUuid(),
+                physical.getPawnPosition(board.getPlayOrder().get(0)),
+                physical.getPawnPosition(board.getPlayOrder().get(1)),
+                physical.getWalls(),
+                physical.getPawnWalls().get(board.getPlayOrder().get(0)),
+                physical.getPawnWalls().get(board.getPlayOrder().get(1)),
+                true,
+                physical.getPawnEndLine().get(board.getPlayOrder().get(0)),
+                physical.getPawnEndLine().get(board.getPlayOrder().get(1))
+        );
+    }
+
+    @CrossOrigin
     @GetMapping("/BoardStatus/{gameId}")
     @ResponseBody
     public Map<String, Object> boardStatus(@PathVariable String gameId) {

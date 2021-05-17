@@ -3,7 +3,7 @@ import json
 import mcts
 
 import rest_api
-from MCTSState import MCTSState, Board
+from MCTSState import MCTSState, Board, transform_physical_board_to_input_board
 from quoridor_env import QuoridorEnv
 from tcp import TCP
 
@@ -26,7 +26,7 @@ class MCTSTrainer:
             self.headline_print("end of episode number {}".format(episode_num + 1))
 
     def start_game_with_agent(self, game_id):
-        env = QuoridorEnv(game_id, "Agent",False)
+        env = QuoridorEnv(game_id, "Agent", False)
 
         cur_state = env.reset()
         done = False
@@ -46,7 +46,7 @@ class MCTSTrainer:
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
-                board = Board(json.loads(rest_api.get_board(self.game_id).content))
+                board = Board(json.loads(rest_api.get_mcts_board(self.game_id).content))
                 state = MCTSState(board)
                 action = self.mcts.search(state).data
                 self.tcp.write(action)

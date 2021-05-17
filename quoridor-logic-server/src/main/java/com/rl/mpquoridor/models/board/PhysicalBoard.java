@@ -15,7 +15,7 @@ import java.util.*;
  * -------------------------------------------
  */
 public class PhysicalBoard {
-    private final Set<Wall> walls;
+    private Set<Wall> walls;
     private BiMap<Pawn, Position> pawns;
     private Map<Pawn, Integer> pawnWalls;
     private int startNumberOfWallsPerPlayer;
@@ -112,4 +112,7 @@ public class PhysicalBoard {
         this.pawnEndLine = pawnEndLine;
     }
 
+    public void setWalls(Set<Wall> walls) {
+        this.walls = walls;
+    }
 }

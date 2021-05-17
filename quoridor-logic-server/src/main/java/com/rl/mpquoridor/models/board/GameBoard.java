@@ -27,6 +27,7 @@ public class GameBoard {
         Map<Pawn, Position> pawnPosition = new HashMap<>();
         pawnPosition.put(p1, source.getP1Pos());
         pawnPosition.put(p2, source.getP2Pos());
+        this.board.setWalls(source.getWalls());
         Map<Pawn, Set<Position>> pawnEndLine = new HashMap<>();
         pawnEndLine.put(p1, source.getP1EndLine());
         pawnEndLine.put(p2, source.getP2EndLine());

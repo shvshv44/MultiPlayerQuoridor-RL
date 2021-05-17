@@ -122,5 +122,18 @@ def load_model_to_path(file_name):
     return "Model Loaded From {}".format(file_name)
 
 
+@route('/TrainAllNight', methods=['GET'])
+def train_all_night():
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = better_trainer.RandomTrainer(agent)
+
+    while True:
+        trainer.start_training_session(200)
+        save_model()
+
+    return "Trained Successfully!"
+
+
 if __name__ == '__main__':
     run(host='0.0.0.0', port=8000, debug=True)

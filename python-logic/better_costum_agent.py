@@ -245,6 +245,8 @@ class Agent:
             change = (legal_predictions[i] / max_sum)
             if change > 0.1:
                 change = change - 0.05
+            if change == 0:
+                change = 0.025
             temporary_sum += change
             action_probs.append(temporary_sum)
         action_probs.append(1.0)

@@ -106,6 +106,11 @@ class Agent:
         self.alternate_model = self.model
         self.advance_chance_value = 0.2
 
+        self.random_act_epsilon_max = 0.9
+        self.random_act_epsilon_min = 0.1
+        self.random_act_epsilon = self.epsilon_max
+        self.random_act_epsilon_decay = 0.9995
+
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
@@ -129,19 +134,22 @@ class Agent:
     def random_act(self, env):
         choices = env.get_action_options()
         choices_len = len(choices)
-        if np.random.random() > 0.5:
+        self.random_act_epsilon *= self.random_act_epsilon_decay
+        self.random_act_epsilon = max(self.random_act_epsilon_min, self.random_act_epsilon)
+        if np.random.random() < 0.4: #self.random_act_epsilon:
             return_value = Agent.smart_move(self, choices)
         else:
             return_value = choices[np.random.randint(0, choices_len)]
         return return_value
 
     def smart_move(self, actions):
+        print("smart random action")
         random_choice = np.random.random()
-        if random_choice < 0.9 and actions.count(1) > 0:
+        if random_choice < 0.6 and actions.count(1) > 0:
             return 1
         elif np.random.random() < 0.5 and actions.count(2) > 0:
             return 2
-        elif actions[0] == 3 or actions.count(3) > 0:
+        elif np.random.random() < 0.5 and actions.count(3) > 0:
             return 3
         elif actions.count(0) > 0:
             return 0
@@ -228,16 +236,24 @@ class Agent:
         for i in max_indices:
             max_sum += legal_predictions[i]
 
+        if max_sum == 0:
+            return np.argmax(legal_predictions)
+
         action_probs = [0]
         temporary_sum = 0
         for i in max_indices:
-            temporary_sum += (legal_predictions[i] / max_sum)
+            change = (legal_predictions[i] / max_sum)
+            if change > 0.1:
+                change = change - 0.05
+            temporary_sum += change
             action_probs.append(temporary_sum)
+        action_probs.append(1.0)
 
         action_index = 0
         actual_prob = np.random.random()
-        for prob_index in range(0,len(max_indices)):
+        for prob_index in range(0, len(max_indices)):
             if action_probs[prob_index] <= actual_prob <= action_probs[prob_index + 1]:
                 action_index = prob_index
 
         return max_indices[action_index]
+

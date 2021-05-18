@@ -85,6 +85,9 @@ def train_better_agent(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.RandomTrainer(agent)
     trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.save(saved_file_name)
 
     return "Trained Successfully!"
 
@@ -95,6 +98,9 @@ def train_better_agent_smart(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.SmartTrainer(agent)
     trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.save(saved_file_name)
 
     return "Trained Successfully!"
 

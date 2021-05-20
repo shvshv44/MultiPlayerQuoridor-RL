@@ -188,7 +188,6 @@ class QuoridorEnv(gym.Env):
                 self.is_my_turn = True
                 self.update_action_options(json_message)
         elif json_message["type"] == "GameOverEvent":
-            self.is_my_turn = True
             self.winner_name = json_message["winnerName"]
             if json_message["winnerName"] == self.player_name:
                 print("Agent win")
@@ -196,6 +195,8 @@ class QuoridorEnv(gym.Env):
             else:
                 print("Trainer win")
                 self.winner_status = GameWinnerStatus.EnvLoser
+            self.is_my_turn = True
+            #self.tcp.close_connection()
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])
             self.update_winning_locations_for_opponent(json_message["players"])

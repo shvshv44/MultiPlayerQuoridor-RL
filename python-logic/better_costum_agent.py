@@ -145,7 +145,7 @@ class Agent:
     def smart_move(self, actions):
         print("smart random action")
         random_choice = np.random.random()
-        if random_choice < 0.8 and actions.count(1) > 0:
+        if random_choice < 0.5 and actions.count(1) > 0:
             return 1
         elif np.random.random() < 0.5 and actions.count(2) > 0:
             return 2

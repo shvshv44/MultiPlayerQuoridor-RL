@@ -49,6 +49,9 @@ class TCP:
         self.num_of_walls = json_message["numOfWalls"]
         self.players = json_message["players"]
 
+    def close_connection(self):
+        self.client.close()
+
     def handle_end_turn_event(self, json_message):
         current_turn_move = json_message["currentTurnMove"]
         player_played = json_message["playerPlayed"]

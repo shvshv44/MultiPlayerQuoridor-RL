@@ -9,6 +9,7 @@ from tcp import TCP
 import utils
 from globals import Global
 import os
+from bfs import build_graph, BFS_SP
 
 
 class GameWinnerStatus(Enum):
@@ -103,7 +104,8 @@ class QuoridorEnv(gym.Env):
 
         reward = -0.001
         # To prefer be close to goal and keep opponent far from goal
-        reward += - 0.0005 * (9 - self.calculate_closest_goal_distance(self.player_winning_points, self.player_location))
+        reward += - 0.0005 * self.calculate_closest_goal_distance_bfs(self.player_location, self.player_winning_points)
+        reward += - 0.0005 * (40 - self.calculate_closest_goal_distance_bfs(self.opponent_location, self.opponent_winning_points))
 
         # To prefer saving the walls for good moments
         if self.last_move_type == MoveType.WALL:
@@ -168,6 +170,9 @@ class QuoridorEnv(gym.Env):
         dim2[board["players"][oi]["position"]["y"]][board["players"][oi]["position"]["x"]] = 1
         self.player_location = (int(board["players"][pi]["position"]["y"]), int(board["players"][pi]["position"]["x"]))
         self.opponent_location = (int(board["players"][oi]["position"]["y"]), int(board["players"][oi]["position"]["x"]))
+
+        self.horizontal_walls = board["horizontalWalls"]
+        self.vertical_walls = board["verticalWalls"]
 
         all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"],
                               self.player_winning_points_dim, self.opponent_winning_points_dim))
@@ -257,6 +262,11 @@ class QuoridorEnv(gym.Env):
                 closest = distance
 
         return closest
+
+    def calculate_closest_goal_distance_bfs(self, location, target):
+        graph = build_graph(self.vertical_walls, self.horizontal_walls)
+        shortest_road = BFS_SP(graph, location, target)
+        return shortest_road
 
     def find_player_index(self, players):
         index = 0

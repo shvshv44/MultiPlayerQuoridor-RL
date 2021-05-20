@@ -35,7 +35,7 @@ def load_better_model(file):
         return keras.models.load_model("./models/{}".format(file))
 
 
-model = load_better_model("")
+model = load_better_model("") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
 
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])

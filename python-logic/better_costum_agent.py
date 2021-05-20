@@ -145,13 +145,13 @@ class Agent:
     def smart_move(self, actions):
         print("smart random action")
         random_choice = np.random.random()
-        if random_choice < 0.6 and actions.count(1) > 0:
+        if random_choice < 0.8 and actions.count(1) > 0:
             return 1
         elif np.random.random() < 0.5 and actions.count(2) > 0:
             return 2
         elif np.random.random() < 0.5 and actions.count(3) > 0:
             return 3
-        elif actions.count(0) > 0:
+        elif np.random.random() < 0.3 and actions.count(0) > 0:
             return 0
         else:
             choices_len = len(actions)
@@ -245,7 +245,7 @@ class Agent:
             change = (legal_predictions[i] / max_sum)
             if change > 0.5:
                 change = change - 0.15
-            if change == 0:
+            if change < 0.075:
                 change = 0.075
             temporary_sum += change
             action_probs.append(temporary_sum)

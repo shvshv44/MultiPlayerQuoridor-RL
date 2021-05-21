@@ -34,7 +34,7 @@ class TCP:
                 while not pos == len(str(message)):
                     j, json_len = self.json_dec.raw_decode(str(message)[pos:])
                     pos += json_len
-                    #print("{} : {} \n".format(self.name, j))
+                    print("{} : {} \n".format(self.name, j))
                     receiveFunc(j)
 
             except Exception as e:

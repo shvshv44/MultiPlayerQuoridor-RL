@@ -38,7 +38,7 @@ def transform_physical_board_to_input_board(physical_board, p1_turn):
     input_board["walls"] = physical_board["walls"]
     input_board["p1Walls"] = physical_board["pawnWalls"][input_board["p1UUID"]["uuid"]]
     input_board["p2Walls"] = physical_board["pawnWalls"][input_board["p2UUID"]["uuid"]]
-    input_board["p1Turn"] = not p1_turn
+    input_board["p1Turn"] = p1_turn
     input_board["p1EndLine"] = physical_board["pawnEndLine"][input_board["p1UUID"]["uuid"]]
     input_board["p2EndLine"] = physical_board["pawnEndLine"][input_board["p2UUID"]["uuid"]]
     return Board(input_board)
@@ -72,7 +72,7 @@ class MCTSState:
     def takeAction(self, action):
         response = rest_api.take_action(self.board, action.data).content.decode("utf8")
         response = json.loads(response)
-        return MCTSState(transform_physical_board_to_input_board(response, not self.board["board"]["p1Turn"]))
+        return MCTSState(Board(response))
 
     def isTerminal(self):
         response = rest_api.fetch_winner(self.board)

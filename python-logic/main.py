@@ -1,10 +1,11 @@
 import logging
 from datetime import datetime
 
-# do not delete imports at any cost!
-from MCTSTrainer import MCTSTrainer
-from competitive_agent_trainer import CompetitiveAgentTrainer
 
+from competitive_agent_trainer import CompetitiveAgentTrainer
+# do not delete imports at any cost!
+import agent
+import model
 from auto_agent import AutoAgent
 import numpy as np
 from globals import Global
@@ -131,7 +132,7 @@ def train_better_agent_smart(episodes):
 def train_better_agent_smart(episodes):
     global model
     agent = better_costum_agent.Agent(model)
-    trainer = MCTSTrainer(agent)
+    trainer = better_trainer.MCTSTrainer(agent)
     trainer.start_training_session(int(episodes))
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./models/quoridor_mcts{}.h5".format(time)

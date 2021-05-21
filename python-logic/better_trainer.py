@@ -5,6 +5,8 @@ from better_quoridor_env import QuoridorEnv
 import random
 import utils
 import numpy as np
+import mcts
+from MCTSState import MCTSState, Board, transform_physical_board_to_input_board
 
 
 
@@ -150,3 +152,25 @@ class SmartTrainer(Trainer):
             choices_len = len(actions)
             random_i = np.random.randint(0, choices_len)
             return actions[random_i]
+
+class MCTSTrainer(Trainer):
+
+    def __init__(self, agent):
+        super().__init__(agent)
+        self.name = "MCTSTrainer"
+        self.mcts = mcts.mcts(timeLimit=1000)
+
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.name:
+                board = Board(json.loads(rest_api.get_mcts_board(self.game_id).content))
+                state = MCTSState(board)
+                action = self.mcts.search(state).data
+                self.tcp.write(action)
+
+        elif json_message["type"] == "GameOverEvent":
+            pass
+        elif json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)
+

@@ -339,7 +339,7 @@ public class GameAPIController {
     @CrossOrigin
     @PostMapping("/Generate/NextAction")
     @ResponseBody
-    public ResponseEntity<PhysicalBoard> calculateNextAction(@RequestBody Map<String, Object> object) {
+    public ResponseEntity<InputBoard> calculateNextAction(@RequestBody Map<String, Object> object) {
         InputBoard board = mapper.convertValue(object.get("board"), InputBoard.class);
         TurnAction action;
         if (((Map) object.get("action")).remove("actionType").equals("MOVE_PAWN")) {
@@ -351,7 +351,37 @@ public class GameAPIController {
         GameBoard root = new GameBoard(board);
         Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
         root.executeAction(playing, action);
-        return createBasicResponse(root.board, HttpStatus.OK);
+        InputBoard output = convertBoardToInputBoard (root, board.isP1Turn());
+
+        return createBasicResponse(output, HttpStatus.OK);
+    }
+
+    private InputBoard convertBoardToInputBoard(GameBoard root, boolean isP1Turn) {
+
+        Pawn p1 = root.getPlayOrder().get(0);
+        Pawn p2 = root.getPlayOrder().get(1);
+        Position p1Pos = root.getReadOnlyPhysicalBoard().getPawnPosition(p1);
+        Position p2Pos = root.getReadOnlyPhysicalBoard().getPawnPosition(p2);
+        Set<Wall> walls = root.getReadOnlyPhysicalBoard().getWalls();
+        int p1Walls = root.getReadOnlyPhysicalBoard().getPawnWalls().get(p1);
+        int p2Walls = root.getReadOnlyPhysicalBoard().getPawnWalls().get(p2);
+        Set<Position> p1EL = root.getReadOnlyPhysicalBoard().getPawnEndLine().get(p1);
+        Set<Position> p2EL = root.getReadOnlyPhysicalBoard().getPawnEndLine().get(p2);
+
+        InputBoard inputBoard = new InputBoard(
+                p1.getUuid(),
+                p2.getUuid(),
+                p1Pos,
+                p2Pos,
+                walls,
+                p1Walls,
+                p2Walls,
+                ! isP1Turn,
+                p1EL,
+                p2EL
+         );
+
+        return inputBoard;
     }
 
 

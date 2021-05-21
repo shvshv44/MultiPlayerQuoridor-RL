@@ -17,7 +17,7 @@ public class GameBoard {
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     @Getter
     private Pawn winner = null;
-    private final List<Pawn> playOrder = new LinkedList<>();
+    private final List<Pawn> playOrder;
 
     public GameBoard(InputBoard source) {
         this.board = new PhysicalBoard();
@@ -37,9 +37,11 @@ public class GameBoard {
         this.board.setPawnPosition(pawnPosition);
         this.board.setPawnEndLine(pawnEndLine);
         this.board.setPawnWalls(pawnWallCount);
+        this.playOrder = Arrays.asList(p1,p2);
     }
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
+        this.playOrder = new LinkedList<>();
         Map<Pawn, Position> pawns;
         this.board = new PhysicalBoard(numberOfWallsPerPlayer);
         this.board.setPawnEndLine(new HashMap<>());
@@ -59,7 +61,6 @@ public class GameBoard {
         }
 
         this.board.setPawnPosition(pawns);
-
     }
 
     private Map<Pawn, Position> initiateTwoPlayers() {

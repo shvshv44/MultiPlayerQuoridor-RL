@@ -8,6 +8,7 @@ import json
 from tcp import TCP
 import utils
 from globals import Global
+from utils import convert_board
 import os
 
 
@@ -41,7 +42,7 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def __init__(self, game_id, player_name):
+    def __init__(self, game_id, player_name, is_not_tcp):
         self.game_id = game_id
         self.player_name = player_name
         self.is_my_turn = False
@@ -60,8 +61,9 @@ class QuoridorEnv(gym.Env):
 
         # join_game(self.game_id, self.player_name)
 
-        self.tcp = TCP(game_id, player_name, self.on_recieved)
-        self.wait_for_my_turn()
+        if not is_not_tcp:
+            self.tcp = TCP(game_id, player_name, self.on_recieved)
+            self.wait_for_my_turn()
 
         self.action_space = spaces.Discrete(Global.num_of_actions)
 
@@ -76,7 +78,7 @@ class QuoridorEnv(gym.Env):
         self.seed()
 
         # Start the first game
-        self.reset()
+        #self.reset()
 
     def step(self, action):
         assert self.action_space.contains(action)
@@ -174,11 +176,15 @@ class QuoridorEnv(gym.Env):
                               self.player_winning_points_dim, self.opponent_winning_points_dim))
         return all_dims
 
+
     def send_to_server(self, operation):
         self.tcp.write(operation)
 
     def on_recieved(self, json_message):
-        if json_message["type"] == "NewTurnEvent":
+        if json_message["type"] == "IllegalMove":
+            # self.is_my_turn = True
+            self.last_turn_illegal = True
+        elif json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
                 self.is_my_turn = True

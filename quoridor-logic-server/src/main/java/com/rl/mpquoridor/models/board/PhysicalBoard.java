@@ -4,10 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -32,6 +29,15 @@ public class PhysicalBoard {
 
     }
 
+    public PhysicalBoard(PhysicalBoard other) {
+        this.walls = new HashSet<>(other.walls);
+        this.pawns = HashBiMap.create(other.pawns.size());
+        this.pawns.putAll(other.pawns);
+        this.pawnWalls = new HashMap<>(other.pawnWalls);
+        this.startNumberOfWallsPerPlayer = other.startNumberOfWallsPerPlayer;
+        this.pawnEndLine = new HashMap<>(other.pawnEndLine);
+    }
+
     public void setPawnPosition (Map<Pawn, Position> pawns) {
         this.pawns = HashBiMap.create(pawns.size());
         this.pawns.putAll(pawns);
@@ -40,7 +46,15 @@ public class PhysicalBoard {
         }
     }
 
+    public void setPawnWalls(Map<Pawn, Integer> pawnWalls) {
+        this.pawnWalls = pawnWalls;
+    }
+
     protected PhysicalBoard() {
+        this.walls = new HashSet<>();
+        this.pawns = HashBiMap.create();
+        this.pawnWalls = new HashMap<>();
+        this.pawnEndLine = new HashMap<>();
     }
 
     public Set<Wall> getWalls() {
@@ -98,4 +112,7 @@ public class PhysicalBoard {
         this.pawnEndLine = pawnEndLine;
     }
 
+    public void setWalls(Set<Wall> walls) {
+        this.walls = walls;
+    }
 }

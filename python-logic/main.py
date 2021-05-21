@@ -2,19 +2,21 @@ import logging
 from datetime import datetime
 
 # do not delete imports at any cost!
-from agent import Agent
-from model import Model
+from MCTSTrainer import MCTSTrainer
+from competitive_agent_trainer import CompetitiveAgentTrainer
 
 from auto_agent import AutoAgent
 import numpy as np
 from globals import Global
 from trainer import WalkingTrainer, RandomTrainer
 from human_trainer import HumanTrainer
+from history_trainer import HistoryTrainer
 import costum_agent
 import better_costum_agent
 import better_trainer
 import better_auto_agent
 import keras
+import rest_api
 
 from bottle import route, run
 
@@ -70,6 +72,26 @@ def train_agent(episodes):
     return "Trained Successfully!"
 
 
+@route('/TrainAgentMCTS/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = MCTSTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+
+@route('/TrainAgentByAgent/<episodes>', methods=['GET'])
+def train_agent(episodes):
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = CompetitiveAgentTrainer(agent)
+    trainer.start_training_session(int(episodes))
+
+    return "Trained Successfully!"
+
+
 @route('/TrainAgentByHuman/<game_id>', methods=['GET'])
 def train_agent_human(game_id):
     global model
@@ -103,6 +125,28 @@ def train_better_agent_smart(episodes):
     model.save(saved_file_name)
 
     return "Trained Successfully!"
+
+
+@route('/TrainBetterAgent/MCTS/<episodes>', methods=['GET'])
+def train_better_agent_smart(episodes):
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = MCTSTrainer(agent)
+    trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_mcts{}.h5".format(time)
+    model.save(saved_file_name)
+
+    return "Trained Successfully!"
+
+
+@route('/TrainAgentByHistory', methods=['GET'])
+def train_agent_history():
+    global model
+    agent = costum_agent.Agent(model)
+    trainer = HistoryTrainer(agent)
+    trainer.start()
+    return "Trained By Human Successfully!"
 
 
 @route('/SaveModel', methods=['GET'])

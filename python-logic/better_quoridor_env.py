@@ -185,8 +185,8 @@ class QuoridorEnv(gym.Env):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:
                 self.board = self.get_and_convert_board()
-                self.is_my_turn = True
                 self.update_action_options(json_message)
+                self.is_my_turn = True
         elif json_message["type"] == "GameOverEvent":
             self.winner_name = json_message["winnerName"]
             if json_message["winnerName"] == self.player_name:

@@ -68,4 +68,15 @@ public final class ReadOnlyPhysicalBoard extends PhysicalBoard {
     public Map<Pawn, Set<Position>> getPawnEndLine() {
         return Collections.unmodifiableMap(source.getPawnEndLine());
     }
+
+    @Override
+    public void setPawnWalls(Map<Pawn, Integer> pawnWalls) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setWalls(Set<Wall> walls) {
+        throw new UnsupportedOperationException();
+    }
 }
+

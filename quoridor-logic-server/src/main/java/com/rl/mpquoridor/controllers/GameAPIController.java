@@ -308,7 +308,7 @@ public class GameAPIController {
             }
         }
         for (MovementDirection d : MovementDirection.values()) {
-            if(root.simulateMove(playing, d) != null){
+            if (root.simulateMove(playing, d) != null) {
                 allActions.add(new MovePawnAction(d));
             }
         }
@@ -317,13 +317,14 @@ public class GameAPIController {
     }
 
     ObjectMapper mapper = new ObjectMapper();
+
     @CrossOrigin
     @PostMapping("/Generate/NextAction")
     @ResponseBody
     public ResponseEntity<PhysicalBoard> calculateNextAction(@RequestBody Map<String, Object> object) {
         InputBoard board = mapper.convertValue(object.get("board"), InputBoard.class);
         TurnAction action;
-        if(((Map)object.get("action")).remove("actionType").equals("MOVE_PAWN")) {
+        if (((Map) object.get("action")).remove("actionType").equals("MOVE_PAWN")) {
             action = mapper.convertValue(object.get("action"), MovePawnAction.class);
         } else {
             action = mapper.convertValue(object.get("action"), PlaceWallAction.class);
@@ -331,7 +332,7 @@ public class GameAPIController {
 
         GameBoard root = new GameBoard(board);
         Pawn playing = board.isP1Turn() ? root.getReadOnlyPhysicalBoard().pawnAt(board.getP1Pos()) : root.getReadOnlyPhysicalBoard().pawnAt(board.getP2Pos());
-        root.executeAction(playing,action);
+        root.executeAction(playing, action);
         return createBasicResponse(root.board, HttpStatus.OK);
     }
 
@@ -342,8 +343,8 @@ public class GameAPIController {
     public ResponseEntity<Position> fetchWinner(@RequestBody InputBoard board) {
         GameBoard root = new GameBoard(board);
         Pawn winner = null;
-        for (Map.Entry<Pawn, Set<Position>> entry: root.board.getPawnEndLine().entrySet()) {
-            if(entry.getValue().contains(root.board.getPawnPosition(entry.getKey()))) {
+        for (Map.Entry<Pawn, Set<Position>> entry : root.board.getPawnEndLine().entrySet()) {
+            if (entry.getValue().contains(root.board.getPawnPosition(entry.getKey()))) {
                 return createBasicResponse(root.board.getPawnPosition(entry.getKey()), HttpStatus.OK);
             }
         }

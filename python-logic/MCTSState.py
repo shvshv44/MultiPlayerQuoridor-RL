@@ -72,7 +72,7 @@ class MCTSState:
     def takeAction(self, action):
         response = rest_api.take_action(self.board, action.data).content.decode("utf8")
         response = json.loads(response)
-        return MCTSState(transform_physical_board_to_input_board(response, self.board["board"]["p1Turn"]))
+        return MCTSState(transform_physical_board_to_input_board(response, not self.board["board"]["p1Turn"]))
 
     def isTerminal(self):
         response = rest_api.fetch_winner(self.board)

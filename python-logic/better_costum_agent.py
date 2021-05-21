@@ -44,25 +44,39 @@ class Model:
         merge = Concatenate()([in_state, li])
 
         f3 = Conv2D(128, (3, 3), strides=(2, 2), padding='same')(merge)
+        f3 = BatchNormalization()(f3)
         f3 = LeakyReLU(alpha=0.2)(f3)
         f3 = Conv2D(128, (3, 3), strides=(2, 2), padding='same')(f3)
+        f3 = BatchNormalization()(f3)
         f3 = LeakyReLU(alpha=0.2)(f3)
         f3 = Flatten()(f3)
 
         f5 = Conv2D(128, (5, 5), strides=(2, 2), padding='same')(merge)
+        f5 = BatchNormalization()(f5)
         f5 = LeakyReLU(alpha=0.2)(f5)
         f5 = Conv2D(128, (5, 5), strides=(2, 2), padding='same')(f5)
+        f5 = BatchNormalization()(f5)
         f5 = LeakyReLU(alpha=0.2)(f5)
         f5 = Flatten()(f5)
 
         f7 = Conv2D(128, (7, 7), strides=(2, 2), padding='same')(merge)
+        f7 = BatchNormalization()(f7)
         f7 = LeakyReLU(alpha=0.2)(f7)
         f7 = Conv2D(128, (7, 7), strides=(2, 2), padding='same')(f7)
+        f7 = BatchNormalization()(f7)
         f7 = LeakyReLU(alpha=0.2)(f7)
         f7 = Flatten()(f7)
 
         merge2 = Concatenate()([f3, f5, f7])
         d = Dropout(0.4)(merge2)
+        d = Dense(2000)(d)
+        d = LeakyReLU(alpha=0.2)(d)
+        d = Dense(1000)(d)
+        d = LeakyReLU(alpha=0.2)(d)
+        d = Dense(500)(d)
+        d = LeakyReLU(alpha=0.2)(d)
+        d = Dense(250)(d)
+        d = LeakyReLU(alpha=0.2)(d)
         out_layer = Dense(actions, activation='softmax')(d)
 
         model = ts.keras.models.Model([in_start_loc, in_state], out_layer)
@@ -84,7 +98,7 @@ class Agent:
 
         self.target_model = model
         self.model = self.create_model_clone(model)
-        self.advance_chance_value = 0.2
+        self.advance_chance_value = 0.1
 
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay

@@ -1,15 +1,16 @@
+import json
+import os
 from enum import Enum
 
 import gym
 import numpy as np
 from gym import spaces
-from rest_api import get_board
-import json
-from tcp import TCP
+
 import utils
-from globals import Global
-import os
 from bfs import build_graph, BFS_SP
+from globals import Global
+from rest_api import get_board
+from tcp import TCP
 
 
 class GameWinnerStatus(Enum):
@@ -104,8 +105,11 @@ class QuoridorEnv(gym.Env):
 
         reward = -0.001
         # To prefer be close to goal and keep opponent far from goal
-        reward += - 0.0005 * self.calculate_closest_goal_distance_bfs(self.player_location, self.player_winning_points)
-        reward += - 0.0005 * (40 - self.calculate_closest_goal_distance_bfs(self.opponent_location, self.opponent_winning_points))
+        graph = self.create_graph()
+        reward += - 0.0005 * self.calculate_closest_goal_distance_bfs(graph, self.player_location,
+                                                                      self.player_winning_points)
+        reward += - 0.0005 * (40 - self.calculate_closest_goal_distance_bfs(graph, self.opponent_location,
+                                                                            self.opponent_winning_points))
 
         # To prefer saving the walls for good moments
         if self.last_move_type == MoveType.WALL:
@@ -196,13 +200,12 @@ class QuoridorEnv(gym.Env):
                 print("Trainer win")
                 self.winner_status = GameWinnerStatus.EnvLoser
             self.is_my_turn = True
-            #self.tcp.close_connection()
+            # self.tcp.close_connection()
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])
             self.update_winning_locations_for_opponent(json_message["players"])
             self.player_start_location = self.get_start_player_location(json_message["players"])
             self.opponent_start_location = self.get_start_opponent_location(json_message["players"])
-
 
     def action_shape(self):
         return action_shape()
@@ -254,7 +257,6 @@ class QuoridorEnv(gym.Env):
 
         return loc
 
-
     def calculate_closest_goal_distance(self, winning_points, location):
         closest = 1000000
         for point in winning_points:
@@ -264,8 +266,10 @@ class QuoridorEnv(gym.Env):
 
         return closest
 
-    def calculate_closest_goal_distance_bfs(self, location, target):
-        graph = build_graph(self.vertical_walls, self.horizontal_walls)
+    def create_graph(self):
+        return build_graph(self.vertical_walls, self.horizontal_walls)
+
+    def calculate_closest_goal_distance_bfs(self, graph, location, target):
         shortest_road = BFS_SP(graph, location, target)
         return shortest_road
 

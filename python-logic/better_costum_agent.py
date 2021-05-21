@@ -136,7 +136,7 @@ class Agent:
         choices_len = len(choices)
         self.random_act_epsilon *= self.random_act_epsilon_decay
         self.random_act_epsilon = max(self.random_act_epsilon_min, self.random_act_epsilon)
-        if np.random.random() < 0.4: #self.random_act_epsilon:
+        if np.random.random() < self.random_act_epsilon:
             return_value = Agent.smart_move(self, choices)
         else:
             return_value = choices[np.random.randint(0, choices_len)]

@@ -126,25 +126,27 @@ class SmartTrainer(Trainer):
             self.want_to_win = self.want_to_win + 0.001
         random_choice = np.random.random()
         putWall = True #if second_player_position_y > 3 else False
-        if putWall and np.random.random() < 0.1 and \
+        if np.random.random() < 0.5 and actions.count(0) > 0:
+            return 0
+        elif putWall and np.random.random() < 0.3 and \
                 actions.count(4 + second_player_position_x + (8 * second_player_position_y)) > 0:
             return 4 + second_player_position_x + (8 * second_player_position_y)
-        elif putWall and np.random.random() < 0.1 and \
+        elif putWall and np.random.random() < 0.3 and \
                 actions.count(4 - 1 + second_player_position_x + (8 * second_player_position_y)) > 0:
-            return 4 + 64 + second_player_position_x + (8 * second_player_position_y)
-        elif putWall and np.random.random() < 0.1 and \
+            return 4 - 1 + second_player_position_x + (8 * second_player_position_y)
+        elif putWall and np.random.random() < 0.2 and \
                 actions.count(4 + 64 + second_player_position_x + (8 * second_player_position_y)) > 0:
             return 4 + 64 + second_player_position_x + (8 * second_player_position_y)
-        elif np.random.random() < 0.2:
-            choices_len = len(actions)
-            random_i = np.random.randint(0, choices_len)
-            return actions[random_i]
-        elif np.random.random() < 0.5 and actions.count(0) > 0:
-            return 0
+        elif putWall and np.random.random() < 0.2 and \
+                actions.count(4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))) > 0:
+            return 4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))
         elif np.random.random() < 0.5 and actions.count(2) > 0:
             return 2
         elif np.random.random() < 0.5 and actions.count(3) > 0:
             return 3
         elif np.random.random() < 0.5 and actions.count(1) > 0:
             return 1
-        return actions[0]
+        else:
+            choices_len = len(actions)
+            random_i = np.random.randint(0, choices_len)
+            return actions[random_i]

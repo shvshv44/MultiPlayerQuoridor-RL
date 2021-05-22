@@ -69,11 +69,7 @@ class Model:
 
         merge2 = Concatenate()([f3, f5, f7])
         d = Dropout(0.4)(merge2)
-        d = Dense(2000)(d)
-        d = LeakyReLU(alpha=0.2)(d)
         d = Dense(1000)(d)
-        d = LeakyReLU(alpha=0.2)(d)
-        d = Dense(500)(d)
         d = LeakyReLU(alpha=0.2)(d)
         d = Dense(250)(d)
         d = LeakyReLU(alpha=0.2)(d)

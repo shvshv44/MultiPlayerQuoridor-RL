@@ -145,9 +145,19 @@ def ava1(episodes):
     num_of_epochs = int(episodes)
 
     for i in range(0, num_of_epochs):
+        print("game number {} has been started!".format(i))
         game_id = rest_api.create_game(agent1.name).content.decode("utf-8")
         threading.Thread(target=rest_api.train_vs_agent, args=(game_id,)).start()
         manager1.start_game_with_agent(game_id, False)
+        print("game number {} has been finished!".format(i))
+
+        if (i + 1) % 50 == 0:
+            agent_1_save()
+            rest_api.save_agent_2()
+
+    print("ALL GAMES FINISHED! SAVING BOTH MODELS!")
+    agent_1_save()
+    rest_api.save_agent_2()
 
     return "Trained Successfully!"
 
@@ -161,6 +171,22 @@ def ava2(game_id):
     manager2.start_game_with_agent(game_id, True)
 
     return "Trained Successfully!"
+
+@route('/AgentVsAgent2/Save', methods=['GET'])
+def agent_2_save():
+    global model
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models2/quoridor2_{}.h5".format(time)
+    model.save(saved_file_name)
+    return "Model Saved In {}".format(saved_file_name)
+
+
+def agent_1_save():
+    global model
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models1/quoridor1_{}.h5".format(time)
+    model.save(saved_file_name)
+    return "Model Saved In {}".format(saved_file_name)
 
 
 if __name__ == '__main__':

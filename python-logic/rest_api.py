@@ -33,3 +33,9 @@ def train_vs_agent(game_id):
     vs_url = Global.vs_server + "/AgentVsAgent2/" + game_id
     response = http.get(vs_url)
     return response
+
+
+def save_agent_2():
+    save_url = Global.vs_server + "/AgentVsAgent2/Save"
+    response = http.get(save_url)
+    return response

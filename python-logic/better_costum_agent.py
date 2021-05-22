@@ -82,7 +82,7 @@ class Model:
 
 class Agent:
 
-    def __init__(self, model):
+    def __init__(self, model, name="Agent"):
         self.memory = deque(maxlen=2000)
 
         self.gamma = 0.85
@@ -95,6 +95,7 @@ class Agent:
         self.target_model = model
         self.model = self.create_model_clone(model)
         self.advance_chance_value = 0.1
+        self.name = name
 
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
@@ -141,7 +142,8 @@ class Agent:
             if done:
                 target[0][action] = reward
             else:
-                Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
+                Q_future = max(
+                    self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
                 target[0][action] = reward + Q_future * self.gamma
             self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
 
@@ -204,7 +206,7 @@ class Agent:
 
         action_index = 0
         actual_prob = np.random.random()
-        for prob_index in range(0,len(max_indices)):
+        for prob_index in range(0, len(max_indices)):
             if action_probs[prob_index] <= actual_prob <= action_probs[prob_index + 1]:
                 action_index = prob_index
 

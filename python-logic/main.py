@@ -7,6 +7,7 @@ from model import Model
 
 from auto_agent import AutoAgent
 import numpy as np
+import threading
 from globals import Global
 from trainer import WalkingTrainer, RandomTrainer
 from human_trainer import HumanTrainer
@@ -14,7 +15,10 @@ import costum_agent
 import better_costum_agent
 import better_trainer
 import better_auto_agent
+import better_manager
 import keras
+import rest_api
+import sys
 
 from bottle import route, run
 
@@ -36,7 +40,6 @@ def load_better_model(file):
 
 
 model = load_better_model("")
-
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
@@ -134,6 +137,31 @@ def train_all_night():
 
     return "Trained Successfully!"
 
+@route('/AgentVsAgent1/<episodes>', methods=['GET'])
+def ava1(episodes):
+    global model
+    agent1 = better_costum_agent.Agent(model, "Agent1")
+    manager1 = better_manager.Manager(agent1)
+    num_of_epochs = int(episodes)
+
+    for i in range(0, num_of_epochs):
+        game_id = rest_api.create_game(agent1.name).content.decode("utf-8")
+        threading.Thread(target=rest_api.train_vs_agent, args=(game_id,)).start()
+        manager1.start_game_with_agent(game_id, False)
+
+    return "Trained Successfully!"
+
+
+@route('/AgentVsAgent2/<game_id>', methods=['GET'])
+def ava2(game_id):
+    print("Agent1 asked Agent2 to start a game!")
+    global model
+    agent2 = better_costum_agent.Agent(model, "Agent2")
+    manager2 = better_manager.Manager(agent2)
+    manager2.start_game_with_agent(game_id, True)
+
+    return "Trained Successfully!"
+
 
 if __name__ == '__main__':
-    run(host='0.0.0.0', port=8000, debug=True)
+    run(host='0.0.0.0', port=int(sys.argv[1]), debug=True)

@@ -3,6 +3,8 @@ from enum import Enum
 import gym
 import numpy as np
 from gym import spaces
+
+import rest_api
 from rest_api import get_board
 import json
 from tcp import TCP
@@ -41,7 +43,7 @@ class QuoridorEnv(gym.Env):
 
     """
 
-    def __init__(self, game_id, player_name):
+    def __init__(self, game_id, player_name, is_start=False):
         self.game_id = game_id
         self.player_name = player_name
         self.is_my_turn = False
@@ -57,6 +59,7 @@ class QuoridorEnv(gym.Env):
         self.opponent_start_location = (-1, -1)
         self.winner_name = ""
         self.last_move_type = MoveType.MOVE
+        self.is_start = is_start
 
         # join_game(self.game_id, self.player_name)
 
@@ -177,6 +180,10 @@ class QuoridorEnv(gym.Env):
         self.tcp.write(operation)
 
     def on_recieved(self, json_message):
+
+        if self.is_start and json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)
 
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.player_name:

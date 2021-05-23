@@ -20,6 +20,9 @@ import java.util.*;
 
 
 public class GameManager {
+
+    private final static Integer MAX_GAME_STEPS = 400;
+
     private final static Logger logger = LoggerFactory.getLogger(GameManager.class);
     private final GameBoard gameBoard;
     private final Queue<Player> players = new LinkedList<>();
@@ -71,6 +74,8 @@ public class GameManager {
     }
 
     public GameResult run() {
+        Random r = new Random();
+        int steps = 0;
         List<HistoryRecord> history = new LinkedList<>();
         GameResult gameResult = new GameResult();
         gameResult.setGameId(this.gameId);
@@ -80,7 +85,7 @@ public class GameManager {
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
-        while (!isGameEnded) {
+        while (!isGameEnded && steps < MAX_GAME_STEPS) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
             this.players.add(this.players.poll());
@@ -90,6 +95,7 @@ public class GameManager {
             trigger(new NewTurnEvent(currentPawn, secondPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn)));
 
             TurnAction action = currentPlayer.play();
+            steps++;
             try {
                 this.gameBoard.executeAction(currentPawn, action);
             } catch (IllegalMovementException e) {
@@ -109,7 +115,14 @@ public class GameManager {
             trigger(new EndTurnEvent(currentPawn, action));
         }
 
-        trigger(new GameOverEvent(this.gameBoard.getWinner()));
+        if(steps + 1 % 100 == 0)
+            System.out.println("A game reached over 100 with: " + steps);
+
+        if (this.gameBoard.getWinner() != null)
+            trigger(new GameOverEvent(this.gameBoard.getWinner()));
+        else
+            trigger(new GameOverEvent(this.getGameBoard().getPlayOrder().get(r.nextInt(this.getGameBoard().getPlayOrder().size()))));
+
         gameResult.setHistory(history);
         gameResult.setWinner(this.gameBoard.getWinner());
         return gameResult;

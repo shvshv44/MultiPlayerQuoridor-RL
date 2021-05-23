@@ -110,15 +110,15 @@ class QuoridorEnv(gym.Env):
 
         # To prefer saving the walls for good moments
         if self.last_move_type == MoveType.WALL:
-            reward -= 0.2
+            reward -= 0.05
 
         # To prefer to win
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 0.7
+                reward = 1
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -0.7
+                reward = -0.95
 
         return reward, done
 

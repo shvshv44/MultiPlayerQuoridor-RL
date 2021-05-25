@@ -9,12 +9,15 @@ import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.common.EventMessage;
+import com.rl.mpquoridor.models.game.GameOverEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.rl.mpquoridor.models.enums.MessageType.GAME_OVER_EVENT;
 
 public class TCPPlayer extends SocketPlayer {
 
@@ -33,12 +36,22 @@ public class TCPPlayer extends SocketPlayer {
     public void sendEvent(EventMessage message) {
         try {
             gameTCPSocket.send(gson.toJson(message, message.getClass()));
+
+            if (message.getType().equals(GAME_OVER_EVENT)) {
+                this.closeConnection();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
+    public void closeConnection() {
+        try {
+            this.gameTCPSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void illegalMovePlayed(IllegalMovementException.Reason reason) {

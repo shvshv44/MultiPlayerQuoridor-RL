@@ -19,6 +19,10 @@ import better_manager
 import keras
 import rest_api
 import sys
+import walking_costum_agent
+import walking_trainer
+from matplotlib import pyplot
+import os
 
 from bottle import route, run
 
@@ -32,6 +36,7 @@ def load_model(file):
     else:
         return keras.models.load_model("./models/{}".format(file))
 
+
 def load_better_model(file):
     if file == "":
         return better_costum_agent.Model().model
@@ -39,7 +44,16 @@ def load_better_model(file):
         return keras.models.load_model("./models/{}".format(file))
 
 
+def load_walking_model(file):
+    if file == "":
+        return walking_costum_agent.Model().model
+    else:
+        return keras.models.load_model("./walking_models/{}".format(file))
+
+
 model = load_better_model("")
+walking_model = load_walking_model("")
+
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
@@ -187,6 +201,42 @@ def agent_1_save():
     saved_file_name = "./models1/quoridor1_{}.h5".format(time)
     model.save(saved_file_name)
     return "Model Saved In {}".format(saved_file_name)
+
+
+@route('/SaveWalkingModel', methods=['GET'])
+def save_walking_model():
+    global walking_model
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./walking_models/walking_{}.h5".format(time)
+    model.save(saved_file_name)
+    return "Walking Model Saved In {}".format(saved_file_name)
+
+
+@route('/TrainWalkingAgent/<episodes>', methods=['GET'])
+def train_better_agent(episodes):
+    global walking_model
+    agent = walking_costum_agent.Agent(walking_model)
+    trainer = walking_trainer.RandomWalkingTrainer(agent)
+    history = trainer.start_training_session(int(episodes))
+
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    pyplot.plot(history)
+    os.makedirs('./walking_metrics/')
+    pyplot.savefig('./walking_metrics/walking_mae_{}.png'.format(time))
+
+    return "Trained Successfully!"
+
+
+@route('/TrainWalkingAgentForEver/<episodes>', methods=['GET'])
+def train_better_agent_for_ever(episodes):
+    while True:
+        global walking_model
+        num_of_episodes = int(episodes)
+        train_better_agent(num_of_episodes)
+        print("Finished {} iterations, saving model!".format(num_of_episodes))
+        save_walking_model()
+        print("Model Saved!")
+
 
 
 if __name__ == '__main__':

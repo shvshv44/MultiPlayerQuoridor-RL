@@ -9,6 +9,7 @@ import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
+import com.rl.mpquoridor.paths.AllShortestPaths;
 import org.springframework.data.util.Pair;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -34,14 +35,14 @@ public class GameRulesTest {
     @Test
     private void WallPlacementNormal() {
         Wall w = new Wall(new Position(2,3), WallDirection.DOWN);
-        this.board.executeAction(p, new PlaceWallAction(w));
+        this.board.executeAction(p, new PlaceWallAction(w), new AllShortestPaths(false));
         assertTrue(this.board.getReadOnlyPhysicalBoard().getWalls().contains(w));
     }
 
     @Test
     private void WallPlacementAtEdge() {
         Wall w = new Wall(new Position(7,2), WallDirection.RIGHT);
-        this.board.executeAction(p, new PlaceWallAction(w));
+        this.board.executeAction(p, new PlaceWallAction(w), new AllShortestPaths(false));
         assertTrue(this.board.getReadOnlyPhysicalBoard().getWalls().contains(w));
     }
 
@@ -49,10 +50,10 @@ public class GameRulesTest {
     private void PlaceWallWhenNoneLeft() {
         for (int i = 0; i < 8; i++) {
             Wall w = new Wall(new Position(i, 0), WallDirection.RIGHT);
-            this.board.executeAction(p, new PlaceWallAction(w));
+            this.board.executeAction(p, new PlaceWallAction(w), new AllShortestPaths(false));
         }
         try {
-            this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(3,3), WallDirection.RIGHT)));
+            this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(3,3), WallDirection.RIGHT)), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
         } catch (IllegalMovementException e) {
             assertEquals(e.getReason(), NO_WALLS_LEFT);
@@ -62,7 +63,7 @@ public class GameRulesTest {
     private void WallPlacementOutsideBounds() {
         Wall w = new Wall(new Position(9,0), WallDirection.DOWN);
         try {
-            this.board.executeAction(p, new PlaceWallAction(w));
+            this.board.executeAction(p, new PlaceWallAction(w), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
         } catch (IllegalMovementException e) {
             assertEquals(e.getReason(), WALL_IS_OUTSIDE_THE_BOARD_BOUNDS);
@@ -73,7 +74,7 @@ public class GameRulesTest {
     @Test
     private void WallPlacementCollision() {
         Wall w1 = new Wall(new Position(1, 2), WallDirection.DOWN);
-        this.board.executeAction(p, new PlaceWallAction(w1));
+        this.board.executeAction(p, new PlaceWallAction(w1), new AllShortestPaths(false));
         Wall[] blockers = new Wall[] {
                 new Wall(new Position(0,2), WallDirection.DOWN),
                 new Wall(new Position(2,2), WallDirection.DOWN),
@@ -81,7 +82,7 @@ public class GameRulesTest {
         };
         for (Wall w : blockers) {
             try {
-                this.board.executeAction(p, new PlaceWallAction(w));
+                this.board.executeAction(p, new PlaceWallAction(w), new AllShortestPaths(false));
                 throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
             } catch (IllegalMovementException e) {
                 assertEquals(e.getReason(), WALL_COLLIDES_WITH_OTHER_WALL);
@@ -97,11 +98,11 @@ public class GameRulesTest {
                 new Wall(new Position(1,4), WallDirection.RIGHT),
                 new Wall(new Position(0,5), WallDirection.DOWN)
         };
-        this.board.executeAction(p, new PlaceWallAction(blockers[0]));
-        this.board.executeAction(p, new PlaceWallAction(blockers[1]));
+        this.board.executeAction(p, new PlaceWallAction(blockers[0]), new AllShortestPaths(false));
+        this.board.executeAction(p, new PlaceWallAction(blockers[1]), new AllShortestPaths(false));
 
         try {
-            this.board.executeAction(p, new PlaceWallAction(blockers[2]));
+            this.board.executeAction(p, new PlaceWallAction(blockers[2]), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
 
         } catch (IllegalMovementException e) {
@@ -112,10 +113,10 @@ public class GameRulesTest {
     @Test
     private void BasicMovement() {
         Position startPos = new Position(this.board.getReadOnlyPhysicalBoard().getPawnPosition(p));
-        this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN));
-        this.board.executeAction(p, new MovePawnAction(MovementDirection.LEFT));
-        this.board.executeAction(p, new MovePawnAction(MovementDirection.RIGHT));
-        this.board.executeAction(p, new MovePawnAction(MovementDirection.UP));
+        this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN), new AllShortestPaths(false));
+        this.board.executeAction(p, new MovePawnAction(MovementDirection.LEFT), new AllShortestPaths(false));
+        this.board.executeAction(p, new MovePawnAction(MovementDirection.RIGHT), new AllShortestPaths(false));
+        this.board.executeAction(p, new MovePawnAction(MovementDirection.UP), new AllShortestPaths(false));
 
         assertEquals(this.board.getReadOnlyPhysicalBoard().getPawnPosition(p), startPos);
     }
@@ -137,10 +138,10 @@ public class GameRulesTest {
 
         for (Pair<Wall, MovementDirection> block : blockers) {
             this.resetBoard();
-            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN)); // Moving the pawn to (1,4)
-            this.board.executeAction(p, new PlaceWallAction(block.getFirst()));
+            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN), new AllShortestPaths(false)); // Moving the pawn to (1,4)
+            this.board.executeAction(p, new PlaceWallAction(block.getFirst()), new AllShortestPaths(false));
             try {
-                this.board.executeAction(p, new MovePawnAction(block.getSecond()));
+                this.board.executeAction(p, new MovePawnAction(block.getSecond()), new AllShortestPaths(false));
                 throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
             } catch (IllegalMovementException e) {
                 assertEquals(e.getReason(), MOVING_IN_DIRECTION_IS_NOT_ALLOWED);
@@ -151,7 +152,7 @@ public class GameRulesTest {
     @Test
     private void MoveOutsideBounds() {
         try {
-            this.board.executeAction(p, new MovePawnAction(MovementDirection.UP));
+            this.board.executeAction(p, new MovePawnAction(MovementDirection.UP), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
         } catch (IllegalMovementException e) {
             assertEquals(e.getReason(), MOVING_IN_DIRECTION_IS_NOT_ALLOWED);
@@ -163,10 +164,10 @@ public class GameRulesTest {
     private void MoveJump() {
         // Moving the pawn to (7,4)
         for (int i = 0; i < 7; i++) {
-            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN));
+            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN), new AllShortestPaths(false));
         }
         Pawn other = this.board.getReadOnlyPhysicalBoard().getPawns().stream().filter(x -> !p.equals(x)).findFirst().get(); // Location should be (8,4)
-        this.board.executeAction(other, new MovePawnAction(MovementDirection.UP));
+        this.board.executeAction(other, new MovePawnAction(MovementDirection.UP), new AllShortestPaths(false));
         assertEquals(this.board.getReadOnlyPhysicalBoard().getPawnPosition(other), new Position(6,4));
     }
 
@@ -175,12 +176,12 @@ public class GameRulesTest {
     private void MoveJumpWallBlockBefore() {
         // Moving the pawn to (7,4)
         for (int i = 0; i < 7; i++) {
-            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN));
+            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN), new AllShortestPaths(false));
         }
         Pawn other = this.board.getReadOnlyPhysicalBoard().getPawns().stream().filter(x -> !p.equals(x)).findFirst().get(); // Location should be (8,4)
-        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(7,4), WallDirection.RIGHT)));
+        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(7,4), WallDirection.RIGHT)), new AllShortestPaths(false));
         try {
-            this.board.executeAction(other, new MovePawnAction(MovementDirection.UP));
+            this.board.executeAction(other, new MovePawnAction(MovementDirection.UP), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
         } catch (IllegalMovementException e) {
             assertEquals(e.getReason(), MOVING_IN_DIRECTION_IS_NOT_ALLOWED);
@@ -192,12 +193,12 @@ public class GameRulesTest {
     private void MoveJumpWallBlockAfter() {
         // Moving the pawn to (7,4)
         for (int i = 0; i < 7; i++) {
-            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN));
+            this.board.executeAction(p, new MovePawnAction(MovementDirection.DOWN), new AllShortestPaths(false));
         }
         Pawn other = this.board.getReadOnlyPhysicalBoard().getPawns().stream().filter(x -> !p.equals(x)).findFirst().get(); // Location should be (8,4)
-        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(7,4), WallDirection.RIGHT)));
+        this.board.executeAction(p, new PlaceWallAction(new Wall(new Position(7,4), WallDirection.RIGHT)), new AllShortestPaths(false));
         try {
-            this.board.executeAction(other, new MovePawnAction(MovementDirection.UP));
+            this.board.executeAction(other, new MovePawnAction(MovementDirection.UP), new AllShortestPaths(false));
             throw new RuntimeException(ILLEGAL_OPERATION_ALLOWED);
         } catch (IllegalMovementException e) {
             assertEquals(e.getReason(), MOVING_IN_DIRECTION_IS_NOT_ALLOWED);

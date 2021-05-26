@@ -3,9 +3,12 @@ package com.rl.mpquoridor.models.board;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
+import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.models.common.ConcurrentHashBiMap;
 import com.rl.mpquoridor.models.enums.WallDirection;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -25,14 +28,14 @@ public class PhysicalBoard {
 
 
     public PhysicalBoard(int numberOfWallsPerPlayer) {
-        this.pawnWalls = new HashMap<>();
+        this.pawnWalls = new ConcurrentHashMap<>();
         this.startNumberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.walls = Sets.newConcurrentHashSet();
 
     }
 
     public void setPawnPosition (Map<Pawn, Position> pawns) {
-        this.pawns = HashBiMap.create(pawns.size());
+        this.pawns = new ConcurrentHashBiMap<>();
         this.pawns.putAll(pawns);
         for (Pawn p : this.pawns.keySet()) {
             this.pawnWalls.put(p, this.startNumberOfWallsPerPlayer);
@@ -115,9 +118,16 @@ public class PhysicalBoard {
             while (currentWalls > 0) {
                 Wall wallToAdd = generateWall();
 
-                while(! wallSimulator.simulatePlaceWall(p, wallToAdd).isAllHavePaths())
-                    wallToAdd = generateWall();
-
+                boolean wallPlaced = false;
+                while(! wallPlaced) {
+                    try {
+                        wallPlaced = wallSimulator.simulatePlaceWall(p, wallToAdd).isAllHavePaths();
+                    } catch (IllegalMovementException ex) {
+                        System.out.println("Wrong wall generated, trying another wall!");
+                        wallToAdd = generateWall();
+                    }
+                }
+                
                 putWall(wallToAdd);
                 currentWalls = currentWalls - 1;
             }

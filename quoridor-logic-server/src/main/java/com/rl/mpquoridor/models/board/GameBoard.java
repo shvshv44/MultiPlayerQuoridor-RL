@@ -12,6 +12,7 @@ import com.rl.mpquoridor.paths.ShortestPathResult;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
 
@@ -26,7 +27,7 @@ public class GameBoard implements PlaceWallSimulator {
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
         this.board = new PhysicalBoard(numberOfWallsPerPlayer);
-        this.board.setPawnEndLine(new HashMap<>());
+        this.board.setPawnEndLine(new ConcurrentHashMap<>());
 
         switch (numberOfPlayers) {
             case 2:
@@ -226,7 +227,7 @@ public class GameBoard implements PlaceWallSimulator {
     public AllShortestPaths isAllPawnsHavePath() {
         AllShortestPaths allShortestPaths = new AllShortestPaths(true);
         for (Pawn p : this.getPhysicalBoard().getPawns()) {
-            ShortestPathResult result = pathHandler.getShortestPath(this.getPhysicalBoard().getPawnPosition(p), this.board.getPawnEndLine().get(p), this.readOnlyPhysicalBoard);
+            ShortestPathResult result = pathHandler.getShortestPath(this.getPhysicalBoard().getPawnPosition(p), this.board.getPawnEndLine().get(p), this.board);
             if (! result.isPathFound()) {
                 return new AllShortestPaths(false);
             }

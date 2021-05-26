@@ -251,3 +251,5 @@ fabric.properties
 models/
 models1/
 models2/
+walking_models/
+walking_metrics/

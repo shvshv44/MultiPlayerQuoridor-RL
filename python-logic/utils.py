@@ -52,6 +52,22 @@ def convert_moves_to_action_options(moves_json):
 
     return action_options
 
+def convert_moves_to_walking_action_options(moves_json):
+    action_options = []
+
+    myLoc = moves_json["currentPosition"]
+    for move in moves_json["avialiableMoves"]:
+        if int(move["x"]) > int(myLoc["x"]):
+            action_options.append(3)  # Move Right
+        elif int(move["x"]) < int(myLoc["x"]):
+            action_options.append(2)  # Move Left
+        elif int(move["y"]) > int(myLoc["y"]):
+            action_options.append(1)  # Move Down
+        elif int(move["y"]) < int(myLoc["y"]):
+            action_options.append(0)  # Move Up
+
+    return action_options
+
 
 # Change if has 4 players
 def define_location_label(start_loc):
@@ -59,3 +75,7 @@ def define_location_label(start_loc):
         return 0 # Start UP
     else:
         return 1 # Start DOWN
+
+
+def location_to_index(loc):
+    return (loc[1] * 9) + loc[0]

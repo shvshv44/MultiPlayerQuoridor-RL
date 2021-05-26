@@ -29,6 +29,12 @@ def start_game(game_id):
     return response
 
 
+def start_generated_game(game_id):
+    start_url = server + "/StartGeneratedGame/" + game_id
+    response = http.get(start_url)
+    return response
+
+
 def train_vs_agent(game_id):
     vs_url = Global.vs_server + "/AgentVsAgent2/" + game_id
     response = http.get(vs_url)

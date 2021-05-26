@@ -1,7 +1,7 @@
 package com.rl.mpquoridor.paths;
 
+import com.rl.mpquoridor.models.board.PhysicalBoard;
 import com.rl.mpquoridor.models.board.Position;
-import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.enums.WallDirection;
 
@@ -9,7 +9,7 @@ import java.util.*;
 
 public class ShortestPathHandler {
 
-    public ShortestPathResult getShortestPath(Position s, Set<Position> dest, ReadOnlyPhysicalBoard physicalBoard) {
+    public ShortestPathResult getShortestPath(Position s, Set<Position> dest, PhysicalBoard physicalBoard) {
         Queue<ShortestPathNode> q = new LinkedList<>();
         Set<ShortestPathNode> visited = new HashSet<>();
         q.add(new ShortestPathNode(s, null));
@@ -28,7 +28,7 @@ public class ShortestPathHandler {
         return new  ShortestPathResult(false, null);
     }
 
-    private List<ShortestPathNode> getAvailableNeighbors(ShortestPathNode node, ReadOnlyPhysicalBoard physicalBoard) {
+    private List<ShortestPathNode> getAvailableNeighbors(ShortestPathNode node, PhysicalBoard physicalBoard) {
         List<ShortestPathNode> ret = new LinkedList<>();
         Position p = node.getPos();
         // UP

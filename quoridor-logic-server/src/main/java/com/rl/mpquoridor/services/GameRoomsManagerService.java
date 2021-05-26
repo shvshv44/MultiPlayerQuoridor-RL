@@ -73,6 +73,16 @@ public class GameRoomsManagerService {
         CompletableFuture.supplyAsync(gameManager::run).thenAcceptAsync(MongoDB.getInstance()::save);
     }
 
+    public void startGeneratedGame(String gameId) {
+        GameRoomState gameRoomState = gameRooms.get(gameId);
+        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
+        gameManager.generateGameBoard();
+        gameRoomState.setManager(gameManager);
+        gameRoomState.setGameStarted(true);
+
+        CompletableFuture.supplyAsync(gameManager::run).thenAcceptAsync(MongoDB.getInstance()::save);
+    }
+
     public GameRoomState getRoomState(String gameId) {
         return gameRooms.get(gameId);
     }

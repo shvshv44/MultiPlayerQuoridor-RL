@@ -3,11 +3,9 @@ package com.rl.mpquoridor.models.board;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
+import com.rl.mpquoridor.models.enums.WallDirection;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -23,6 +21,7 @@ public class PhysicalBoard {
     private Map<Pawn, Integer> pawnWalls;
     private int startNumberOfWallsPerPlayer;
     private Map<Pawn, Set<Position>> pawnEndLine;
+    private Random rand = new Random();
 
 
     public PhysicalBoard(int numberOfWallsPerPlayer) {
@@ -96,6 +95,50 @@ public class PhysicalBoard {
 
     public void setPawnEndLine(final Map<Pawn, Set<Position>> pawnEndLine) {
         this.pawnEndLine = pawnEndLine;
+    }
+
+    public void generate(PlaceWallSimulator wallSimulator) {
+        List<Position> generatedPositions = new ArrayList<>();
+        for (Pawn p : pawns.keySet()){
+            Position newPosition = generatePos(pawnEndLine.get(p));
+            while (generatedPositions.contains(newPosition))
+                newPosition = generatePos(pawnEndLine.get(p));
+
+            pawns.put(p, newPosition);
+            generatedPositions.add(newPosition);
+        }
+
+        for (Pawn p : pawns.keySet()){
+            int numOfWallsToPut = rand.nextInt(startNumberOfWallsPerPlayer + 1); // if starts with 8 walls so there is 0 - 8 walls to put
+            int currentWalls = numOfWallsToPut;
+
+            while (currentWalls > 0) {
+                Wall wallToAdd = generateWall();
+
+                while(! wallSimulator.simulatePlaceWall(p, wallToAdd).isAllHavePaths())
+                    wallToAdd = generateWall();
+
+                putWall(wallToAdd);
+                currentWalls = currentWalls - 1;
+            }
+
+            pawnWalls.put(p, startNumberOfWallsPerPlayer - numOfWallsToPut);
+        }
+    }
+
+    private Position generatePos(Set<Position> positions) {
+        Position currentPos = new Position(rand.nextInt(9), rand.nextInt(9));
+        while (positions.contains(currentPos))
+            currentPos = new Position(rand.nextInt(9), rand.nextInt(9));
+
+        return currentPos;
+    }
+
+    private Wall generateWall() {
+        Position pos = new Position(rand.nextInt(8), rand.nextInt(8));
+        int wallType = rand.nextInt(2);
+        WallDirection direction = (wallType == 0)? WallDirection.RIGHT : WallDirection.DOWN;
+        return new Wall(pos, direction);
     }
 
 }

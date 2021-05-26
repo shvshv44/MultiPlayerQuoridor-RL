@@ -1,23 +1,27 @@
 package com.rl.mpquoridor.models.board;
 
 import com.rl.mpquoridor.exceptions.IllegalMovementException;
+import com.rl.mpquoridor.paths.AllShortestPaths;
+import com.rl.mpquoridor.paths.ShortestPathHandler;
 import com.rl.mpquoridor.models.actions.MovePawnAction;
 import com.rl.mpquoridor.models.actions.PlaceWallAction;
 import com.rl.mpquoridor.models.actions.TurnAction;
 import com.rl.mpquoridor.models.enums.MovementDirection;
 import com.rl.mpquoridor.models.enums.WallDirection;
+import com.rl.mpquoridor.paths.ShortestPathResult;
 import lombok.Getter;
 
 import java.util.*;
 
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
 
-public class GameBoard {
+public class GameBoard implements PlaceWallSimulator {
     private final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     @Getter
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
+    private final ShortestPathHandler pathHandler = new ShortestPathHandler();
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
@@ -116,13 +120,15 @@ public class GameBoard {
         }
     }
 
-    private void placeWall(Pawn pawn, Wall wall) throws IllegalMovementException {
-        simulatePlaceWall(pawn, wall);
+    private AllShortestPaths placeWall(Pawn pawn, Wall wall) throws IllegalMovementException {
+        AllShortestPaths allShortestPaths = simulatePlaceWall(pawn, wall);
         this.getPhysicalBoard().putWall(wall);
         this.getPhysicalBoard().reduceWallToPawn(pawn);
+        return allShortestPaths;
     }
 
-    private void simulatePlaceWall(Pawn pawn, Wall wall) throws IllegalMovementException {
+    @Override
+    public AllShortestPaths simulatePlaceWall(Pawn pawn, Wall wall) throws IllegalMovementException {
         // Make sure the pawn has enough walls
         if (getPhysicalBoard().getPawnWalls().get(pawn) == 0) {
             throw new IllegalMovementException(NO_WALLS_LEFT);
@@ -141,11 +147,13 @@ public class GameBoard {
 
         // Make sure all the pawns have an available path
         this.getPhysicalBoard().putWall(wall); // Putting this, if pawn has no path, remove this wall.
-        if (!isAllPawnsHavePath()) {
+        AllShortestPaths allShortestPaths = isAllPawnsHavePath();
+        if (! allShortestPaths.isAllHavePaths()) {
             this.getPhysicalBoard().removeWall(wall);
             throw new IllegalMovementException(NO_PATH_AVAILABLE);
         }
         this.getPhysicalBoard().removeWall(wall);
+        return allShortestPaths;
     }
 
     public Set<Wall> getAvailableWalls(Pawn pawn) {
@@ -166,12 +174,15 @@ public class GameBoard {
         return ret;
     }
 
-    public void executeAction(Pawn pawn, TurnAction action) throws IllegalMovementException {
+    public AllShortestPaths executeAction(Pawn pawn, TurnAction action, AllShortestPaths lastASP) throws IllegalMovementException {
         if (action instanceof PlaceWallAction) {
-            placeWall(pawn, ((PlaceWallAction) action).getWall());
+            return placeWall(pawn, ((PlaceWallAction) action).getWall());
         } else if (action instanceof MovePawnAction) {
             movePawn(pawn, ((MovePawnAction) action).getDirection());
+            return isAllPawnsHavePath();
         }
+
+        return lastASP;
     }
 
 
@@ -184,48 +195,6 @@ public class GameBoard {
             this.readOnlyPhysicalBoard = new ReadOnlyPhysicalBoard(this.board);
         }
         return this.readOnlyPhysicalBoard;
-    }
-
-    private boolean isPathExists(Position s, Set<Position> dest) {
-        Queue<Position> q = new LinkedList<>();
-        Set<Position> visited = new HashSet<>();
-        q.add(s);
-        while (!q.isEmpty()) {
-            Position curr = q.poll();
-            if (dest.contains(curr)) { // This is an O(1) operation
-                return true;
-            }
-            if (!visited.contains(curr)) {
-                visited.add(curr);
-                q.addAll(getAvailableNeighbors(curr));
-            }
-        }
-
-        return false;
-    }
-
-    private List<Position> getAvailableNeighbors(Position p) {
-        List<Position> ret = new LinkedList<>();
-        // UP
-        if (p.getY() > 0 && Collections.disjoint(this.getPhysicalBoard().getWalls(), getUpBlockers(p))) {
-            ret.add(new Position(p.getY() - 1, p.getX()));
-        }
-        // DOWN
-        if (p.getY() < this.getPhysicalBoard().getSize() - 1 && Collections.disjoint(this.getPhysicalBoard().getWalls(), getDownBlockers(p))) {
-            ret.add(new Position(p.getY() + 1, p.getX()));
-        }
-
-        // LEFT
-        if (p.getX() > 0 && Collections.disjoint(this.getPhysicalBoard().getWalls(), getLeftBlockers(p))) {
-            ret.add(new Position(p.getY(), p.getX() - 1));
-        }
-
-        // RIGHT
-        if (p.getX() < this.getPhysicalBoard().getSize() - 1 && Collections.disjoint(this.getPhysicalBoard().getWalls(), getRightBlockers(p))) {
-            ret.add(new Position(p.getY(), p.getX() + 1));
-        }
-
-        return ret;
     }
 
     private boolean isWallCollides(Wall wall) {
@@ -254,13 +223,18 @@ public class GameBoard {
 
     }
 
-    private boolean isAllPawnsHavePath() {
+    public AllShortestPaths isAllPawnsHavePath() {
+        AllShortestPaths allShortestPaths = new AllShortestPaths(true);
         for (Pawn p : this.getPhysicalBoard().getPawns()) {
-            if (!isPathExists(this.getPhysicalBoard().getPawnPosition(p), this.board.getPawnEndLine().get(p))) {
-                return false;
+            ShortestPathResult result = pathHandler.getShortestPath(this.getPhysicalBoard().getPawnPosition(p), this.board.getPawnEndLine().get(p), this.readOnlyPhysicalBoard);
+            if (! result.isPathFound()) {
+                return new AllShortestPaths(false);
             }
+
+            allShortestPaths.add(p, result.getShortestNode().getLengthFromStart());
         }
-        return true;
+
+        return allShortestPaths;
     }
 
     /**
@@ -407,5 +381,9 @@ public class GameBoard {
         ret.add(new Wall(new Position(p.getY() - 1, p.getX()), WallDirection.DOWN));
         ret.add(new Wall(new Position(p.getY(), p.getX()), WallDirection.DOWN));
         return ret;
+    }
+
+    public void generateGameBoard() {
+        board.generate(this);
     }
 }

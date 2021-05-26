@@ -4,7 +4,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.rl.mpquoridor.database.MongoDB;
 import com.rl.mpquoridor.exceptions.InvalidOperationException;
 import com.rl.mpquoridor.models.board.Pawn;
-import com.rl.mpquoridor.models.board.Position;
 import com.rl.mpquoridor.models.board.ReadOnlyPhysicalBoard;
 import com.rl.mpquoridor.models.board.Wall;
 import com.rl.mpquoridor.models.common.Constants;
@@ -31,7 +30,6 @@ import java.net.ServerSocket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @RestController
 public class GameAPIController {
@@ -195,10 +193,34 @@ public class GameAPIController {
         return createBasicOKResponse(gameId);
     }
 
-    private void startRoomGame(@PathVariable String gameId) {
+    @CrossOrigin
+    @GetMapping("/StartGeneratedGame/{gameId}")
+    @ResponseBody
+    public ResponseEntity<String> startGeneratedGame(@PathVariable String gameId) {
+        GameRoomState roomState = gameRoomManager.getRoomState(gameId);
+        if (roomState.getPlayers().size() < Constants.MIN_NUMBER_PLAYERS)
+            return createBasicBadRequestResponse("Game room must contain at least two players!");
+
+        if (roomState.isGameStarted())
+            return createBasicBadRequestResponse("Game is already started!");
+
+        startGeneratedRoomGame(gameId);
+        return createBasicOKResponse(gameId);
+    }
+
+    private void startRoomGame(String gameId) {
         try {
             logger.info("Starting game with id: " + gameId);
             gameRoomManager.startGame(gameId);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!
+        }
+    }
+
+    private void startGeneratedRoomGame(String gameId) {
+        try {
+            logger.info("Starting generated game with id: " + gameId);
+            gameRoomManager.startGeneratedGame(gameId);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!
         }

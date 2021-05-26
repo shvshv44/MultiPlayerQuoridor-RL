@@ -13,6 +13,7 @@ import com.rl.mpquoridor.models.events.GameEvent;
 import com.rl.mpquoridor.models.events.NewTurnEvent;
 import com.rl.mpquoridor.models.events.StartGameEvent;
 import com.rl.mpquoridor.models.players.Player;
+import com.rl.mpquoridor.paths.AllShortestPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,10 @@ public class GameManager {
         this.numberOfWallsPerPlayer = numberOfWallsPerPlayer;
         this.gameBoard = new GameBoard(this.players.size(), numberOfWallsPerPlayer);
         initPlayerPawn();
+    }
+
+    public void generateGameBoard() {
+        this.gameBoard.generateGameBoard();
     }
 
     public Queue<Player> getPlayers() {
@@ -80,6 +85,7 @@ public class GameManager {
         boolean isGameEnded = (this.gameBoard.getWinner() != null);
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
+        AllShortestPaths lastASP = this.gameBoard.isAllPawnsHavePath();
         while (!isGameEnded) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
@@ -87,11 +93,11 @@ public class GameManager {
             Player secondPlayer = this.players.peek();
             Pawn secondPawn = playerPawn.get(secondPlayer);
             this.players.add(this.players.poll());
-            trigger(new NewTurnEvent(currentPawn, secondPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn)));
+            trigger(new NewTurnEvent(currentPawn, secondPawn, this.gameBoard.getCurrentPlayerMoves(currentPawn), this.gameBoard.getAvailableWalls(currentPawn), lastASP.getPawnShortestPath()));
 
             TurnAction action = currentPlayer.play();
             try {
-                this.gameBoard.executeAction(currentPawn, action);
+                lastASP = this.gameBoard.executeAction(currentPawn, action, lastASP);
             } catch (IllegalMovementException e) {
                 currentPlayer.illegalMovePlayed(e.getReason());
                 logger.info("Illegal action " + e.getReason().getMessage());

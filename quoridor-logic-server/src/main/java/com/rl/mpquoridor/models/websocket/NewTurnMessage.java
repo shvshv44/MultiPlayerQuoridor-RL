@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class NewTurnMessage extends EventMessage {
@@ -21,5 +22,6 @@ public class NewTurnMessage extends EventMessage {
     private Position secondPlayerPosition;
     private List<Position> avialiableMoves;
     private Collection<Wall> availableWalls;
+    private Map<String, Integer> playerShortestPaths;
 
 }

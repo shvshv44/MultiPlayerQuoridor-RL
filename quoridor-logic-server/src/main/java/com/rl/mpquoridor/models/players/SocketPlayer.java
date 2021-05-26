@@ -83,6 +83,12 @@ public abstract class SocketPlayer implements Player{
             message.setAvialiableMoves(this.myPawn == newTurnEvent.getPawn() ? newTurnEvent.getCurrentPawnMoves() : Collections.emptyList());
             message.setAvailableWalls(this.myPawn == newTurnEvent.getPawn() ? newTurnEvent.getCurrentPawnWalls() : Collections.emptyList());
 
+            HashMap<String, Integer> paths = new HashMap<>();
+            for (Map.Entry<Pawn, Integer> entry : newTurnEvent.getPawnShortestPath().entrySet()) {
+                paths.put(this.pawnPerPlayerName.get(entry.getKey()), entry.getValue());
+            }
+            message.setPlayerShortestPaths(paths);
+
             this.sendEvent(message);
         }
 

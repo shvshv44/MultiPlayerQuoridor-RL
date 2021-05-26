@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.rl.mpquoridor.models.enums.MessageType.GAME_OVER_EVENT;
+
 public class TCPPlayer extends SocketPlayer {
 
     private static final String ASK_FOR_PLAY_MESSAGE = "play";
@@ -33,6 +35,10 @@ public class TCPPlayer extends SocketPlayer {
     public void sendEvent(EventMessage message) {
         try {
             gameTCPSocket.send(gson.toJson(message, message.getClass()));
+
+            if (message.getType().equals(GAME_OVER_EVENT)) {
+                closeConnection();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,6 +78,17 @@ public class TCPPlayer extends SocketPlayer {
             return gson.fromJson(msg, PlaceWallAction.class);
         } else {
             return gson.fromJson(msg, MovePawnAction.class);
+        }
+    }
+
+    private void closeConnection() {
+        try {
+            Thread.sleep(1000);
+            this.gameTCPSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

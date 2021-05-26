@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -16,5 +17,5 @@ public class NewTurnEvent implements GameEvent{
     Pawn secondPawn;
     List<Position> currentPawnMoves;
     Set<Wall> currentPawnWalls;
-
+    Map<Pawn, Integer> pawnShortestPath;
 }

@@ -12,12 +12,15 @@ import java.util.*;
 
 import static com.rl.mpquoridor.exceptions.IllegalMovementException.Reason.*;
 
+
 public class GameBoard {
     private final PhysicalBoard board;
     private ReadOnlyPhysicalBoard readOnlyPhysicalBoard;
     @Getter
     private Pawn winner = null;
     private final List<Pawn> playOrder = new LinkedList<>();
+    private Random rand = new Random();
+
 
     public GameBoard(int numberOfPlayers, int numberOfWallsPerPlayer) {
         Map<Pawn, Position> pawns;
@@ -50,8 +53,27 @@ public class GameBoard {
         playOrder.add(p1);
         playOrder.add(p2);
 
-        ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
-        ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
+        int isRandomLocations = rand.nextInt(100);
+
+        if (isRandomLocations > 60) {
+            ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
+            ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
+        } else {
+            int firstPlayerX = rand.nextInt(9);
+            int firstPlayerY = rand.nextInt(8);
+
+            int secondPlayerX = rand.nextInt(9);
+            int secondPlayerY = rand.nextInt(8);
+
+            while (secondPlayerX == firstPlayerX && (secondPlayerY + 1) == firstPlayerY) {
+                secondPlayerX = rand.nextInt(9);
+                secondPlayerY = rand.nextInt(8);
+            }
+
+            ret.put(p1, new Position(firstPlayerY, firstPlayerX));
+            ret.put(p2, new Position(secondPlayerY + 1, secondPlayerX));
+        }
+
         this.board.getPawnEndLine().put(p1, new HashSet<>());
         this.board.getPawnEndLine().put(p2, new HashSet<>());
 

@@ -1,19 +1,17 @@
-import json
-import rest_api
-from tcp import TCP
-from better_quoridor_env import QuoridorEnv
-import random
-import utils
 import numpy as np
 
+import rest_api
+import utils
+from better_quoridor_env import QuoridorEnv
+from tcp import TCP
 
 
 class Trainer:
     def __init__(self, agent):
         self.agent = agent
         self.name = "Trainer"
-        self.overfitting_limitation_winning_games = 15 # how many winning games will be overfitting
-        self.overfitting_limitation_winning_steps = 30 # how many steps will be considered good game
+        self.overfitting_limitation_winning_games = 15  # how many winning games will be overfitting
+        self.overfitting_limitation_winning_steps = 30  # how many steps will be considered good game
         self.sum_of_steps = 0
 
     def start_training_session(self, num_of_episodes):
@@ -60,7 +58,11 @@ class Trainer:
             if self.sum_of_steps % 500 == 0:
                 self.agent.reset_epsilon()
 
-        print("\n\nAGENT STARTS IN LOCATION ({},{}) - LABEL {} - GAME FINISHED IN {} STEPS!\n\n".format(start_location[0], start_location[1], location_label, steps_num))
+        print(
+            "\n\nAGENT STARTS IN LOCATION ({},{}) - LABEL {} - GAME FINISHED IN {} STEPS!\n\n".format(start_location[0],
+                                                                                                      start_location[1],
+                                                                                                      location_label,
+                                                                                                      steps_num))
         return env.winner_name == env.player_name and steps_num <= self.overfitting_limitation_winning_steps
 
     def headline_print(self, text):
@@ -86,7 +88,8 @@ class RandomTrainer(Trainer):
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
-                print("Agent position", json_message["secondPlayerPosition"])
+                print("Agent position", json_message["secondPlayerPosition"], ", Trainer position ",
+                      json_message["currentPosition"])
                 actions = utils.convert_moves_to_action_options(json_message)
                 choices_len = len(actions)
                 if choices_len == 0:
@@ -111,9 +114,11 @@ class SmartTrainer(Trainer):
     def on_recieved(self, json_message):
         if json_message["type"] == "NewTurnEvent":
             if json_message["nextPlayerToPlay"] == self.name:
-                print("Agent position", json_message["secondPlayerPosition"])
+                print("Agent position", json_message["secondPlayerPosition"], ", Trainer position ",
+                      json_message["currentPosition"])
                 actions = utils.convert_moves_to_action_options(json_message)
-                action = self.trainer_move(actions, json_message["secondPlayerPosition"]["y"], json_message["secondPlayerPosition"]["x"])
+                action = self.trainer_move(actions, json_message["secondPlayerPosition"]["y"],
+                                           json_message["secondPlayerPosition"]["x"])
                 act_json = utils.convert_action_to_server(action)
                 self.tcp.write(act_json)
 
@@ -125,10 +130,99 @@ class SmartTrainer(Trainer):
         if self.want_to_win < 0.7:
             self.want_to_win = self.want_to_win + 0.001
         random_choice = np.random.random()
-        putWall = True #if second_player_position_y > 3 else False
-        if np.random.random() < 0.5 and actions.count(0) > 0:
+        putWall = True  # if second_player_position_y > 3 else False
+        if np.random.random() < 0.7 and actions.count(0) > 0:
             return 0
         elif putWall and np.random.random() < 0.3 and \
+                actions.count(4 + second_player_position_x + (8 * second_player_position_y)) > 0:
+            print("Put wall on agent face 1")
+            return 4 + second_player_position_x + (8 * second_player_position_y)
+        elif putWall and np.random.random() < 0.3 and \
+                actions.count(4 - 1 + second_player_position_x + (8 * second_player_position_y)) > 0:
+            print("Put wall on agent face 1")
+            return 4 - 1 + second_player_position_x + (8 * second_player_position_y)
+        elif putWall and np.random.random() < 0.1 and \
+                actions.count(4 + 64 + second_player_position_x + (8 * second_player_position_y)) > 0:
+            return 4 + 64 + second_player_position_x + (8 * second_player_position_y)
+        elif putWall and np.random.random() < 0.1 and \
+                actions.count(4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))) > 0:
+            return 4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))
+        elif np.random.random() < 0.5 and actions.count(2) > 0:
+            return 2
+        elif np.random.random() < 0.5 and actions.count(3) > 0:
+            return 3
+        elif np.random.random() < 0.2 and actions.count(1) > 0:
+            return 1
+        else:
+            choices_len = len(actions)
+            random_i = np.random.randint(0, choices_len)
+            return actions[random_i]
+
+
+class SmartTrainerMoves(Trainer):
+
+    def __init__(self, agent):
+        super().__init__(agent)
+        self.name = "ZZTrainer"
+        self.want_to_win = 0.3
+
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.name:
+                print("Agent position", json_message["secondPlayerPosition"], ", Trainer position ",
+                      json_message["currentPosition"])
+                actions = utils.convert_moves_to_action_options(json_message)
+                action = self.trainer_move(actions, json_message["secondPlayerPosition"]["y"],
+                                           json_message["secondPlayerPosition"]["x"])
+                act_json = utils.convert_action_to_server(action)
+                self.tcp.write(act_json)
+
+        elif json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)
+
+    def trainer_move(self, actions, second_player_position_y, second_player_position_x):
+        if np.random.random() < 0.5 and actions.count(0) > 0:
+            return 0
+        elif np.random.random() < 0.3 and actions.count(2) > 0:
+            return 2
+        elif np.random.random() < 0.3 and actions.count(3) > 0:
+            return 3
+        elif np.random.random() < 0.1 and actions.count(1) > 0:
+            return 1
+        else:
+            choices_len = len(actions)
+            random_i = np.random.randint(0, choices_len)
+            return actions[random_i]
+
+
+class SmartTrainerWalls(Trainer):
+
+    def __init__(self, agent):
+        super().__init__(agent)
+        self.name = "ZZTrainer"
+        self.want_to_win = 0.3
+
+    def on_recieved(self, json_message):
+        if json_message["type"] == "NewTurnEvent":
+            if json_message["nextPlayerToPlay"] == self.name:
+                print("Agent position", json_message["secondPlayerPosition"], ", Trainer position ",
+                      json_message["currentPosition"])
+                actions = utils.convert_moves_to_action_options(json_message)
+                action = self.trainer_move(actions, json_message["secondPlayerPosition"]["y"],
+                                           json_message["secondPlayerPosition"]["x"])
+                act_json = utils.convert_action_to_server(action)
+                self.tcp.write(act_json)
+
+        elif json_message["type"] == "RoomStateResponse":
+            if len(json_message["players"]) == 2:
+                rest_api.start_game(self.game_id)
+
+    def trainer_move(self, actions, second_player_position_y, second_player_position_x):
+        if self.want_to_win < 0.7:
+            self.want_to_win = self.want_to_win + 0.001
+        putWall = True  # if second_player_position_y > 3 else False
+        if putWall and np.random.random() < 0.3 and \
                 actions.count(4 + second_player_position_x + (8 * second_player_position_y)) > 0:
             return 4 + second_player_position_x + (8 * second_player_position_y)
         elif putWall and np.random.random() < 0.3 and \
@@ -140,11 +234,19 @@ class SmartTrainer(Trainer):
         elif putWall and np.random.random() < 0.2 and \
                 actions.count(4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))) > 0:
             return 4 + 64 + second_player_position_x + (8 * (second_player_position_y - 1))
-        elif np.random.random() < 0.5 and actions.count(2) > 0:
+        elif putWall and np.random.random() < 0.1 and \
+                actions.count(4 + second_player_position_x + (8 * (second_player_position_y + 1))) > 0:
+            return 4 + second_player_position_x + (8 * (second_player_position_y + 1))
+        elif putWall and np.random.random() < 0.1 and \
+                actions.count(4 - 1 + second_player_position_x + (8 * (second_player_position_y + 1))) > 0:
+            return 4 - 1 + second_player_position_x + (8 * (second_player_position_y + 1))
+        elif np.random.random() < 0.4 and actions.count(0) > 0:
+            return 0
+        elif np.random.random() < 0.2 and actions.count(2) > 0:
             return 2
-        elif np.random.random() < 0.5 and actions.count(3) > 0:
+        elif np.random.random() < 0.2 and actions.count(3) > 0:
             return 3
-        elif np.random.random() < 0.5 and actions.count(1) > 0:
+        elif np.random.random() < 0.1 and actions.count(1) > 0:
             return 1
         else:
             choices_len = len(actions)

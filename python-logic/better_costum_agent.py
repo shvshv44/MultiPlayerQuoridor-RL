@@ -1,17 +1,15 @@
+import random
 from collections import deque
 
-from tensorflow.keras.optimizers import Adam
-import tensorflow as tf
-from globals import Global
 import numpy as np
+import tensorflow as tf
 import tensorflow as ts
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, BatchNormalization, Dropout
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Dropout
 from tensorflow.keras.layers import LeakyReLU, Input, Embedding, Reshape, Concatenate
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.initializers import RandomNormal
-import random
 from tensorflow.keras.models import clone_model
-from datetime import datetime
+from tensorflow.keras.optimizers import Adam
+
+from globals import Global
 
 loss = "mean_squared_error"
 optimizer = Adam(learning_rate=1e-3)
@@ -109,16 +107,16 @@ class Agent:
         self.random_act_epsilon_max = 0.9
         self.random_act_epsilon_min = 0.1
         self.random_act_epsilon = self.epsilon_max
-        self.random_act_epsilon_decay = 0.9995
+        self.random_act_epsilon_decay = 0.99995
 
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
-        if np.random.random() < self.epsilon:
+        if np.random.random() < 0.5:  # self.epsilon:
             print("random action")
             action = self.random_act(env)
         else:
-            #print("predicted action")
+            # print("predicted action")
             action = self.predicated_act(state, env, location_label)
 
         return action
@@ -137,21 +135,29 @@ class Agent:
         self.random_act_epsilon *= self.random_act_epsilon_decay
         self.random_act_epsilon = max(self.random_act_epsilon_min, self.random_act_epsilon)
         if np.random.random() < self.random_act_epsilon:
-            return_value = Agent.smart_move(self, choices)
+            return_value = Agent.smart_move(self, choices, env.get_opponent_location())
         else:
             return_value = choices[np.random.randint(0, choices_len)]
         return return_value
 
-    def smart_move(self, actions):
+    def smart_move(self, actions, opponent_position):
         print("smart random action")
         random_choice = np.random.random()
-        if random_choice < 0.5 and actions.count(1) > 0:
+        if random_choice < 0.7 and actions.count(1) > 0:
             return 1
+        elif np.random.random() < 0.3 and actions.count(
+                4 + opponent_position[1] + (8 * (opponent_position[0] - 1))) > 0:
+            print("Put wall on trainer face 1")
+            return 4 + opponent_position[1] + (8 * (opponent_position[0] - 1))
+        elif np.random.random() < 0.3 and actions.count(
+                4 - 1 + opponent_position[1] + (8 * (opponent_position[0] - 1))) > 0:
+            print("Put wall on trainer face 2")
+            return 4 - 1 + opponent_position[1] + (8 * (opponent_position[0] - 1))
         elif np.random.random() < 0.5 and actions.count(2) > 0:
             return 2
         elif np.random.random() < 0.5 and actions.count(3) > 0:
             return 3
-        elif np.random.random() < 0.3 and actions.count(0) > 0:
+        elif np.random.random() < 0.1 and actions.count(0) > 0:
             return 0
         else:
             choices_len = len(actions)
@@ -180,7 +186,8 @@ class Agent:
             else:
                 # Q_future = max(self.target_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])
                 # target = reward + self.discount_factor * np.max(self.model.predict(next_state)[0])
-                Q_future = self.alternate_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0][
+                Q_future = \
+                self.alternate_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0][
                     np.argmax(self.model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])]
                 target[0][action] = reward + Q_future * self.gamma
             self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
@@ -258,4 +265,3 @@ class Agent:
                 action_index = prob_index
 
         return max_indices[action_index]
-

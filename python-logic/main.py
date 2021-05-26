@@ -34,7 +34,7 @@ def load_better_model(file):
     else:
         return keras.models.load_model("./models/{}".format(file))
 
-
+#quoridor_21_05_2021__10_43_34.h5 #quoridor_22_05_2021__21_20_33
 model = load_better_model("") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
 
 
@@ -104,6 +104,29 @@ def train_better_agent_smart(episodes):
 
     return "Trained Successfully!"
 
+@route('/TrainBetterAgent/SmartMove/<episodes>', methods=['GET'])
+def train_better_agent_smart_move(episodes):
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = better_trainer.SmartTrainerMoves(agent)
+    trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.save(saved_file_name)
+
+    return "Trained Successfully!"
+
+@route('/TrainBetterAgent/SmartWalls/<episodes>', methods=['GET'])
+def train_better_agent_smart_walls(episodes):
+    global model
+    agent = better_costum_agent.Agent(model)
+    trainer = better_trainer.SmartTrainerWalls(agent)
+    trainer.start_training_session(int(episodes))
+    time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+    saved_file_name = "./models/quoridor_{}.h5".format(time)
+    model.save(saved_file_name)
+
+    return "Trained Successfully!"
 
 @route('/SaveModel', methods=['GET'])
 def save_model():

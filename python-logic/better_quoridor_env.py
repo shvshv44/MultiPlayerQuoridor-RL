@@ -200,12 +200,14 @@ class QuoridorEnv(gym.Env):
                 print("Trainer win")
                 self.winner_status = GameWinnerStatus.EnvLoser
             self.is_my_turn = True
-            # self.tcp.close_connection()
+            #self.tcp.close_connection()
         elif json_message["type"] == "StartGameMessage":
             self.update_winning_locations(json_message["players"])
             self.update_winning_locations_for_opponent(json_message["players"])
             self.player_start_location = self.get_start_player_location(json_message["players"])
             self.opponent_start_location = self.get_start_opponent_location(json_message["players"])
+            print("Agent start position - ", self.get_start_player_location(json_message["players"]))
+            print("Trainer start position - ", self.get_start_opponent_location(json_message["players"]))
 
     def action_shape(self):
         return action_shape()
@@ -218,6 +220,9 @@ class QuoridorEnv(gym.Env):
 
     def get_action_options(self):
         return self.action_options
+
+    def get_opponent_location(self):
+        return self.opponent_location
 
     def update_winning_locations(self, players):
         for player in players:

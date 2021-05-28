@@ -4,6 +4,8 @@ import rest_api
 import utils
 from better_quoridor_env import QuoridorEnv
 from tcp import TCP
+from datetime import datetime
+
 
 
 class Trainer:
@@ -13,11 +15,14 @@ class Trainer:
         self.overfitting_limitation_winning_games = 15  # how many winning games will be overfitting
         self.overfitting_limitation_winning_steps = 30  # how many steps will be considered good game
         self.sum_of_steps = 0
+        self.time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
 
     def start_training_session(self, num_of_episodes):
         num_of_agent_good_winning = 0
         self.sum_of_steps = 0
+        self.game_number = 0
         for episode_num in range(num_of_episodes):
+            self.game_number = episode_num
             self.headline_print("start game of episode number {}".format(episode_num + 1))
             self.game_id = rest_api.create_game(self.name).content.decode("utf-8")
             print("Trainer created game with id: {}".format(self.game_id))
@@ -44,6 +49,7 @@ class Trainer:
         num_of_agent_good_winning = 0
         location_label = utils.define_location_label(start_location)
         self.agent.alternate_model = self.agent.model
+        r = []
 
         while not done:
             steps_num += 1
@@ -54,6 +60,8 @@ class Trainer:
             self.agent.replay(env, location_label)  # internally iterates default (prediction) model
             self.agent.target_train()  # iterates target model
             cur_state = new_state
+            r.append(reward)
+
 
             if self.sum_of_steps % 500 == 0:
                 self.agent.reset_epsilon()
@@ -62,8 +70,20 @@ class Trainer:
             "\n\nAGENT STARTS IN LOCATION ({},{}) - LABEL {} - GAME FINISHED IN {} STEPS!\n\n".format(start_location[0],
                                                                                                       start_location[1],
                                                                                                       location_label,
-                                                                                                      steps_num))
+                                                                                                steps_num))
+
+        if env.player_start_location[0] == 0 and env.player_start_location[1] == 4 and env.opponent_start_location[
+            0] == 8 and env.opponent_start_location[1] == 4:
+            r = np.mean(r)
+            print("episode number: ", self.game_number, ", reward: ", r, "steps  ", steps_num)
+            self.save_info(self.game_number, r, steps_num)
+
         return env.winner_name == env.player_name and steps_num <= self.overfitting_limitation_winning_steps
+
+    def save_info(self, episode, reward, steps):
+        file = open("./Plot/NoisyDQN-" + self.time, 'a')
+        file.write(str(episode) + " " + str(reward) + " " + str(steps) + " \n")
+        file.close()
 
     def headline_print(self, text):
         print("====================================================")

@@ -143,6 +143,14 @@ def save_model_to_path(file_name):
     model.save(file_name)
     return "Model Saved In {}".format(file_name)
 
+@route('/RunTrain', methods=['GET'])
+def run_train():
+    while True:
+        train_better_agent(200)
+        train_better_agent_smart(150)
+        train_better_agent(200)
+        train_better_agent_smart_move(100)
+
 
 @route('/LoadModel/<file_name>', methods=['GET'])
 def load_model_to_path(file_name):
@@ -153,3 +161,4 @@ def load_model_to_path(file_name):
 
 if __name__ == '__main__':
     run(host='0.0.0.0', port=8000, debug=True)
+

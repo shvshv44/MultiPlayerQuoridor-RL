@@ -106,9 +106,9 @@ class QuoridorEnv(gym.Env):
         reward = -0.001
         # To prefer be close to goal and keep opponent far from goal
         graph = self.create_graph()
-        reward += - 0.0005 * self.calculate_closest_goal_distance_bfs(graph, self.player_location,
+        reward += - 0.005 * self.calculate_closest_goal_distance_bfs(graph, self.player_location,
                                                                       self.player_winning_points)
-        reward += - 0.0005 * (40 - self.calculate_closest_goal_distance_bfs(graph, self.opponent_location,
+        reward += - 0.005 * (40 - self.calculate_closest_goal_distance_bfs(graph, self.opponent_location,
                                                                             self.opponent_winning_points))
 
         # To prefer saving the walls for good moments
@@ -119,9 +119,9 @@ class QuoridorEnv(gym.Env):
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 0.7
+                reward = 0.8
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -0.7
+                reward = -0.8
 
         return reward, done
 

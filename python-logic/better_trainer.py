@@ -13,7 +13,7 @@ class Trainer:
         self.agent = agent
         self.name = "Trainer"
         self.overfitting_limitation_winning_games = 15  # how many winning games will be overfitting
-        self.overfitting_limitation_winning_steps = 30  # how many steps will be considered good game
+        self.overfitting_limitation_winning_steps = 10  # how many steps will be considered good game
         self.sum_of_steps = 0
         self.time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
 

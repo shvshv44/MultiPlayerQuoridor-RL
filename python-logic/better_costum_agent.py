@@ -38,7 +38,7 @@ class Model:
         li = Dense(n_nodes)(li)
         li = Reshape((board_shape[0], board_shape[1], 1))(li)
 
-        in_state = Input(shape=(board_shape[0], board_shape[1], 6))
+        in_state = Input(shape=(board_shape[0], board_shape[1], 4))
         merge = Concatenate()([in_state, li])
 
         f3 = Conv2D(128, (3, 3), strides=(2, 2), padding='same')(merge)
@@ -96,7 +96,7 @@ class Agent:
         self.epsilon_max = 0.85
         self.epsilon_min = 0.15
         self.epsilon = self.epsilon_max
-        self.epsilon_decay = 0.98
+        self.epsilon_decay = 0.998
         self.tau = .125
 
         self.target_model = model
@@ -105,14 +105,14 @@ class Agent:
         self.advance_chance_value = 0.2
 
         self.random_act_epsilon_max = 0.9
-        self.random_act_epsilon_min = 0.1
+        self.random_act_epsilon_min = 0.3
         self.random_act_epsilon = self.epsilon_max
-        self.random_act_epsilon_decay = 0.99995
+        self.random_act_epsilon_decay = 0.9995
 
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
-        if np.random.random() < 0.5:  # self.epsilon:
+        if np.random.random() < self.epsilon:
             print("random action")
             action = self.random_act(env)
         else:
@@ -134,7 +134,7 @@ class Agent:
         choices_len = len(choices)
         self.random_act_epsilon *= self.random_act_epsilon_decay
         self.random_act_epsilon = max(self.random_act_epsilon_min, self.random_act_epsilon)
-        if np.random.random() < self.random_act_epsilon:
+        if np.random.random() < 0.8:#self.random_act_epsilon:
             return_value = Agent.smart_move(self, choices, env.get_opponent_location())
         else:
             return_value = choices[np.random.randint(0, choices_len)]
@@ -157,8 +157,6 @@ class Agent:
             return 2
         elif np.random.random() < 0.5 and actions.count(3) > 0:
             return 3
-        elif np.random.random() < 0.1 and actions.count(0) > 0:
-            return 0
         else:
             choices_len = len(actions)
             random_i = np.random.randint(0, choices_len)

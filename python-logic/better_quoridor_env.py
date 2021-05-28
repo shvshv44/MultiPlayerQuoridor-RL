@@ -51,6 +51,8 @@ class QuoridorEnv(gym.Env):
         self.action_options = []
         self.player_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
         self.opponent_winning_points_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.player_scene_dim = np.zeros(shape=(9, 9), dtype=int)
+        self.opponent_scene_dim = np.zeros(shape=(9, 9), dtype=int)
         self.player_winning_points = []
         self.opponent_winning_points = []
         self.player_location = (-1, -1)
@@ -103,27 +105,28 @@ class QuoridorEnv(gym.Env):
     def calculate_reward(self):
         done = False
 
-        reward = -0.001
+        reward = 0
         # To prefer be close to goal and keep opponent far from goal
         graph = self.create_graph()
-        reward += - 0.0005 * self.calculate_closest_goal_distance_bfs(graph, self.player_location,
+        reward += - 0.005 * self.calculate_closest_goal_distance_bfs(graph, self.player_location,
                                                                       self.player_winning_points)
-        reward += - 0.0005 * (40 - self.calculate_closest_goal_distance_bfs(graph, self.opponent_location,
+        reward += - 0.005 * (40 - self.calculate_closest_goal_distance_bfs(graph, self.opponent_location,
                                                                             self.opponent_winning_points))
 
         # To prefer saving the walls for good moments
         if self.last_move_type == MoveType.WALL:
-            reward -= 0.2
+            reward -= 0.1
 
         # To prefer to win
         if self.winner_status != GameWinnerStatus.NoWinner:
             done = True
             if self.winner_status == GameWinnerStatus.EnvWinner:
-                reward = 0.7
+                reward = 0.9
             elif self.winner_status == GameWinnerStatus.EnvLoser:
-                reward = -0.7
+                reward = -0.9
 
         return reward, done
+
 
     def update_board(self, action):
         if 0 <= action <= 3:
@@ -170,16 +173,15 @@ class QuoridorEnv(gym.Env):
         dim2 = np.zeros((9, 9), dtype=int)
         pi = self.find_player_index(board["players"])
         oi = self.find_opponent_index(board["players"])
-        dim1[board["players"][pi]["position"]["y"]][board["players"][pi]["position"]["x"]] = 1
-        dim2[board["players"][oi]["position"]["y"]][board["players"][oi]["position"]["x"]] = 1
+        self.player_scene_dim[board["players"][pi]["position"]["y"]][board["players"][pi]["position"]["x"]] = 1
+        self.opponent_scene_dim[board["players"][oi]["position"]["y"]][board["players"][oi]["position"]["x"]] = 1
         self.player_location = (int(board["players"][pi]["position"]["y"]), int(board["players"][pi]["position"]["x"]))
         self.opponent_location = (int(board["players"][oi]["position"]["y"]), int(board["players"][oi]["position"]["x"]))
 
         self.horizontal_walls = board["horizontalWalls"]
         self.vertical_walls = board["verticalWalls"]
 
-        all_dims = np.dstack((dim1, dim2, board["horizontalWalls"], board["verticalWalls"],
-                              self.player_winning_points_dim, self.opponent_winning_points_dim))
+        all_dims = np.dstack((self.player_scene_dim, self.opponent_scene_dim, board["horizontalWalls"], board["verticalWalls"]))
         return all_dims
 
     def send_to_server(self, operation):
@@ -232,6 +234,7 @@ class QuoridorEnv(gym.Env):
                     x = int(loc["x"])
                     y = int(loc["y"])
                     self.player_winning_points_dim[y, x] = 1
+                    self.player_scene_dim[y, x] = 1
 
     def update_winning_locations_for_opponent(self, players):
         for player in players:
@@ -241,6 +244,7 @@ class QuoridorEnv(gym.Env):
                     x = int(loc["x"])
                     y = int(loc["y"])
                     self.opponent_winning_points_dim[y, x] = 1
+                    self.opponent_scene_dim[y, x] = 1
 
     def get_start_player_location(self, players):
         loc = (-1, -1)

@@ -86,10 +86,10 @@ class Agent:
         self.memory = deque(maxlen=2000)
 
         self.gamma = 0.85
-        self.epsilon_max = 0.8
-        self.epsilon_min = 0.1
+        self.epsilon_max = 0.9
+        self.epsilon_min = 0.15
         self.epsilon = self.epsilon_max
-        self.epsilon_decay = 0.95
+        self.epsilon_decay = 0.98
         self.tau = .125
 
         self.target_model = model

@@ -222,7 +222,7 @@ def train_better_agent(episodes):
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     pyplot.plot(history)
     os.makedirs('./walking_metrics/')
-    pyplot.savefig('./walking_metrics/walking_mae_{}.png'.format(time))
+    pyplot.savefig('./walking_metrics/walking_loss_{}.png'.format(time))
 
     return "Trained Successfully!"
 

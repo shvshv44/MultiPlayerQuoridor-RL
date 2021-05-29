@@ -118,7 +118,7 @@ class QuoridorEnv(gym.Env):
         pi = self.find_player_index(board["players"])
         self.player_location = (int(board["players"][pi]["position"]["y"]), int(board["players"][pi]["position"]["x"]))
 
-        loc = utils.define_location_label(self.player_location)
+        loc = utils.location_to_index(self.player_location)
         all_dims = np.dstack((board["horizontalWalls"], board["verticalWalls"], self.player_winning_points_dim))
         return [loc, all_dims]
 

@@ -127,7 +127,7 @@ public class PhysicalBoard {
                         wallToAdd = generateWall();
                     }
                 }
-                
+
                 putWall(wallToAdd);
                 currentWalls = currentWalls - 1;
             }

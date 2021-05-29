@@ -221,7 +221,10 @@ def train_walking_agent(episodes, max_steps):
 
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     pyplot.plot(history)
-    os.makedirs('./walking_metrics/')
+
+    if not os.path.exists('./walking_metrics/'):
+        os.makedirs('./walking_metrics/')
+        
     pyplot.savefig('./walking_metrics/walking_loss_{}.png'.format(time))
 
     return "Trained Successfully!"

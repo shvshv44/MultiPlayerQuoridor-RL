@@ -72,6 +72,7 @@ def BFS_SP(graph, start, goal):
                     if goal.count(neighbour) > 0:
                         #print("Shortest path = ", *new_path)
                         return len(new_path)
+                explored.append(node)
 
         # Condition when the nodes
         # are not connected

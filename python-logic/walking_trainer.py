@@ -9,10 +9,11 @@ import numpy as np
 
 
 class Trainer:
-    def __init__(self, agent):
+    def __init__(self, agent, max_steps=-1):
         self.agent = agent
         self.name = "WalkingTrainer"
         self.history = []
+        self.max_steps = max_steps
 
     def start_training_session(self, num_of_episodes):
         for episode_num in range(num_of_episodes):
@@ -40,6 +41,9 @@ class Trainer:
             self.agent.replay(env, self.history)  # internally iterates default (prediction) model
             self.agent.target_train()  # iterates target model
             cur_state = new_state
+
+            if (steps_num + 1) % 50 == 0:
+                print("GAME REACHED {} STEPS!".format(steps_num))
 
         print("\n\nAGENT STARTS IN LOCATION ({},{}) - GAME FINISHED IN {} STEPS!\n\n".format(start_location[0], start_location[1], steps_num))
 
@@ -78,4 +82,4 @@ class RandomWalkingTrainer(Trainer):
 
         elif json_message["type"] == "RoomStateResponse":
             if len(json_message["players"]) == 2:
-                rest_api.start_generated_game(self.game_id)
+                rest_api.start_generated_game(self.game_id, self.max_steps)

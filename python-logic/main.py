@@ -212,11 +212,11 @@ def save_walking_model():
     return "Walking Model Saved In {}".format(saved_file_name)
 
 
-@route('/TrainWalkingAgent/<episodes>', methods=['GET'])
-def train_better_agent(episodes):
+@route('/TrainWalkingAgent/<episodes>/<max_steps>', methods=['GET'])
+def train_walking_agent(episodes, max_steps):
     global walking_model
     agent = walking_costum_agent.Agent(walking_model)
-    trainer = walking_trainer.RandomWalkingTrainer(agent)
+    trainer = walking_trainer.RandomWalkingTrainer(agent, int(max_steps))
     history = trainer.start_training_session(int(episodes))
 
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
@@ -227,12 +227,12 @@ def train_better_agent(episodes):
     return "Trained Successfully!"
 
 
-@route('/TrainWalkingAgentForEver/<episodes>', methods=['GET'])
-def train_better_agent_for_ever(episodes):
+@route('/TrainWalkingAgentForEver/<episodes>/<max_steps>', methods=['GET'])
+def train_walking_agent_for_ever(episodes, max_steps):
     while True:
         global walking_model
         num_of_episodes = int(episodes)
-        train_better_agent(num_of_episodes)
+        train_walking_agent(num_of_episodes, max_steps)
         print("Finished {} iterations, saving model!".format(num_of_episodes))
         save_walking_model()
         print("Model Saved!")

@@ -27,12 +27,14 @@ public class GameManager {
     private BiMap<Player, Pawn> playerPawn;
     private final int numberOfWallsPerPlayer;
     private final String gameId;
+    private final int maxGameSteps;
 
     public BiMap<Player, Pawn> getPlayerPawn() {
         return playerPawn;
     }
 
-    public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer) {
+    public GameManager(String gameId, Collection<Player> players, int numberOfWallsPerPlayer, int maxGameSteps) {
+        this.maxGameSteps = maxGameSteps;
         this.players.addAll(players);
         // Collections.shuffle((List<?>) this.players);
         Collections.sort((List<? extends Comparable>) this.players);
@@ -86,7 +88,8 @@ public class GameManager {
         notifyStartGameToPlayers();
         trigger(new StartGameEvent(playerPawn.inverse(), this.numberOfWallsPerPlayer));
         AllShortestPaths lastASP = this.gameBoard.isAllPawnsHavePath();
-        while (!isGameEnded) {
+        int stepsNum = 0;
+        while (!isGameEnded && stepsNum != maxGameSteps) {
             Player currentPlayer = this.players.peek();
             Pawn currentPawn = playerPawn.get(currentPlayer);
             this.players.add(this.players.poll());
@@ -112,10 +115,15 @@ public class GameManager {
             }
             history.add(record);
             this.players.add(this.players.poll()); // Move the current player to the end of the queue
+            stepsNum++;
             trigger(new EndTurnEvent(currentPawn, action));
         }
 
-        trigger(new GameOverEvent(this.gameBoard.getWinner()));
+        if(this.gameBoard.getWinner() == null)
+            trigger(new GameOverEvent(this.getGameBoard().getPlayOrder().get(1))); // get the second to make the agent lose
+        else
+            trigger(new GameOverEvent(this.gameBoard.getWinner()));
+
         gameResult.setHistory(history);
         gameResult.setWinner(this.gameBoard.getWinner());
         return gameResult;

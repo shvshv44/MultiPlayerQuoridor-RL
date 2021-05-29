@@ -194,9 +194,9 @@ public class GameAPIController {
     }
 
     @CrossOrigin
-    @GetMapping("/StartGeneratedGame/{gameId}")
+    @GetMapping("/StartGeneratedGame/{gameId}/{maxSteps}")
     @ResponseBody
-    public ResponseEntity<String> startGeneratedGame(@PathVariable String gameId) {
+    public ResponseEntity<String> startGeneratedGame(@PathVariable String gameId, @PathVariable int maxSteps) {
         GameRoomState roomState = gameRoomManager.getRoomState(gameId);
         if (roomState.getPlayers().size() < Constants.MIN_NUMBER_PLAYERS)
             return createBasicBadRequestResponse("Game room must contain at least two players!");
@@ -204,7 +204,7 @@ public class GameAPIController {
         if (roomState.isGameStarted())
             return createBasicBadRequestResponse("Game is already started!");
 
-        startGeneratedRoomGame(gameId);
+        startGeneratedRoomGame(gameId, maxSteps);
         return createBasicOKResponse(gameId);
     }
 
@@ -217,10 +217,10 @@ public class GameAPIController {
         }
     }
 
-    private void startGeneratedRoomGame(String gameId) {
+    private void startGeneratedRoomGame(String gameId, int maxSteps) {
         try {
             logger.info("Starting generated game with id: " + gameId);
-            gameRoomManager.startGeneratedGame(gameId);
+            gameRoomManager.startGeneratedGame(gameId, maxSteps);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: wont work till TCPPlayer will be implemented!
         }

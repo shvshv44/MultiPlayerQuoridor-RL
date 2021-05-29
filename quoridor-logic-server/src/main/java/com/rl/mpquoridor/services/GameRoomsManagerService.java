@@ -66,16 +66,16 @@ public class GameRoomsManagerService {
 
     public void startGame(String gameId) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER, -1);
         gameRoomState.setManager(gameManager);
         gameRoomState.setGameStarted(true);
 
         CompletableFuture.supplyAsync(gameManager::run).thenAcceptAsync(MongoDB.getInstance()::save);
     }
 
-    public void startGeneratedGame(String gameId) {
+    public void startGeneratedGame(String gameId, int maxSteps) {
         GameRoomState gameRoomState = gameRooms.get(gameId);
-        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER);
+        GameManager gameManager = new GameManager(gameId, new ArrayList<>(gameRoomState.getPlayers().values()), NUMBER_OF_WALLS_PER_PLAYER, maxSteps);
         gameManager.generateGameBoard();
         gameRoomState.setManager(gameManager);
         gameRoomState.setGameStarted(true);

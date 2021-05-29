@@ -29,8 +29,8 @@ def start_game(game_id):
     return response
 
 
-def start_generated_game(game_id):
-    start_url = server + "/StartGeneratedGame/" + game_id
+def start_generated_game(game_id, max_steps):
+    start_url = server + "/StartGeneratedGame/" + game_id + "/" + max_steps
     response = http.get(start_url)
     return response
 

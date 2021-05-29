@@ -30,7 +30,7 @@ def start_game(game_id):
 
 
 def start_generated_game(game_id, max_steps):
-    start_url = server + "/StartGeneratedGame/" + game_id + "/" + max_steps
+    start_url = server + "/StartGeneratedGame/{}/{}".format(game_id, max_steps)
     response = http.get(start_url)
     return response
 

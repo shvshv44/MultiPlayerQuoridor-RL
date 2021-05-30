@@ -208,7 +208,7 @@ def save_walking_model():
     global walking_model
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./walking_models/walking_{}.h5".format(time)
-    model.save(saved_file_name)
+    walking_model.save(saved_file_name)
     return "Walking Model Saved In {}".format(saved_file_name)
 
 
@@ -224,7 +224,7 @@ def train_walking_agent(episodes, max_steps):
 
     if not os.path.exists('./walking_metrics/'):
         os.makedirs('./walking_metrics/')
-        
+
     pyplot.savefig('./walking_metrics/walking_loss_{}.png'.format(time))
 
     return "Trained Successfully!"
@@ -239,6 +239,13 @@ def train_walking_agent_for_ever(episodes, max_steps):
         print("Finished {} iterations, saving model!".format(num_of_episodes))
         save_walking_model()
         print("Model Saved!")
+
+
+@route('/LoadWalkingModel/<file_name>', methods=['GET'])
+def load_walking_model_to_path(file_name):
+    global walking_model
+    walking_model = keras.models.load_model("./walking_models/{}".format(file_name))
+    return "Model Loaded From {}".format(file_name)
 
 
 

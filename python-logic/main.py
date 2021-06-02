@@ -21,6 +21,7 @@ import rest_api
 import sys
 import walking_costum_agent
 import walking_trainer
+import walking_auto_agent
 from matplotlib import pyplot
 import os
 
@@ -57,12 +58,10 @@ walking_model = load_walking_model("")
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
 def add_agent_to_game(game_id_to_join):
-    global model
+    global walking_model
     print("adding agent to game id {}".format(game_id_to_join))
-    agent = better_costum_agent.Agent(model)
-    auto_agent = better_auto_agent.AutoAgent(agent)
-    # agent = costum_agent.Agent(model)
-    # auto_agent = AutoAgent(agent)
+    agent = walking_costum_agent.Agent(walking_model)
+    auto_agent = walking_auto_agent.AutoAgent(agent)
     auto_agent.join_game(game_id_to_join)
     return "Add agent to game id " + game_id_to_join
 

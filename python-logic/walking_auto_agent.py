@@ -1,5 +1,5 @@
 import rest_api
-from better_quoridor_env import QuoridorEnv
+from walking_quoridor_env import QuoridorEnv
 import utils
 
 

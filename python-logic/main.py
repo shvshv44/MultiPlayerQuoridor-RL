@@ -35,7 +35,7 @@ def load_better_model(file):
         return keras.models.load_model("./models/{}".format(file))
 
 #quoridor_21_05_2021__10_43_34.h5 #quoridor_22_05_2021__21_20_33
-model = load_better_model("quoridor_21_05_2021__10_43_34.h5") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
+model = load_better_model("quoridor_09_06_2021__18_03_56.h5") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
 
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
@@ -146,9 +146,13 @@ def save_model_to_path(file_name):
 @route('/RunTrain', methods=['GET'])
 def run_train():
     while True:
+        print("Random")
         train_better_agent(200)
+        print("Smart")
         train_better_agent_smart(150)
+        print("Random")
         train_better_agent(200)
+        print("Smart move")
         train_better_agent_smart_move(100)
 
 

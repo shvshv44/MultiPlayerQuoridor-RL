@@ -55,7 +55,7 @@ public class GameBoard {
 
         int isRandomLocations = rand.nextInt(100);
 
-        if (isRandomLocations > 60) {
+        if (isRandomLocations > 0) {
             ret.put(p1, new Position(0, this.getPhysicalBoard().getSize() / 2));
             ret.put(p2, new Position(this.getPhysicalBoard().getSize() - 1, this.getPhysicalBoard().getSize() / 2));
         } else {

@@ -1,6 +1,9 @@
 import logging
 from datetime import datetime
 
+from matplotlib import pyplot
+import os
+
 # do not delete imports at any cost!
 from agent import Agent
 from model import Model
@@ -35,7 +38,8 @@ def load_better_model(file):
         return keras.models.load_model("./models/{}".format(file))
 
 #quoridor_21_05_2021__10_43_34.h5 #quoridor_22_05_2021__21_20_33
-model = load_better_model("quoridor_09_06_2021__18_03_56.h5") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
+#model = load_better_model("quoridor_26_06_2021__06_29_51.h5")
+model = load_better_model("") #quoridor_19_05_2021__22_22_15.h5" #load_better_model("quoridor_19_05_2021__20_20_36.h5")
 
 
 @route('/AddAgentToGame/<game_id_to_join>', methods=['GET'])
@@ -85,6 +89,7 @@ def train_better_agent(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.RandomTrainer(agent)
     trainer.start_training_session(int(episodes))
+    print_loss(trainer.avg_history)
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./models/quoridor_{}.h5".format(time)
     model.save(saved_file_name)
@@ -98,6 +103,7 @@ def train_better_agent_smart(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.SmartTrainer(agent)
     trainer.start_training_session(int(episodes))
+    print_loss(trainer.avg_history)
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./models/quoridor_{}.h5".format(time)
     model.save(saved_file_name)
@@ -110,6 +116,7 @@ def train_better_agent_smart_move(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.SmartTrainerMoves(agent)
     trainer.start_training_session(int(episodes))
+    print_loss(trainer.avg_history)
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./models/quoridor_{}.h5".format(time)
     model.save(saved_file_name)
@@ -122,6 +129,7 @@ def train_better_agent_smart_walls(episodes):
     agent = better_costum_agent.Agent(model)
     trainer = better_trainer.SmartTrainerWalls(agent)
     trainer.start_training_session(int(episodes))
+    print_loss(trainer.avg_history)
     time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
     saved_file_name = "./models/quoridor_{}.h5".format(time)
     model.save(saved_file_name)
@@ -162,7 +170,14 @@ def load_model_to_path(file_name):
     model = keras.models.load_model("./models/{}".format(file_name))
     return "Model Loaded From {}".format(file_name)
 
+def print_loss(history):
+    time = datetime.now().strftime("%d_%m_%Y_%H%M_%S")
+    pyplot.plot(history)
 
+    if not os.path.exists('./loss_metrics/'):
+        os.makedirs('./loss_metrics/')
+
+    pyplot.savefig('./loss_metrics/loss_{}.png'.format(time))
 if __name__ == '__main__':
     run(host='0.0.0.0', port=8000, debug=True)
 

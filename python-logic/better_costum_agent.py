@@ -109,6 +109,11 @@ class Agent:
         self.random_act_epsilon = self.epsilon_max
         self.random_act_epsilon_decay = 0.99995
 
+        self.history = []
+
+    def get_history(self):
+        return self.history
+
     def act(self, state, env, location_label):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
@@ -190,7 +195,8 @@ class Agent:
                 self.alternate_model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0][
                     np.argmax(self.model.predict(self.prepare_state_to_predication(new_state, env, location_label))[0])]
                 target[0][action] = reward + Q_future * self.gamma
-            self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
+            current_history = self.model.fit(self.prepare_state_to_predication(state, env, location_label), target, epochs=1, verbose=0)
+            self.history.append(current_history.history["loss"][0])
 
     def target_train(self):
         weights = self.model.get_weights()

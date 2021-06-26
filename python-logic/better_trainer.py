@@ -11,6 +11,7 @@ from datetime import datetime
 class Trainer:
     def __init__(self, agent):
         self.agent = agent
+        self.avg_history = []
         self.name = "Trainer"
         self.overfitting_limitation_winning_games = 15  # how many winning games will be overfitting
         self.overfitting_limitation_winning_steps = 10  # how many steps will be considered good game
@@ -18,6 +19,7 @@ class Trainer:
         self.time = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
 
     def start_training_session(self, num_of_episodes):
+        self.avg_history = []
         num_of_agent_good_winning = 0
         self.sum_of_steps = 0
         self.game_number = 0
@@ -77,6 +79,8 @@ class Trainer:
             r = np.mean(r)
             print("episode number: ", self.game_number, ", reward: ", r, "steps  ", steps_num)
             self.save_info(self.game_number, r, steps_num)
+            lst = self.agent.get_history()
+            self.avg_history.append(sum(lst) / len(lst))
 
         return env.winner_name == env.player_name and steps_num <= self.overfitting_limitation_winning_steps
 
